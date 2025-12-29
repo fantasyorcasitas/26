@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Atletismo | Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css"> 
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-logo">FANTASY <span>ATLETISMO</span></div>
+        <div class="nav-links">
+            <a href="clasificaciones.html"><i class="fa-solid fa-trophy"></i> Ranking</a>
+            <a href="calendario.html"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+            <a href="mercado.html"><i class="fa-solid fa-shop"></i> Mercado</a>
+            <a href="mi_equipo.html" class="highlight-btn"><i class="fa-solid fa-users"></i> Mi Equipo</a>
+        </div>
+        <div class="user-info">
+            <span id="userNameDisplay">Cargando...</span>
+            <span class="user-money" id="userMoneyDisplay">€ ---</span>
+            <button id="btnLogout" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <h1>Bienvenido al Tartán, <span id="welcomeName" style="color: var(--primary-color);">Manager</span></h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Tu Presupuesto</h3>
+                <p id="budgetBig">--- €</p>
+            </div>
+            <div class="stat-card">
+                <h3>Puntos Totales</h3>
+                <p>0 pts</p>
+            </div>
+            <div class="stat-card">
+                <h3>Próxima Competición</h3>
+                <p>Sin datos</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "../js/firebase-config.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 1. SEGURIDAD: ¿Está logueado el usuario?
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Si está logueado, buscamos sus datos en la base de datos
+                const docRef = doc(db, "usuarios", user.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Rellenamos la página con sus datos reales
+                    document.getElementById('userNameDisplay').innerText = data.nombre_usuario;
+                    document.getElementById('welcomeName').innerText = data.nombre_usuario;
+                    
+                    // Formatear dinero (ej: 100000 -> 100.000 €)
+                    const dineroFormateado = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(data.presupuesto);
+                    
+                    document.getElementById('userMoneyDisplay').innerText = dineroFormateado;
+                    document.getElementById('budgetBig').innerText = dineroFormateado;
+                }
+            } else {
+                // Si NO está logueado, lo echamos fuera (al login)
+                window.location.href = "../index.html";
+            }
+        });
+
+        // 2. BOTÓN DE CERRAR SESIÓN
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "../index.html";
+            });
+        });
+    </script>
+
+</body>
+</html>
