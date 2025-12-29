@@ -3,84 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Atletismo | Home</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Inicio | Mi Liga</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css"> 
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-logo">FANTASY <span>ATLETISMO</span></div>
-        <div class="nav-links">
-            <a href="clasificaciones.html"><i class="fa-solid fa-trophy"></i> Ranking</a>
-            <a href="calendario.html"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
-            <a href="mercado.html"><i class="fa-solid fa-shop"></i> Mercado</a>
-            <a href="mi_equipo.html" class="highlight-btn"><i class="fa-solid fa-users"></i> Mi Equipo</a>
-        </div>
-        <div class="user-info">
-            <span id="userNameDisplay">Cargando...</span>
-            <span class="user-money" id="userMoneyDisplay">€ ---</span>
-            <button id="btnLogout" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="home.html"><i class="fa-solid fa-futbol"></i> La Liga</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="home.html">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="mi_equipo.html">Mi Equipo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="mercado.html">Mercado</a></li>
+                    <li class="nav-item"><a class="nav-link" href="clasificaciones.html">Clasificación</a></li>
+                    <li class="nav-item"><a class="nav-link" href="calendario.html">Calendario</a></li>
+                    <li class="nav-item"><a class="nav-link" href="stats.html">Stats</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="dashboard-container">
-        <h1>Bienvenido al Tartán, <span id="welcomeName" style="color: var(--primary-color);">Manager</span></h1>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Tu Presupuesto</h3>
-                <p id="budgetBig">--- €</p>
+    <div class="container">
+        <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
+            <div class="container-fluid py-2">
+                <h1 class="display-5 fw-bold">Bienvenido, Míster</h1>
+                <p class="col-md-8 fs-4">La jornada 12 comienza en 2 días. Revisa tu alineación antes del cierre de mercado.</p>
+                <a href="mi_equipo.html" class="btn btn-primary btn-lg" type="button">Gestionar Alineación</a>
             </div>
-            <div class="stat-card">
-                <h3>Puntos Totales</h3>
-                <p>0 pts</p>
+        </div>
+
+        <h3 class="mb-3">Últimas Noticias</h3>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 player-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fa-solid fa-triangle-exclamation text-warning"></i> Lesión Importante</h5>
+                        <p class="card-text">El delantero estrella se perderá los próximos 2 partidos.</p>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Próxima Competición</h3>
-                <p>Sin datos</p>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 player-card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fa-solid fa-arrow-trend-up text-success"></i> Subidas de Valor</h5>
+                        <p class="card-text">Revisa el mercado, hay jóvenes promesas subiendo de precio.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <script type="module">
-        import { auth, db } from "../js/firebase-config.js";
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // 1. SEGURIDAD: ¿Está logueado el usuario?
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Si está logueado, buscamos sus datos en la base de datos
-                const docRef = doc(db, "usuarios", user.uid);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    // Rellenamos la página con sus datos reales
-                    document.getElementById('userNameDisplay').innerText = data.nombre_usuario;
-                    document.getElementById('welcomeName').innerText = data.nombre_usuario;
-                    
-                    // Formatear dinero (ej: 100000 -> 100.000 €)
-                    const dineroFormateado = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(data.presupuesto);
-                    
-                    document.getElementById('userMoneyDisplay').innerText = dineroFormateado;
-                    document.getElementById('budgetBig').innerText = dineroFormateado;
-                }
-            } else {
-                // Si NO está logueado, lo echamos fuera (al login)
-                window.location.href = "../index.html";
-            }
-        });
-
-        // 2. BOTÓN DE CERRAR SESIÓN
-        document.getElementById('btnLogout').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = "../index.html";
-            });
-        });
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
