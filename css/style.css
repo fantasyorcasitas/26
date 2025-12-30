@@ -555,11 +555,11 @@ h1 span {
     padding-bottom: 20px;
 }
 
-/* --- ESTILOS DEL PANEL ADMIN --- */
+/* --- ESTILOS DEL PANEL DE ADMINISTRACIÓN --- */
 .admin-container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 20px 20px 80px 20px; /* Padding inferior extra */
+    padding: 20px 20px 80px 20px;
 }
 
 .admin-section {
@@ -587,6 +587,12 @@ h1 span {
 
 .full-width { grid-column: span 2; }
 
+/* En móvil, que ocupe todo el ancho */
+@media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
+}
+
 .form-grid label { 
     display: block; 
     color: #aaa; 
@@ -608,6 +614,7 @@ h1 span {
     border-color: var(--primary); 
 }
 
+/* Botones de acción */
 .btn-action {
     background: var(--primary);
     color: white;
@@ -621,12 +628,10 @@ h1 span {
     text-transform: uppercase;
     transition: 0.3s;
 }
-
 .btn-action:hover { background: #e55500; }
-
 .btn-secondary { background: #444; margin-top: 10px; }
 
-/* Caja visual de participantes */
+/* Caja visual de participantes (Lineup) */
 .lineup-box {
     background: #000;
     border: 1px dashed #666;
@@ -648,7 +653,7 @@ h1 span {
     color: white;
 }
 
-/* Botón de editar */
+/* Controles de edición (arriba del formulario) */
 .edit-controls {
     display: flex;
     gap: 10px;
@@ -658,10 +663,3 @@ h1 span {
     border-radius: 8px;
     margin-bottom: 20px;
 }
-
-@media (max-width: 768px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .full-width { grid-column: span 1; }
-    .edit-controls { flex-direction: column; }
-    .edit-controls button { width: 100%; }
-}   
