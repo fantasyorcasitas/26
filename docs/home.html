@@ -2,62 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio | Mi Liga</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Dashboard | Fantasy Athletics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="home.html"><i class="fa-solid fa-futbol"></i> La Liga</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="home.html">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mi_equipo.html">Mi Equipo</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mercado.html">Mercado</a></li>
-                    <li class="nav-item"><a class="nav-link" href="clasificaciones.html">Clasificación</a></li>
-                    <li class="nav-item"><a class="nav-link" href="calendario.html">Calendario</a></li>
-                    <li class="nav-item"><a class="nav-link" href="stats.html">Stats</a></li>
-                </ul>
-            </div>
+    <nav class="navbar">
+        <a href="#" class="nav-logo"><i class="fa-solid fa-stopwatch"></i> Fantasy <span>Athletics</span></a>
+        <div class="nav-links">
+            <a href="home.html" class="active">Inicio</a>
+            <a href="docs/mi_equipo.html">Mi Equipo</a>
+            <a href="docs/mercado.html">Mercado</a>
+            <a href="docs/clasificaciones.html">Ranking</a>
+            <a href="docs/calendario.html">Calendario</a>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span style="color: #888; font-size: 0.9rem;">Hola, <span id="userDisplay" style="color: white; font-weight: bold;">Atleta</span></span>
+            <a href="login.html" style="color: #d63031;"><i class="fa-solid fa-power-off"></i></a>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
-            <div class="container-fluid py-2">
-                <h1 class="display-5 fw-bold">Bienvenido, Míster</h1>
-                <p class="col-md-8 fs-4">La jornada 12 comienza en 2 días. Revisa tu alineación antes del cierre de mercado.</p>
-                <a href="mi_equipo.html" class="btn btn-primary btn-lg" type="button">Gestionar Alineación</a>
+    <div class="main-container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+            <div>
+                <h2 style="font-weight: 800; font-size: 2.5rem; line-height: 1;">RESUMEN <br><span style="color: var(--primary);">JORNADA 4</span></h2>
+            </div>
+            <div style="text-align: right;">
+                <p style="color: #888;">Tu Puntuación Total</p>
+                <div style="font-size: 3rem; font-weight: 800; color: white;">1,240 <span style="font-size: 1rem; color: var(--primary);">pts</span></div>
             </div>
         </div>
 
-        <h3 class="mb-3">Últimas Noticias</h3>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="card h-100 player-card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fa-solid fa-triangle-exclamation text-warning"></i> Lesión Importante</h5>
-                        <p class="card-text">El delantero estrella se perderá los próximos 2 partidos.</p>
-                    </div>
+        <div class="grid-3">
+            <div class="athlete-card" style="border-left: 4px solid var(--primary);">
+                <h3 style="margin-bottom: 10px;">Próximo Evento</h3>
+                <p style="font-size: 1.2rem; font-weight: bold;">Cto. España Absoluto</p>
+                <p style="color: #888; font-size: 0.9rem;"><i class="fa-regular fa-calendar"></i> Este Fin de Semana</p>
+                <div style="margin-top: 15px; background: rgba(255,94,0,0.1); padding: 10px; border-radius: 8px;">
+                    <small style="color: var(--primary); display: block; margin-bottom: 5px;">CIERRE DE MERCADO:</small>
+                    <strong>Viernes 23:59h</strong>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="card h-100 player-card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fa-solid fa-arrow-trend-up text-success"></i> Subidas de Valor</h5>
-                        <p class="card-text">Revisa el mercado, hay jóvenes promesas subiendo de precio.</p>
-                    </div>
-                </div>
+
+            <div class="athlete-card">
+                <h3>Mercado</h3>
+                <p style="margin-bottom: 10px;">Valores actualizados (Miércoles)</p>
+                <ul style="list-style: none; color: #aaa; font-size: 0.9rem;">
+                    <li><i class="fa-solid fa-arrow-trend-up" style="color: #00b894;"></i> Ana Peleteiro (+200k)</li>
+                    <li><i class="fa-solid fa-arrow-trend-up" style="color: #00b894;"></i> Mariano García (+150k)</li>
+                    <li><i class="fa-solid fa-arrow-trend-down" style="color: #d63031;"></i> Jordan Díaz (-50k)</li>
+                </ul>
+                <a href="docs/mercado.html" class="btn-login" style="padding: 10px; margin-top: 15px; font-size: 0.8rem; width: auto; display: inline-block;">Ir al Mercado</a>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('userDisplay').innerText = localStorage.getItem('fantasy_user') || 'Invitado';
+    </script>
 </body>
 </html>

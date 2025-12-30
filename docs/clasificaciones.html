@@ -2,65 +2,47 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clasificación</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Calendario | Fantasy Athletics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="home.html">La Liga</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="home.html">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mi_equipo.html">Mi Equipo</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mercado.html">Mercado</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="clasificaciones.html">Clasificación</a></li>
-                    <li class="nav-item"><a class="nav-link" href="calendario.html">Calendario</a></li>
-                    <li class="nav-item"><a class="nav-link" href="stats.html">Stats</a></li>
-                </ul>
-            </div>
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <nav class="navbar">
+        <a href="../home.html" class="nav-logo">Fantasy <span>Athletics</span></a>
+        <div class="nav-links">
+            <a href="../home.html">Inicio</a>
+            <a href="mi_equipo.html">Mi Equipo</a>
+            <a href="mercado.html">Mercado</a>
+            <a href="clasificaciones.html">Ranking</a>
+            <a href="calendario.html" class="active">Calendario</a>
         </div>
     </nav>
 
-    <div class="container">
-        <h2 class="mb-3">Tabla General</h2>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-header-custom">
-                    <tr>
-                        <th>Pos</th>
-                        <th>Equipo</th>
-                        <th>PJ</th>
-                        <th>PG</th>
-                        <th>Pts</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><strong>Los Galácticos</strong></td>
-                        <td>10</td>
-                        <td>8</td>
-                        <td>25</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Sporting FC</td>
-                        <td>10</td>
-                        <td>7</td>
-                        <td>22</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Rayo Vallecano</td>
-                        <td>10</td>
-                        <td>6</td>
-                        <td>20</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="main-container">
+        <h2 class="page-title">Calendario Octubre 2025</h2>
+        
+        <div class="calendar-grid">
+            <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
+            
+            <div class="cal-day">1</div>
+            <div class="cal-day">2</div>
+            <div class="cal-day" onclick="alert('Control FAM: 100m, 400m, Longitud')">
+                3
+                <div class="cal-event">Control FAM</div>
+            </div>
+            <div class="cal-day">4</div>
+            <div class="cal-day">5</div>
+            <div class="cal-day">6</div>
+            <div class="cal-day">7</div>
+            <div class="cal-day">8</div>
+            <div class="cal-day" style="border: 1px solid var(--primary);">
+                9
+                <div class="cal-event">Cto. Madrid Abs</div>
+            </div>
         </div>
     </div>
 </body>
