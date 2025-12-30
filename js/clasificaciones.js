@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// Mantenemos getDocsFromServer para evitar problemas de caché viejos
+import { getFirestore, collection, getDocsFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// TU CONFIGURACIÓN
 const firebaseConfig = {
   apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
   authDomain: "fantasy-atletismo-26.firebaseapp.com",
@@ -19,49 +19,49 @@ async function cargarRanking(coleccionNombre, bodyId) {
     tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#888;">Cargando...</td></tr>`;
 
     try {
-        const querySnapshot = await getDocs(collection(db, coleccionNombre));
+        // Forzamos la descarga real de datos
+        const querySnapshot = await getDocsFromServer(collection(db, coleccionNombre));
         let listaDatos = [];
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            let objetoLimpio = { nombre: "Desconocido", puntos: 0 };
-            let esValido = false; // Solo añadiremos si encontramos datos reales
+            let objetoLimpio = { nombre: "---", puntos: 0 };
+            let incluirEnTabla = false;
 
             if (coleccionNombre === 'usuarios') {
-                // CASO 1: Estructura Completa (Admin/Mateo)
-                // Verificamos que 'equipo' NO sea un array y tenga nombre_usuario
-                if (data.equipo && !Array.isArray(data.equipo) && data.equipo.nombre_usuario) {
-                    objetoLimpio.nombre = data.equipo.nombre_usuario;
-                    objetoLimpio.puntos = data.equipo.puntos_totales || 0;
-                    esValido = true;
+                // --- CORRECCIÓN DEFINITIVA SEGÚN TU ÚLTIMA FOTO ---
+                // Los datos están en la raíz, NO dentro de 'equipo'
+                
+                // Buscamos 'nombre_usuario' (Tu estructura nueva) O 'nombre' (Posible estructura vieja)
+                const nombreReal = data.nombre_usuario || data.nombre;
+                const puntosReales = data.puntos_totales || data.puntos || 0;
+
+                if (nombreReal) {
+                    objetoLimpio.nombre = nombreReal;
+                    objetoLimpio.puntos = puntosReales;
+                    incluirEnTabla = true;
                 }
-                // CASO 2: Estructura Antigua o Array Vacío
-                // Si 'equipo' es [] (tu lista de atletas), buscamos el nombre fuera
-                else if (data.nombre) {
-                    objetoLimpio.nombre = data.nombre;
-                    objetoLimpio.puntos = data.puntos || 0;
-                    esValido = true;
-                }
-                // Si es un usuario "fantasma" sin nombre ni datos, lo ignoramos (esValido = false)
             } else {
                 // ATLETAS
-                objetoLimpio.nombre = data.nombre || data.nombre_atleta || "Atleta";
-                objetoLimpio.puntos = data.puntos || 0;
-                esValido = true;
+                if (data.nombre || data.nombre_atleta) {
+                    objetoLimpio.nombre = data.nombre || data.nombre_atleta;
+                    objetoLimpio.puntos = data.puntos || 0;
+                    incluirEnTabla = true;
+                }
             }
             
-            if (esValido) {
+            if (incluirEnTabla) {
                 listaDatos.push(objetoLimpio);
             }
         });
 
-        // Ordenar
+        // Ordenar de Mayor a Menor
         listaDatos.sort((a, b) => b.puntos - a.puntos);
 
         tbody.innerHTML = "";
         
         if (listaDatos.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">Esperando managers...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">Esperando datos...</td></tr>`;
             return;
         }
 
@@ -86,7 +86,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
     } catch (error) {
         console.error("Error:", error);
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error de conexión.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error conexión.</td></tr>`;
     }
 }
 
