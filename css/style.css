@@ -545,11 +545,12 @@ h1 span {
 .btn-simular:hover { background: rgba(255,255,255,0.1); }
 
 /* --- CAMBIO DE POSICIÓN --- */
-.dashboard-container2 {
+/* css/style.css */
+.dashboard-container {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Esto hace que empiece arriba */
-    padding-top: 90px;       /* Distancia justa con la barra de navegación */
+    align-items: flex-start;
+    padding-top: 85px;       /* <--- CAMBIADO: Antes 100px/140px, ahora más pegado */
     padding-bottom: 20px;
 }
