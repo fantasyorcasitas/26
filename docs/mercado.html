@@ -2,10 +2,76 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mercado | Fantasy Track</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        /* --- ESTILOS RESPONSIVE PARA EL MENÚ --- */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap;
+                padding: 15px;
+            }
+
+            .nav-logo {
+                flex-grow: 1;
+            }
+
+            .menu-toggle {
+                display: block;
+                margin-left: 15px;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                margin-top: 15px;
+                background: rgba(0, 0, 0, 0.95);
+                border-radius: 8px;
+                padding: 10px;
+                border: 1px solid #333;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 15px;
+                border-bottom: 1px solid #222;
+                text-align: center;
+                width: 100%;
+                display: block;
+            }
+
+            /* Ajustes del Mercado en móvil */
+            .dashboard-container {
+                padding-top: 20px; /* Menos padding en móvil porque la barra cambia */
+            }
+            
+            h1 {
+                font-size: 1.5rem; /* Título más pequeño */
+            }
+
+            #buscadorAtleta {
+                font-size: 1rem; /* Texto legible */
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -18,31 +84,58 @@
                 <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
             </a>
         </div>
-        <div class="nav-links">
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;">
+            <i class="fa-solid fa-power-off"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html" class="active">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
             <a href="calendario.html">Calendario</a>
+            <a href="stats.html">Stats</a>
         </div>
     </nav>
 
-    <div class="dashboard-container" style="flex-direction: column; padding-top: 90px;">
+    <div class="dashboard-container" style="flex-direction: column; padding-top: 100px;">
         
         <h1 style="color:white; text-transform: uppercase; margin-bottom: 20px; text-align: center;">
-            <i class="fa-solid fa-shop"></i> Mercado de Atletas
+            <i class="fa-solid fa-shop"></i> Mercado
         </h1>
 
-        <div style="width: 100%; max-width: 1000px; margin-bottom: 20px; padding: 0 20px;">
-            <input type="text" id="buscadorAtleta" placeholder="Buscar atleta..." 
-            style="width: 100%; padding: 15px; border-radius: 8px; border: none; background: rgba(0,0,0,0.7); color: white; border: 1px solid #444;">
+        <div style="width: 100%; max-width: 600px; margin-bottom: 30px; padding: 0 20px;">
+            <div style="position: relative;">
+                <i class="fa-solid fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                <input type="text" id="buscadorAtleta" placeholder="Buscar por nombre..." 
+                style="width: 100%; padding: 15px 15px 15px 45px; border-radius: 50px; border: 1px solid #444; background: rgba(0,0,0,0.8); color: white; outline: none;">
+            </div>
         </div>
 
         <div id="mercadoGrid" class="market-grid">
-            <p style="color: white; text-align: center; grid-column: 1/-1;">Cargando mercado...</p>
+            <p style="color: white; text-align: center; grid-column: 1/-1;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Cargando mercado...
+            </p>
         </div>
 
     </div>
+
+    <script>
+        function toggleMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('fantasy_user');
+            window.location.href = '../index.html';
+        }
+    </script>
 
     <script type="module" src="../js/mercado.js"></script>
 </body>

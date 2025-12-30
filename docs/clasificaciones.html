@@ -3,11 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clasificación | Fantasy Athletics</title>
+    <title>Clasificación | Fantasy Track</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        /* --- ESTILOS RESPONSIVE (MÓVIL) --- */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Contenedor de tabla para scroll horizontal en móvil */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Suavidad en iPhone */
+        }
+
+        @media (max-width: 768px) {
+            /* Navbar Móvil */
+            .navbar {
+                flex-wrap: wrap;
+                padding: 15px;
+            }
+            .nav-logo { flex-grow: 1; }
+            .menu-toggle { display: block; margin-left: 15px; }
+            
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                margin-top: 15px;
+                background: rgba(0, 0, 0, 0.95);
+                border-radius: 8px;
+                padding: 10px;
+                border: 1px solid #333;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a {
+                padding: 15px;
+                border-bottom: 1px solid #222;
+                text-align: center;
+                width: 100%;
+                display: block;
+            }
+
+            /* Ajustes de contenido */
+            .dashboard-container {
+                padding-top: 20px !important; /* Menos espacio arriba en móvil */
+                align-items: center;
+            }
+
+            .rankings-wrapper {
+                width: 100%;
+                padding: 0 10px;
+            }
+
+            /* Tarjetas de ranking */
+            .ranking-card {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            /* Ajuste de fuente en tablas para móvil */
+            .ranking-table th, .ranking-table td {
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -19,12 +90,17 @@
             <a href="home.html" style="color:white; text-decoration:none;">
                 <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
             </a>
-            <button onclick="window.location.href='../login.html'" class="btn-logout" style="font-size: 1.2rem;">
-                <i class="fa-solid fa-power-off"></i>
-            </button>
         </div>
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;">
+            <i class="fa-solid fa-power-off"></i>
+        </button>
         
-        <div class="nav-links">
+        <div class="nav-links" id="navLinks">
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
@@ -34,42 +110,64 @@
         </div>
     </nav>
 
-    <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 100px;">
+    <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 90px;">
         
-        <div class="rankings-wrapper">
+        <div class="rankings-wrapper" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1200px;">
             
-            <div class="ranking-card">
-                <div class="ranking-title"><i class="fa-solid fa-users"></i> Managers</div>
-                <table class="ranking-table">
-                    <thead>
-                        <tr>
-                            <th class="rank-col">#</th>
-                            <th>Nombre</th>
-                            <th style="text-align: right;">Pts</th>
-                        </tr>
-                    </thead>
-                    <tbody id="managersBody">
-                        </tbody>
-                </table>
+            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 20px; border: 1px solid #333;">
+                <div class="ranking-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px;">
+                    <i class="fa-solid fa-users"></i> Managers
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="ranking-table" style="width: 100%; border-collapse: collapse; color: white;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <th class="rank-col" style="padding: 10px; text-align: center;">#</th>
+                                <th style="padding: 10px; text-align: left;">Nombre</th>
+                                <th style="padding: 10px; text-align: right;">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="managersBody">
+                            </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="ranking-card">
-                <div class="ranking-title"><i class="fa-solid fa-medal"></i> Atletas</div>
-                <table class="ranking-table">
-                    <thead>
-                        <tr>
-                            <th class="rank-col">#</th>
-                            <th>Atleta</th>
-                            <th style="text-align: right;">Pts</th>
-                        </tr>
-                    </thead>
-                    <tbody id="atletasBody">
-                        </tbody>
-                </table>
+            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 20px; border: 1px solid #333;">
+                <div class="ranking-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px;">
+                    <i class="fa-solid fa-medal"></i> Atletas
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="ranking-table" style="width: 100%; border-collapse: collapse; color: white;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #444;">
+                                <th class="rank-col" style="padding: 10px; text-align: center;">#</th>
+                                <th style="padding: 10px; text-align: left;">Atleta</th>
+                                <th style="padding: 10px; text-align: right;">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="atletasBody">
+                            </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
     </div>
+
+    <script>
+        function toggleMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('fantasy_user');
+            window.location.href = '../index.html';
+        }
+    </script>
 
     <script type="module" src="../js/clasificaciones.js"></script>
 </body>
