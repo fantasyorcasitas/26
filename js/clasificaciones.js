@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// TU CONFIGURACIÓN
 const firebaseConfig = {
   apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
   authDomain: "fantasy-atletismo-26.firebaseapp.com",
@@ -23,29 +24,47 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // CHIVATO EN CONSOLA: Pulsa F12 para ver qué datos llegan realmente
-            console.log(`Leído doc (${doc.id}):`, data);
-
             let objetoLimpio = { nombre: "---", puntos: 0 };
 
+            console.log(`🔎 Analizando doc (${doc.id}):`, data); // Mira la consola (F12)
+
             if (coleccionNombre === 'usuarios') {
-                // INTENTO 1: Buscar dentro de la carpeta 'equipo' (Tu estructura nueva)
-                if (data.equipo && data.equipo.nombre_usuario) {
-                    objetoLimpio.nombre = data.equipo.nombre_usuario;
-                    objetoLimpio.puntos = data.equipo.puntos_totales || 0;
+                // ESTRATEGIA FUERZA BRUTA: Buscar el nombre donde sea
+                
+                // 1. ¿Está dentro de 'equipo'?
+                if (data.equipo) {
+                    // Intenta leer el nombre exacto
+                    let nombre = data.equipo.nombre_usuario;
+                    let puntos = data.equipo.puntos_totales;
+
+                    // Si falla, ¿quizás el campo tiene un espacio? (Ej: "nombre_usuario ")
+                    if (!nombre) {
+                        // Buscamos cualquier clave que se parezca a 'nombre'
+                        const keys = Object.keys(data.equipo);
+                        const keyNombre = keys.find(k => k.includes("nombre")); 
+                        if (keyNombre) nombre = data.equipo[keyNombre];
+                    }
+
+                    if (nombre) {
+                        objetoLimpio.nombre = nombre;
+                        objetoLimpio.puntos = puntos || 0;
+                    } else {
+                        // Si data.equipo existe pero no tiene nombre, muéstrame qué tiene dentro
+                        objetoLimpio.nombre = "DATA: " + JSON.stringify(data.equipo);
+                        objetoLimpio.puntos = 0;
+                    }
                 } 
-                // INTENTO 2: Buscar fuera (Estructura antigua)
+                // 2. ¿Está fuera (en la raíz)?
                 else if (data.nombre) {
                     objetoLimpio.nombre = data.nombre;
                     objetoLimpio.puntos = data.puntos || 0;
-                } 
-                // FALLO: Si no hay nombre, mostramos el ID para que sepas cuál borrar
+                }
+                // 3. Fallo total: Muéstrame todo lo que hay
                 else {
-                    objetoLimpio.nombre = `⚠️ ID: ${doc.id.substring(0, 8)}...`;
-                    objetoLimpio.puntos = 0;
+                    objetoLimpio.nombre = "RAW: " + JSON.stringify(data); 
                 }
             } else {
-                // ATLETAS
+                // LOGICA ATLETAS
                 objetoLimpio.nombre = data.nombre || data.nombre_atleta || "Atleta";
                 objetoLimpio.puntos = data.puntos || 0;
             }
@@ -53,7 +72,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
             listaDatos.push(objetoLimpio);
         });
 
-        // Ordenar por puntos (Mayor a menor)
+        // Ordenar
         listaDatos.sort((a, b) => b.puntos - a.puntos);
 
         tbody.innerHTML = "";
@@ -67,9 +86,9 @@ async function cargarRanking(coleccionNombre, bodyId) {
             const tr = document.createElement('tr');
             
             let rankDisplay = index + 1;
-            if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i>';
-            if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i>';
-            if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i>';
+            if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i> ';
+            if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i> ';
+            if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i> ';
 
             tr.innerHTML = `
                 <td class="rank-col">${rankDisplay}</td>
@@ -77,7 +96,6 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 <td class="points-col">${item.puntos}</td>
             `;
             
-            // Animación suave
             tr.style.opacity = "0";
             tr.style.animation = `slideIn 0.3s ease-out forwards ${index * 0.1}s`;
             tbody.appendChild(tr);
