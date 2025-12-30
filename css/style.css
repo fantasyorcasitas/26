@@ -551,6 +551,6 @@ h1 span {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 85px;       /* <--- CAMBIADO: Antes 100px/140px, ahora más pegado */
+    padding-top: 80px;  /* <--- REDUCIDO: Antes era 90px/100px. Ahora está pegado a la barra. */
     padding-bottom: 20px;
 }

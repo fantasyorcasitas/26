@@ -1,4 +1,3 @@
-/* js/clasificaciones.js */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -24,26 +23,26 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
+            // CHIVATO EN CONSOLA: Pulsa F12 para ver qué datos llegan realmente
+            console.log(`Leído doc (${doc.id}):`, data);
+
             let objetoLimpio = { nombre: "---", puntos: 0 };
 
             if (coleccionNombre === 'usuarios') {
-                // ESTRUCTURA CON 'EQUIPO'
-                if (data.equipo) {
-                    // Intento 1: Leer el nombre normal
-                    let nombreLeido = data.equipo.nombre_usuario;
-                    
-                    // MODO RAYOS X: Si no lo encuentra, muéstrame QUÉ HAY dentro de 'equipo'
-                    if (!nombreLeido) {
-                        // Esto imprimirá algo como: {"nombre_usuario ": "Mateo"} (fíjate en los espacios)
-                        nombreLeido = "DEBUG: " + JSON.stringify(data.equipo).substring(0, 40);
-                    }
-                    
-                    objetoLimpio.nombre = nombreLeido;
+                // INTENTO 1: Buscar dentro de la carpeta 'equipo' (Tu estructura nueva)
+                if (data.equipo && data.equipo.nombre_usuario) {
+                    objetoLimpio.nombre = data.equipo.nombre_usuario;
                     objetoLimpio.puntos = data.equipo.puntos_totales || 0;
-                } else {
-                    // Si no tiene carpeta equipo (versión plana)
-                    objetoLimpio.nombre = data.nombre || "Sin carpeta equipo";
+                } 
+                // INTENTO 2: Buscar fuera (Estructura antigua)
+                else if (data.nombre) {
+                    objetoLimpio.nombre = data.nombre;
                     objetoLimpio.puntos = data.puntos || 0;
+                } 
+                // FALLO: Si no hay nombre, mostramos el ID para que sepas cuál borrar
+                else {
+                    objetoLimpio.nombre = `⚠️ ID: ${doc.id.substring(0, 8)}...`;
+                    objetoLimpio.puntos = 0;
                 }
             } else {
                 // ATLETAS
@@ -54,10 +53,9 @@ async function cargarRanking(coleccionNombre, bodyId) {
             listaDatos.push(objetoLimpio);
         });
 
-        // Ordenar
+        // Ordenar por puntos (Mayor a menor)
         listaDatos.sort((a, b) => b.puntos - a.puntos);
 
-        // Pintar
         tbody.innerHTML = "";
         
         if (listaDatos.length === 0) {
@@ -79,13 +77,14 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 <td class="points-col">${item.puntos}</td>
             `;
             
+            // Animación suave
             tr.style.opacity = "0";
             tr.style.animation = `slideIn 0.3s ease-out forwards ${index * 0.1}s`;
             tbody.appendChild(tr);
         });
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error cargando ranking:", error);
         tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error de conexión.</td></tr>`;
     }
 }
