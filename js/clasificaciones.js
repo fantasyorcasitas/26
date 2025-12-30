@@ -24,52 +24,35 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            let objetoLimpio = { nombre: "---", puntos: 0 };
-
-            console.log(`🔎 Analizando doc (${doc.id}):`, data); // Mira la consola (F12)
+            let objetoLimpio = { nombre: "Desconocido", puntos: 0 };
+            let esValido = false; // Solo añadiremos si encontramos datos reales
 
             if (coleccionNombre === 'usuarios') {
-                // ESTRATEGIA FUERZA BRUTA: Buscar el nombre donde sea
-                
-                // 1. ¿Está dentro de 'equipo'?
-                if (data.equipo) {
-                    // Intenta leer el nombre exacto
-                    let nombre = data.equipo.nombre_usuario;
-                    let puntos = data.equipo.puntos_totales;
-
-                    // Si falla, ¿quizás el campo tiene un espacio? (Ej: "nombre_usuario ")
-                    if (!nombre) {
-                        // Buscamos cualquier clave que se parezca a 'nombre'
-                        const keys = Object.keys(data.equipo);
-                        const keyNombre = keys.find(k => k.includes("nombre")); 
-                        if (keyNombre) nombre = data.equipo[keyNombre];
-                    }
-
-                    if (nombre) {
-                        objetoLimpio.nombre = nombre;
-                        objetoLimpio.puntos = puntos || 0;
-                    } else {
-                        // Si data.equipo existe pero no tiene nombre, muéstrame qué tiene dentro
-                        objetoLimpio.nombre = "DATA: " + JSON.stringify(data.equipo);
-                        objetoLimpio.puntos = 0;
-                    }
-                } 
-                // 2. ¿Está fuera (en la raíz)?
+                // CASO 1: Estructura Completa (Admin/Mateo)
+                // Verificamos que 'equipo' NO sea un array y tenga nombre_usuario
+                if (data.equipo && !Array.isArray(data.equipo) && data.equipo.nombre_usuario) {
+                    objetoLimpio.nombre = data.equipo.nombre_usuario;
+                    objetoLimpio.puntos = data.equipo.puntos_totales || 0;
+                    esValido = true;
+                }
+                // CASO 2: Estructura Antigua o Array Vacío
+                // Si 'equipo' es [] (tu lista de atletas), buscamos el nombre fuera
                 else if (data.nombre) {
                     objetoLimpio.nombre = data.nombre;
                     objetoLimpio.puntos = data.puntos || 0;
+                    esValido = true;
                 }
-                // 3. Fallo total: Muéstrame todo lo que hay
-                else {
-                    objetoLimpio.nombre = "RAW: " + JSON.stringify(data); 
-                }
+                // Si es un usuario "fantasma" sin nombre ni datos, lo ignoramos (esValido = false)
             } else {
-                // LOGICA ATLETAS
+                // ATLETAS
                 objetoLimpio.nombre = data.nombre || data.nombre_atleta || "Atleta";
                 objetoLimpio.puntos = data.puntos || 0;
+                esValido = true;
             }
             
-            listaDatos.push(objetoLimpio);
+            if (esValido) {
+                listaDatos.push(objetoLimpio);
+            }
         });
 
         // Ordenar
@@ -78,7 +61,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
         tbody.innerHTML = "";
         
         if (listaDatos.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">No hay datos.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">Esperando managers...</td></tr>`;
             return;
         }
 
@@ -86,9 +69,9 @@ async function cargarRanking(coleccionNombre, bodyId) {
             const tr = document.createElement('tr');
             
             let rankDisplay = index + 1;
-            if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i> ';
-            if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i> ';
-            if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i> ';
+            if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i>';
+            if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i>';
+            if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i>';
 
             tr.innerHTML = `
                 <td class="rank-col">${rankDisplay}</td>
@@ -102,7 +85,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
         });
 
     } catch (error) {
-        console.error("Error cargando ranking:", error);
+        console.error("Error:", error);
         tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error de conexión.</td></tr>`;
     }
 }
