@@ -2,19 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mercado | Fantasy Athletics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado | Fantasy Track</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
+
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
     <nav class="navbar">
-        <a href="../home.html" class="nav-logo">Fantasy <span>Athletics</span></a>
+        <div class="nav-logo">
+            <a href="home.html" style="color:white; text-decoration:none;">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
+            </a>
+        </div>
         <div class="nav-links">
-            <a href="../home.html">Inicio</a>
+            <a href="home.html">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html" class="active">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
@@ -22,44 +27,23 @@
         </div>
     </nav>
 
-    <div class="main-container">
-        <h2 class="page-title">Mercado de Fichajes</h2>
-        <p style="color: #aaa; margin-bottom: 20px;">Los precios se actualizan Miércoles y Domingos.</p>
+    <div class="dashboard-container" style="flex-direction: column; padding-top: 90px;">
+        
+        <h1 style="color:white; text-transform: uppercase; margin-bottom: 20px; text-align: center;">
+            <i class="fa-solid fa-shop"></i> Mercado de Atletas
+        </h1>
 
-        <table class="table-custom">
-            <thead>
-                <tr>
-                    <th>Atleta</th>
-                    <th>Prueba</th>
-                    <th>MMP / SB</th>
-                    <th>Precio</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Mondo Duplantis</strong> <i class="fa-solid fa-star" style="color: gold;"></i></td>
-                    <td>Pértiga</td>
-                    <td>6.26 WR <span style="color: #888;">(SB: 6.26)</span></td>
-                    <td style="color: var(--primary); font-weight: bold;">15.000.000 €</td>
-                    <td><button class="btn-login" style="padding: 5px 15px; font-size: 0.8rem; width: auto;">Fichar</button></td>
-                </tr>
-                <tr>
-                    <td><strong>Yulimar Rojas</strong></td>
-                    <td>Triple Salto</td>
-                    <td>15.74 WR <span style="color: #888;">(SB: --)</span></td>
-                    <td style="color: var(--primary); font-weight: bold;">13.800.000 €</td>
-                    <td><button class="btn-login" style="padding: 5px 15px; font-size: 0.8rem; width: auto;">Fichar</button></td>
-                </tr>
-                <tr>
-                    <td><strong>Asier Martínez</strong></td>
-                    <td>110m Vallas</td>
-                    <td>13.14 <span style="color: #888;">(SB: 13.25)</span></td>
-                    <td style="color: var(--primary); font-weight: bold;">6.500.000 €</td>
-                    <td><button class="btn-login" style="padding: 5px 15px; font-size: 0.8rem; width: auto;">Fichar</button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div style="width: 100%; max-width: 1000px; margin-bottom: 20px; padding: 0 20px;">
+            <input type="text" id="buscadorAtleta" placeholder="Buscar atleta..." 
+            style="width: 100%; padding: 15px; border-radius: 8px; border: none; background: rgba(0,0,0,0.7); color: white; border: 1px solid #444;">
+        </div>
+
+        <div id="mercadoGrid" class="market-grid">
+            <p style="color: white; text-align: center; grid-column: 1/-1;">Cargando mercado...</p>
+        </div>
+
     </div>
+
+    <script type="module" src="../js/mercado.js"></script>
 </body>
 </html>

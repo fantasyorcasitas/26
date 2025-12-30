@@ -663,3 +663,162 @@ h1 span {
     border-radius: 8px;
     margin-bottom: 20px;
 }
+
+/* --- ESTILOS DEL MERCADO --- */
+
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Responsivo */
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px 50px 20px;
+}
+
+.athlete-card {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+}
+
+.athlete-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 5px 15px rgba(255, 94, 0, 0.2);
+}
+
+/* Cabecera de la tarjeta: Foto Izq, Datos Der */
+.card-header-flex {
+    display: flex;
+    padding: 15px;
+    gap: 15px;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+.card-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%; /* Foto redonda */
+    border: 2px solid var(--primary);
+    background: #000;
+}
+
+.card-basic-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.card-basic-info p {
+    margin: 5px 0 0 0;
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+.card-category-badge {
+    display: inline-block;
+    background: #333;
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+/* Estadísticas principales (Total y Jornada) */
+.card-main-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-box span {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.stat-box strong {
+    font-size: 1.2rem;
+    color: white;
+}
+
+.stat-box.price strong { color: #4cd137; } /* Precio en verde */
+
+/* Botón desplegable */
+.btn-toggle-details {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-top: 1px solid #333;
+    color: var(--primary);
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.btn-toggle-details:hover {
+    background: rgba(255, 94, 0, 0.1);
+}
+
+/* Sección Oculta (Desplegable) */
+.card-details {
+    display: none; /* Oculto por defecto */
+    padding: 15px;
+    background: #111;
+    border-top: 1px solid #333;
+    animation: slideDown 0.3s ease-out;
+}
+
+.details-block {
+    margin-bottom: 15px;
+}
+
+.details-title {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 2px;
+}
+
+/* Listas de historial */
+.history-list {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.history-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.history-val { font-weight: bold; color: white; }
+.history-label { font-size: 0.65rem; color: #666; }
+
+/* Flechas de tendencia */
+.trend-up { color: #4cd137; }
+.trend-down { color: #e84118; }
+.trend-flat { color: #fbc531; }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -29,10 +29,8 @@ async function cargarRanking(coleccionNombre, bodyId) {
             let incluirEnTabla = false;
 
             if (coleccionNombre === 'usuarios') {
-                // --- CORRECCIÓN DEFINITIVA SEGÚN TU ÚLTIMA FOTO ---
-                // Los datos están en la raíz, NO dentro de 'equipo'
-                
-                // Buscamos 'nombre_usuario' (Tu estructura nueva) O 'nombre' (Posible estructura vieja)
+                // --- LÓGICA MANAGERS (USUARIOS) ---
+                // Buscamos 'nombre_usuario' o 'nombre'
                 const nombreReal = data.nombre_usuario || data.nombre;
                 const puntosReales = data.puntos_totales || data.puntos || 0;
 
@@ -42,11 +40,17 @@ async function cargarRanking(coleccionNombre, bodyId) {
                     incluirEnTabla = true;
                 }
             } else {
-                // ATLETAS
-                if (data.nombre || data.nombre_atleta) {
-                    objetoLimpio.nombre = data.nombre || data.nombre_atleta;
-                    objetoLimpio.puntos = data.puntos || 0;
-                    incluirEnTabla = true;
+                // --- LÓGICA ATLETAS (CON APELLIDOS) ---
+                const nombre = data.nombre || data.nombre_atleta || "Atleta";
+                const apellidos = data.apellidos || ""; // <--- Nuevo: Leemos apellidos
+                
+                // Juntamos Nombre + Apellido
+                objetoLimpio.nombre = `${nombre} ${apellidos}`.trim(); 
+                objetoLimpio.puntos = data.puntos || 0;
+                
+                // Incluimos en la tabla si tiene nombre válido
+                if (objetoLimpio.nombre !== "Atleta" || data.puntos !== undefined) {
+                     incluirEnTabla = true;
                 }
             }
             
@@ -97,4 +101,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const styleSheet = document.createElement("style");
 styleSheet.innerText = `@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`;
-document.head.appendChild(styleSheet);
+document.head.appendChild(styleSheet);  
