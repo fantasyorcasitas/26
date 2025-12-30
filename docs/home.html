@@ -2,67 +2,138 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard | Fantasy Athletics</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inicio | Fantasy Orcasitas</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
+
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
     <nav class="navbar">
-        <a href="#" class="nav-logo"><i class="fa-solid fa-stopwatch"></i> Fantasy <span>Athletics</span></a>
+        <div class="nav-logo">
+            <a href="home.html" style="color:white; text-decoration:none;">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
+            </a>
+            <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem;">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+        
         <div class="nav-links">
             <a href="home.html" class="active">Inicio</a>
-            <a href="docs/mi_equipo.html">Mi Equipo</a>
-            <a href="docs/mercado.html">Mercado</a>
-            <a href="docs/clasificaciones.html">Ranking</a>
-            <a href="docs/calendario.html">Calendario</a>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <span style="color: #888; font-size: 0.9rem;">Hola, <span id="userDisplay" style="color: white; font-weight: bold;">Atleta</span></span>
-            <a href="login.html" style="color: #d63031;"><i class="fa-solid fa-power-off"></i></a>
+            <a href="mi_equipo.html">Mi Equipo</a>
+            <a href="mercado.html">Mercado</a>
+            <a href="clasificaciones.html">Ranking</a>
+            <a href="calendario.html">Calendario</a>
+            <a href="stats.html">Stats</a>
         </div>
     </nav>
 
-    <div class="main-container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
-            <div>
-                <h2 style="font-weight: 800; font-size: 2.5rem; line-height: 1;">RESUMEN <br><span style="color: var(--primary);">JORNADA 4</span></h2>
-            </div>
-            <div style="text-align: right;">
-                <p style="color: #888;">Tu Puntuación Total</p>
-                <div style="font-size: 3rem; font-weight: 800; color: white;">1,240 <span style="font-size: 1rem; color: var(--primary);">pts</span></div>
-            </div>
-        </div>
+    <div class="dashboard-container">
+        
+        <div class="login-card" style="width: 100%; max-width: 600px; padding: 2rem 1rem;">
+            
+            <div id="todayDate" class="date-display">Cargando fecha...</div>
 
-        <div class="grid-3">
-            <div class="athlete-card" style="border-left: 4px solid var(--primary);">
-                <h3 style="margin-bottom: 10px;">Próximo Evento</h3>
-                <p style="font-size: 1.2rem; font-weight: bold;">Cto. España Absoluto</p>
-                <p style="color: #888; font-size: 0.9rem;"><i class="fa-regular fa-calendar"></i> Este Fin de Semana</p>
-                <div style="margin-top: 15px; background: rgba(255,94,0,0.1); padding: 10px; border-radius: 8px;">
-                    <small style="color: var(--primary); display: block; margin-bottom: 5px;">CIERRE DE MERCADO:</small>
-                    <strong>Viernes 23:59h</strong>
+            <h2 style="font-size: 1.8rem; margin-top: 15px; text-transform: uppercase;">
+                Próxima <span>Jornada</span>
+            </h2>
+            
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">
+                <i class="fa-regular fa-clock"></i> Cierre: Viernes 23:59
+            </p>
+
+            <div class="countdown-container">
+                <div class="time-box">
+                    <span class="time-number" id="days">00</span>
+                    <span class="time-label">Días</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-number" id="hours">00</span>
+                    <span class="time-label">Horas</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-number" id="minutes">00</span>
+                    <span class="time-label">Min</span>
+                </div>
+                <div class="time-box">
+                    <span class="time-number" id="seconds">00</span>
+                    <span class="time-label">Seg</span>
                 </div>
             </div>
 
-            <div class="athlete-card">
-                <h3>Mercado</h3>
-                <p style="margin-bottom: 10px;">Valores actualizados (Miércoles)</p>
-                <ul style="list-style: none; color: #aaa; font-size: 0.9rem;">
-                    <li><i class="fa-solid fa-arrow-trend-up" style="color: #00b894;"></i> Ana Peleteiro (+200k)</li>
-                    <li><i class="fa-solid fa-arrow-trend-up" style="color: #00b894;"></i> Mariano García (+150k)</li>
-                    <li><i class="fa-solid fa-arrow-trend-down" style="color: #d63031;"></i> Jordan Díaz (-50k)</li>
-                </ul>
-                <a href="docs/mercado.html" class="btn-login" style="padding: 10px; margin-top: 15px; font-size: 0.8rem; width: auto; display: inline-block;">Ir al Mercado</a>
+            <div style="margin-top: 30px;">
+                <a href="mi_equipo.html" class="btn-login" style="text-decoration: none; display: inline-flex; width: auto; padding: 12px 30px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-users-gear" style="margin-right: 8px;"></i> Gestionar Equipo
+                </a>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 0.8rem; color: #888;">
+                Usuario: <span id="userNick" style="color: var(--primary); font-weight: bold;">Invitado</span>
             </div>
         </div>
+
     </div>
 
     <script>
-        document.getElementById('userDisplay').innerText = localStorage.getItem('fantasy_user') || 'Invitado';
+        // 1. Mostrar Usuario
+        const user = localStorage.getItem('fantasy_user');
+        if(user) document.getElementById('userNick').innerText = user;
+
+        // 2. Fecha Actual
+        const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+        const today = new Date().toLocaleDateString('es-ES', dateOptions);
+        document.getElementById('todayDate').innerText = today.charAt(0).toUpperCase() + today.slice(1);
+
+        // 3. Lógica del Contador (Próximo Viernes 23:59)
+        function updateCountdown() {
+            const now = new Date();
+            const target = new Date();
+            
+            // 5 = Viernes. Calculamos cuántos días faltan.
+            let daysUntilFriday = 5 - now.getDay();
+            
+            // Si ya pasamos el viernes a las 23:59, apuntamos al de la semana que viene
+            if (daysUntilFriday < 0 || (daysUntilFriday === 0 && now.getHours() >= 23 && now.getMinutes() >= 59)) {
+                daysUntilFriday += 7;
+            }
+            
+            target.setDate(now.getDate() + daysUntilFriday);
+            target.setHours(23, 59, 59, 0);
+
+            const diff = target - now;
+
+            if (diff <= 0) {
+                // Reset a 00 si se acabó
+                ['days', 'hours', 'minutes', 'seconds'].forEach(id => document.getElementById(id).innerText = "00");
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            // Formato con ceros (05 en vez de 5)
+            document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 4. Cerrar Sesión
+        function cerrarSesion() {
+            localStorage.removeItem('fantasy_user');
+            window.location.href = '../login.html';
+        }
     </script>
 </body>
 </html>

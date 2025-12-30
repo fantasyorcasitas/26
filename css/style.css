@@ -283,13 +283,6 @@ h1 span {
     font-size: 1.1rem;
 }
 
-/* Contenido */
-.dashboard-container {
-    margin-top: 80px; /* Para no quedar bajo el navbar */
-    padding: 2rem;
-    color: white;
-}
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -298,7 +291,7 @@ h1 span {
 }
 
 .stat-card {
-    background: #1e1e1e;
+    background: #ffffff;
     padding: 20px;
     border-radius: 12px;
     border: 1px solid #333;
@@ -328,108 +321,225 @@ h1 span {
     text-shadow: 0 0 10px rgba(255, 94, 0, 0.5);
 }
 
-/* --- PEGA AQUÍ TU CSS ORIGINAL (El que me pasaste) --- */
-:root {
-    --primary: #ff5e00;       /* Naranja Neón Deportivo */
-    --primary-dark: #cc4b00;
-    --dark: #0a0a0a;
-    --glass: rgba(20, 20, 20, 0.95); /* Un poco más opaco para lectura */
-    --border: rgba(255, 255, 255, 0.1);
-    --text: #ffffff;
-    --text-muted: #888888;
-    --success: #00b894;
-    --danger: #d63031;
-    --gold: #f1c40f;
-}
+/* --- AÑADIR AL FINAL DE STYLE.CSS --- */
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-body { background-color: var(--dark); color: var(--text); min-height: 100vh; }
+/* --- CORRECCIÓN BARRA DE NAVEGACIÓN --- */
 
-/* Fondos */
-.bg-image {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
-    z-index: -2; transform: scale(1.05);
-}
-.bg-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.85) 100%);
-    z-index: -1; backdrop-filter: blur(4px);
-}
-
-/* --- ESTILOS DE LOGIN (Tus estilos) --- */
-.login-wrapper { width: 100%; max-width: 420px; padding: 20px; margin: 10vh auto; }
-.login-card {
-    background: var(--glass); padding: 3rem 2rem; border-radius: 24px;
-    border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    text-align: center; position: relative; overflow: hidden;
-}
-.login-card::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-    background: linear-gradient(90deg, transparent, var(--primary), transparent);
-}
-.icon-circle {
-    width: 70px; height: 70px; background: rgba(255, 94, 0, 0.1);
-    border-radius: 50%; display: flex; justify-content: center; align-items: center;
-    margin: 0 auto 20px; border: 1px solid var(--primary); box-shadow: 0 0 15px rgba(255, 94, 0, 0.3);
-}
-.icon-circle i { font-size: 30px; color: var(--primary); }
-h1 { font-weight: 800; font-size: 2rem; color: var(--text); text-transform: uppercase; letter-spacing: -1px; margin-bottom: 20px;}
-h1 span { color: var(--primary); }
-.input-container { position: relative; margin-bottom: 20px; }
-.input-container .icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-.input-container input {
-    width: 100%; background: rgba(0,0,0,0.3); border: 2px solid #333;
-    padding: 16px 20px 16px 55px; border-radius: 12px; color: var(--text);
-    font-size: 1rem; font-weight: 600; transition: all 0.3s ease;
-}
-.input-container input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 15px rgba(255, 94, 0, 0.1); }
-.btn-login {
-    width: 100%; padding: 18px; background: var(--primary); color: white;
-    border: none; border-radius: 12px; font-size: 1rem; font-weight: 800;
-    text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
-}
-.btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 94, 0, 0.2); }
-
-/* --- NAVBAR (Global) --- */
+/* 1. Asegurar fondo oscuro en la barra */
 .navbar {
-    position: fixed; top: 0; left: 0; right: 0;
-    background: rgba(10, 10, 10, 0.95); border-bottom: 1px solid var(--border);
-    padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+    background-color: #0a0a0a !important; /* Negro oscuro */
+    border-bottom: 1px solid rgba(255, 94, 0, 0.3); /* Línea sutil naranja */
 }
-.nav-logo { font-weight: 900; font-size: 1.2rem; color: white; text-decoration: none; text-transform: uppercase; }
-.nav-logo span { color: var(--primary); }
-.nav-links { display: flex; gap: 20px; }
-.nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.9rem; text-transform: uppercase;}
-.nav-links a:hover, .nav-links a.active { color: var(--primary); }
 
-/* --- CONTENIDO INTERNO --- */
-.main-container { margin-top: 80px; padding: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
-.page-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; border-left: 5px solid var(--primary); padding-left: 15px; text-transform: uppercase;}
-
-/* Tablas Oscuras */
-.table-custom { width: 100%; border-collapse: collapse; margin-bottom: 2rem; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; }
-.table-custom th { background: rgba(255, 94, 0, 0.15); color: var(--primary); padding: 15px; text-align: left; text-transform: uppercase; font-size: 0.85rem; }
-.table-custom td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; }
-.table-custom tr:hover { background: rgba(255,255,255,0.05); }
-
-/* Tarjetas de Atletas */
-.athlete-card {
-    background: rgba(30, 30, 30, 0.6); border: 1px solid #333; border-radius: 15px;
-    padding: 20px; position: relative; transition: transform 0.3s;
+/* 2. Forzar texto BLANCO en los enlaces del menú */
+.nav-links a {
+    color: #ffffff !important; /* Texto blanco */
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    opacity: 0.8; /* Un pelín transparente para estilo */
 }
-.athlete-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-.athlete-card .role { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
-.athlete-card .name { font-size: 1.2rem; font-weight: bold; margin: 5px 0; }
-.athlete-card .price { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
-.captain-badge { position: absolute; top: 10px; right: 10px; color: var(--gold); font-size: 1.2rem; }
 
-/* Grid Sistema */
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.alert-box { background: rgba(255, 94, 0, 0.1); border: 1px solid var(--primary); padding: 15px; border-radius: 10px; margin-bottom: 20px; color: var(--text); }
+/* 3. Cuando pasas el ratón o es la página activa -> NARANJA */
+.nav-links a:hover, 
+.nav-links a.active {
+    color: #ff5e00 !important; /* Naranja Neón */
+    opacity: 1;
+    background: rgba(255, 94, 0, 0.1); /* Fondo suave naranja opcional */
+}
 
-/* Calendario */
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; }
-.cal-day { background: rgba(255,255,255,0.05); min-height: 100px; padding: 10px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
-.cal-day:hover { background: rgba(255,255,255,0.1); }
-.cal-event { font-size: 0.75rem; background: var(--primary); color: black; padding: 2px 5px; border-radius: 3px; margin-top: 5px; font-weight: bold; }
+/* 4. El Logo también blanco */
+.nav-logo, .nav-logo a {
+    color: #ffffff !important;
+
+}
+
+/* --- CORRECCIONES FINALES --- */
+
+/* 1. POSICIÓN: Centrado pero "tirando para arriba" */
+.dashboard-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: flex-start; /* Alineado arriba (no en el centro vertical) */
+    padding-top: 140px; /* Empujamos un poco hacia abajo desde la barra */
+    padding-bottom: 20px;
+}
+
+/* 2. BOTÓN APAGADO: Naranja Neón */
+.btn-logout {
+    background: transparent;
+    border: none;
+    color: var(--primary) !important; /* FORZAR NARANJA */
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: transform 0.2s;
+    margin-left: 10px; /* Un poco de aire */
+}
+
+.btn-logout:hover {
+    color: white !important;
+    transform: scale(1.1);
+    text-shadow: 0 0 10px var(--primary);
+}
+
+/* 3. CONTADOR: Diseño "Reloj Digital" Horizontal */
+.countdown-container {
+    display: flex;
+    flex-direction: row; /* Forzar que vayan en fila, no lista */
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap; /* En móviles muy pequeños permite que baje si no cabe */
+}
+
+.time-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6); /* Fondo más oscuro para contraste */
+    border: 1px solid var(--primary); /* Borde naranja fino */
+    box-shadow: 0 0 15px rgba(255, 94, 0, 0.1); /* Brillo suave */
+    border-radius: 12px;
+    width: 80px;  /* Ancho fijo para que queden cuadrados */
+    height: 85px;
+    padding: 5px;
+}
+
+.time-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white; /* Número blanco para leer mejor */
+    line-height: 1;
+}
+
+.time-label {
+    color: var(--primary); /* Texto "Días" en naranja */
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+/* Ajuste móvil para que no se rompa el reloj */
+@media (max-width: 480px) {
+    .time-box {
+        width: 65px;
+        height: 70px;
+    }
+    .time-number {
+        font-size: 1.6rem;
+    }
+    .time-label {
+        font-size: 0.6rem;
+    }
+    .dashboard-container {
+        padding-top: 110px; /* Un poco más arriba en móvil */
+    }
+}
+/* --- CORRECCIÓN DE COLOR DE TEXTO FINAL --- */
+
+/* Fuerza que TODO el texto dentro de la tarjeta central sea blanco */
+.login-card {
+    color: #ffffff !important;
+}
+
+/* Fuerza que la fecha sea blanca específicamente (por si acaso) */
+.date-display {
+    color: #ffffff !important;
+}
+
+/* El subtítulo de "Próxima Jornada" (Cierre: Viernes...) */
+.login-card p {
+    color: #cccccc !important; /* Blanco un poco más apagado para jerarquía */
+}
+
+/* --- ESTILOS DE CLASIFICACIONES --- */
+
+.rankings-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* En móvil se pone columna (uno debajo de otro), en PC fila */
+    flex-wrap: wrap; 
+}
+
+.ranking-card {
+    background: rgba(20, 20, 20, 0.9); /* Fondo oscuro semitransparente */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    flex: 1; /* Ocupan el mismo espacio */
+    min-width: 300px; /* Ancho mínimo para que no se aplasten */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.ranking-title {
+    text-align: center;
+    color: var(--primary);
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 10px;
+}
+
+/* Diseño de la Tabla */
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ranking-table th {
+    text-align: left;
+    color: #888;
+    font-size: 0.8rem;
+    padding: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ranking-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: white;
+    font-weight: 600;
+}
+
+/* Columna de Puntos (Naranja) */
+.points-col {
+    color: var(--primary) !important;
+    font-weight: 800 !important;
+    text-align: right;
+}
+
+/* Columna Puesto (Centrada) */
+.rank-col {
+    text-align: center;
+    width: 50px;
+}
+
+/* Medallas para los 3 primeros */
+.medal-1 { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); } /* Oro */
+.medal-2 { color: #C0C0C0; } /* Plata */
+.medal-3 { color: #CD7F32; } /* Bronce */
+
+/* Botón simulación (solo para demo) */
+.btn-simular {
+    display: block;
+    margin: 20px auto;
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.btn-simular:hover { background: rgba(255,255,255,0.1); }

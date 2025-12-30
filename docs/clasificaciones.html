@@ -2,48 +2,136 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Calendario | Fantasy Athletics</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clasificación | Fantasy Athletics</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
+
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
     <nav class="navbar">
-        <a href="../home.html" class="nav-logo">Fantasy <span>Athletics</span></a>
+        <div class="nav-logo">
+            <a href="home.html" style="color:white; text-decoration:none;">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
+            </a>
+            <button onclick="window.location.href='../login.html'" class="btn-logout" style="font-size: 1.2rem;">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+        
         <div class="nav-links">
-            <a href="../home.html">Inicio</a>
+            <a href="home.html">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
-            <a href="clasificaciones.html">Ranking</a>
-            <a href="calendario.html" class="active">Calendario</a>
+            <a href="clasificaciones.html" class="active">Ranking</a>
+            <a href="calendario.html">Calendario</a>
+            <a href="stats.html">Stats</a>
         </div>
     </nav>
 
-    <div class="main-container">
-        <h2 class="page-title">Calendario Octubre 2025</h2>
+    <div class="dashboard-container" style="flex-direction: column; align-items: center;">
         
-        <div class="calendar-grid">
-            <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div>
+        <button onclick="simularCambios()" class="btn-simular"><i class="fa-solid fa-shuffle"></i> Simular cambio de puntos</button>
+
+        <div class="rankings-wrapper">
             
-            <div class="cal-day">1</div>
-            <div class="cal-day">2</div>
-            <div class="cal-day" onclick="alert('Control FAM: 100m, 400m, Longitud')">
-                3
-                <div class="cal-event">Control FAM</div>
+            <div class="ranking-card">
+                <div class="ranking-title"><i class="fa-solid fa-users"></i> Managers</div>
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th class="rank-col">#</th>
+                            <th>Nombre</th>
+                            <th style="text-align: right;">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="managersBody">
+                        </tbody>
+                </table>
             </div>
-            <div class="cal-day">4</div>
-            <div class="cal-day">5</div>
-            <div class="cal-day">6</div>
-            <div class="cal-day">7</div>
-            <div class="cal-day">8</div>
-            <div class="cal-day" style="border: 1px solid var(--primary);">
-                9
-                <div class="cal-event">Cto. Madrid Abs</div>
+
+            <div class="ranking-card">
+                <div class="ranking-title"><i class="fa-solid fa-medal"></i> Atletas</div>
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th class="rank-col">#</th>
+                            <th>Atleta</th>
+                            <th style="text-align: right;">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="atletasBody">
+                        </tbody>
+                </table>
             </div>
+
         </div>
     </div>
+
+    <script>
+        // DATOS INICIALES (Simulando base de datos)
+        let managers = [
+            { nombre: "UsainBoltFan", pts: 1250 },
+            { nombre: "RayoVallecano", pts: 1400 },
+            { nombre: "AnaPeleteiroTeam", pts: 980 },
+            { nombre: "MaratonMan", pts: 1150 },
+            { nombre: "PistaCubierta", pts: 1320 }
+        ];
+
+        let atletas = [
+            { nombre: "Jakob Ingebrigtsen", pts: 250 },
+            { nombre: "Yulimar Rojas", pts: 210 },
+            { nombre: "Mondo Duplantis", pts: 300 },
+            { nombre: "Femke Bol", pts: 180 },
+            { nombre: "Noah Lyles", pts: 150 }
+        ];
+
+        // Función para renderizar una tabla
+        function renderTable(data, bodyId) {
+            // 1. ORDENAR AUTOMÁTICAMENTE (De mayor a menor puntos)
+            data.sort((a, b) => b.pts - a.pts);
+
+            const tbody = document.getElementById(bodyId);
+            tbody.innerHTML = ""; // Limpiar tabla actual
+
+            // 2. CREAR FILAS
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                
+                // Lógica de medallas para los 3 primeros
+                let rankDisplay = index + 1;
+                if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i>';
+                if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i>';
+                if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i>';
+
+                tr.innerHTML = `
+                    <td class="rank-col">${rankDisplay}</td>
+                    <td>${item.nombre}</td>
+                    <td class="points-col">${item.pts}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Función para simular que los puntos cambian (Para ver el efecto)
+        function simularCambios() {
+            // Sumar o restar puntos aleatorios a managers y atletas
+            managers.forEach(m => m.pts += Math.floor(Math.random() * 100) - 20);
+            atletas.forEach(a => a.pts += Math.floor(Math.random() * 50) - 10);
+            
+            // Volver a pintar las tablas (se ordenarán solas)
+            renderTable(managers, 'managersBody');
+            renderTable(atletas, 'atletasBody');
+        }
+
+        // Cargar tablas al inicio
+        renderTable(managers, 'managersBody');
+        renderTable(atletas, 'atletasBody');
+    <script type="module" src="../js/clasificaciones.js"></script>
 </body>
 </html>
