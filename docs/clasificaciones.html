@@ -34,10 +34,8 @@
         </div>
     </nav>
 
-    <div class="dashboard-container" style="flex-direction: column; align-items: center;">
+    <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 100px;">
         
-        <button onclick="simularCambios()" class="btn-simular"><i class="fa-solid fa-shuffle"></i> Simular cambio de puntos</button>
-
         <div class="rankings-wrapper">
             
             <div class="ranking-card">
@@ -73,65 +71,6 @@
         </div>
     </div>
 
-    <script>
-        // DATOS INICIALES (Simulando base de datos)
-        let managers = [
-            { nombre: "UsainBoltFan", pts: 1250 },
-            { nombre: "RayoVallecano", pts: 1400 },
-            { nombre: "AnaPeleteiroTeam", pts: 980 },
-            { nombre: "MaratonMan", pts: 1150 },
-            { nombre: "PistaCubierta", pts: 1320 }
-        ];
-
-        let atletas = [
-            { nombre: "Jakob Ingebrigtsen", pts: 250 },
-            { nombre: "Yulimar Rojas", pts: 210 },
-            { nombre: "Mondo Duplantis", pts: 300 },
-            { nombre: "Femke Bol", pts: 180 },
-            { nombre: "Noah Lyles", pts: 150 }
-        ];
-
-        // Función para renderizar una tabla
-        function renderTable(data, bodyId) {
-            // 1. ORDENAR AUTOMÁTICAMENTE (De mayor a menor puntos)
-            data.sort((a, b) => b.pts - a.pts);
-
-            const tbody = document.getElementById(bodyId);
-            tbody.innerHTML = ""; // Limpiar tabla actual
-
-            // 2. CREAR FILAS
-            data.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                
-                // Lógica de medallas para los 3 primeros
-                let rankDisplay = index + 1;
-                if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i>';
-                if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i>';
-                if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i>';
-
-                tr.innerHTML = `
-                    <td class="rank-col">${rankDisplay}</td>
-                    <td>${item.nombre}</td>
-                    <td class="points-col">${item.pts}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Función para simular que los puntos cambian (Para ver el efecto)
-        function simularCambios() {
-            // Sumar o restar puntos aleatorios a managers y atletas
-            managers.forEach(m => m.pts += Math.floor(Math.random() * 100) - 20);
-            atletas.forEach(a => a.pts += Math.floor(Math.random() * 50) - 10);
-            
-            // Volver a pintar las tablas (se ordenarán solas)
-            renderTable(managers, 'managersBody');
-            renderTable(atletas, 'atletasBody');
-        }
-
-        // Cargar tablas al inicio
-        renderTable(managers, 'managersBody');
-        renderTable(atletas, 'atletasBody');
     <script type="module" src="../js/clasificaciones.js"></script>
 </body>
 </html>
