@@ -543,3 +543,13 @@ h1 span {
     font-size: 0.8rem;
 }
 .btn-simular:hover { background: rgba(255,255,255,0.1); }
+
+/* --- CAMBIO DE POSICIÓN --- */
+.dashboard-container2 {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Esto hace que empiece arriba */
+    padding-top: 90px;       /* Distancia justa con la barra de navegación */
+    padding-bottom: 20px;
+}

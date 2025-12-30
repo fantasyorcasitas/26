@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// TU CONFIGURACIÓN (Fantasy Atletismo 26)
+// TU CONFIGURACIÓN
 const firebaseConfig = {
   apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
   authDomain: "fantasy-atletismo-26.firebaseapp.com",
@@ -16,28 +16,33 @@ const db = getFirestore(app);
 
 async function cargarRanking(coleccionNombre, bodyId) {
     const tbody = document.getElementById(bodyId);
+    
+    // Mensaje de carga limpio
     tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#888;">Cargando...</td></tr>`;
 
     try {
-        // 1. Traemos TODOS los documentos de la colección
+        // 1. Descargar datos
         const querySnapshot = await getDocs(collection(db, coleccionNombre));
-        
         let listaDatos = [];
 
-        // 2. Procesamos los datos para sacar lo que nos interesa
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            
-            let objetoLimpio = { nombre: "Desconocido", puntos: 0 };
+            console.log("Datos leídos:", data); // Para que veas en la consola qué lee
 
+            let objetoLimpio = { nombre: "---", puntos: 0 };
+
+            // --- AQUÍ ESTÁ LA CLAVE PARA QUE SALGA TU NOMBRE ---
             if (coleccionNombre === 'usuarios') {
-                // LÓGICA ESPECÍFICA PARA TU ESTRUCTURA "EQUIPO"
+                // Si existe el campo 'equipo', entramos dentro
                 if (data.equipo) {
-                    objetoLimpio.nombre = data.equipo.nombre_usuario || "Sin Nombre";
+                    objetoLimpio.nombre = data.equipo.nombre_usuario || "Usuario sin nombre";
                     objetoLimpio.puntos = data.equipo.puntos_totales || 0;
+                } else {
+                    // Si por algún casual el dato estuviera fuera (versiones viejas)
+                    objetoLimpio.nombre = data.nombre || "Error Datos";
                 }
             } else {
-                // Para atletas (si la estructura es simple)
+                // Para Atletas (estructura simple)
                 objetoLimpio.nombre = data.nombre || data.nombre_atleta || "Atleta";
                 objetoLimpio.puntos = data.puntos || 0;
             }
@@ -45,10 +50,10 @@ async function cargarRanking(coleccionNombre, bodyId) {
             listaDatos.push(objetoLimpio);
         });
 
-        // 3. Ordenamos nosotros mismos (Mayor a menor puntos)
+        // 2. Ordenar de mayor a menor puntos
         listaDatos.sort((a, b) => b.puntos - a.puntos);
 
-        // 4. Pintamos la tabla
+        // 3. Pintar tabla
         tbody.innerHTML = "";
         
         if (listaDatos.length === 0) {
@@ -79,7 +84,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
         });
 
     } catch (error) {
-        console.error("Error cargando ranking:", error);
+        console.error("Error:", error);
         tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error de conexión.</td></tr>`;
     }
 }
