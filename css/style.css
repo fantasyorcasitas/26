@@ -822,3 +822,86 @@ h1 span {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- GRÁFICOS DEL MERCADO --- */
+
+/* 1. GRÁFICO DE BARRAS (Puntos) */
+.chart-bar-container {
+    display: flex;
+    align-items: flex-end; /* Alinea las barras abajo */
+    justify-content: space-between;
+    height: 100px; /* Altura del gráfico */
+    padding-top: 20px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 10px;
+}
+
+.bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 15%; /* Ancho de cada columna */
+    position: relative;
+}
+
+.bar {
+    width: 100%;
+    background: var(--primary); /* Naranja */
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: flex-start; /* Texto arriba dentro de la barra */
+    justify-content: center;
+    transition: height 0.5s ease;
+    min-height: 20px; /* Para que siempre se vea algo si es 0 */
+}
+
+.bar span {
+    color: black;
+    font-weight: bold;
+    font-size: 0.75rem;
+    margin-top: 5px; /* Separación del techo de la barra */
+}
+
+.bar-label {
+    margin-top: 5px;
+    font-size: 0.7rem;
+    color: #888;
+}
+
+/* 2. GRÁFICO DE LÍNEA (Precio - SVG) */
+.chart-line-container {
+    width: 100%;
+    height: 100px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 5px;
+    position: relative;
+    padding: 10px 0;
+}
+
+svg.price-chart {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.price-line {
+    fill: none;
+    stroke: var(--primary); /* Línea Naranja */
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.price-dot {
+    fill: #111;
+    stroke: var(--primary);
+    stroke-width: 2;
+}
+
+.price-text {
+    fill: white;
+    font-size: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    text-anchor: middle; /* Centrar texto */
+}

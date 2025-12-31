@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// TU CONFIGURACIÓN
 const firebaseConfig = {
   apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
   authDomain: "fantasy-atletismo-26.firebaseapp.com",
@@ -14,12 +13,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- 1. FUNCIÓN PRINCIPAL CARGAR MERCADO ---
+// --- CARGAR MERCADO ---
 async function cargarMercado() {
     const grid = document.getElementById('mercadoGrid');
     const inputBuscador = document.getElementById('buscadorAtleta');
     
-    grid.innerHTML = '<p style="color:white;">Cargando atletas...</p>';
+    grid.innerHTML = '<p style="color:white; text-align:center;">Cargando atletas...</p>';
 
     try {
         const querySnapshot = await getDocs(collection(db, "atletas"));
@@ -27,17 +26,13 @@ async function cargarMercado() {
 
         querySnapshot.forEach((doc) => {
             let data = doc.data();
-            data.id = doc.id; // Guardamos el ID por si acaso
+            data.id = doc.id;
             atletas.push(data);
         });
 
-        // Ordenar por precio (Los más caros primero)
         atletas.sort((a, b) => b.precio - a.precio);
-
-        // Renderizar
         renderizarAtletas(atletas, grid);
 
-        // --- 2. FUNCIONALIDAD DEL BUSCADOR ---
         inputBuscador.addEventListener('keyup', (e) => {
             const termino = e.target.value.toLowerCase();
             const filtrados = atletas.filter(atleta => 
@@ -49,41 +44,58 @@ async function cargarMercado() {
 
     } catch (error) {
         console.error("Error mercado:", error);
-        grid.innerHTML = '<p style="color:red;">Error al cargar datos.</p>';
+        grid.innerHTML = '<p style="color:red; text-align:center;">Error al cargar datos.</p>';
     }
 }
 
-// --- 3. FUNCIÓN PARA DIBUJAR LAS TARJETAS ---
+// --- RENDERIZAR TARJETAS ---
 function renderizarAtletas(lista, contenedor) {
     contenedor.innerHTML = "";
 
     if (lista.length === 0) {
-        contenedor.innerHTML = '<p style="color:#aaa;">No se encontraron atletas.</p>';
+        contenedor.innerHTML = '<p style="color:#aaa; text-align:center;">No se encontraron atletas.</p>';
         return;
     }
 
     lista.forEach(atleta => {
-        // DATOS SIMULADOS (Hasta que la BD tenga historial real)
-        // Simulamos 5 puntuaciones recientes
+        // 1. DATOS SIMULADOS (PUNTOS)
+        // Usamos datos aleatorios si no hay histórico real
         const histPuntos = [
-            Math.floor(Math.random() * 50),
-            Math.floor(Math.random() * 50),
-            Math.floor(Math.random() * 50),
-            Math.floor(Math.random() * 50),
-            atleta.puntos_ultima_jornada || 0 // El último es real si existe
+            Math.floor(Math.random() * 40) + 10,
+            Math.floor(Math.random() * 40) + 10,
+            Math.floor(Math.random() * 40) + 10,
+            Math.floor(Math.random() * 40) + 10,
+            atleta.puntos_ultima_jornada || Math.floor(Math.random() * 40)
         ];
 
-        // Simulamos progresión de valor (Ej: 90M -> 91M -> 89M...)
-        const precioBase = atleta.precio;
-        const histValor = [
-            precioBase - 2,
-            precioBase - 1,
-            precioBase + 1,
-            precioBase,
-            precioBase // El actual
-        ];
+        // 2. DATOS SIMULADOS (PRECIO)
+        const p = atleta.precio;
+        const histValor = [ p - 2, p - 3, p - 1, p + 1, p ]; // Simulación de curva
 
-        // Crear Tarjeta HTML
+        // --- GENERADOR DE GRÁFICO DE BARRAS (HTML) ---
+        // Buscamos el valor máximo para calcular el 100% de altura (ej: si el max es 50pts)
+        const maxPuntosChart = Math.max(...histPuntos, 50); 
+        
+        const barrasHTML = histPuntos.map((pt, i) => {
+            // Regla de tres: Si maxPuntosChart es 100%, pt es X%
+            let altura = (pt / maxPuntosChart) * 100;
+            if (altura < 20) altura = 20; // Mínimo para que quepa el número
+            
+            return `
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: ${altura}%;">
+                        <span>${pt}</span>
+                    </div>
+                    <div class="bar-label">J${i+1}</div>
+                </div>
+            `;
+        }).join('');
+
+        // --- GENERADOR DE GRÁFICO DE LÍNEA (SVG) ---
+        const svgHTML = generarGraficoLinea(histValor);
+
+
+        // --- CREAR TARJETA ---
         const card = document.createElement('div');
         card.className = 'athlete-card';
 
@@ -101,53 +113,36 @@ function renderizarAtletas(lista, contenedor) {
 
             <div class="card-main-stats">
                 <div class="stat-box">
-                    <span>Total Pts</span>
+                    <span>Total</span>
                     <strong>${atleta.puntos || 0}</strong>
                 </div>
                 <div class="stat-box">
-                    <span>Últ. Jornada</span>
+                    <span>Última</span>
                     <strong>${atleta.puntos_ultima_jornada || 0}</strong>
                 </div>
                 <div class="stat-box">
                     <span>Media</span>
-                    <strong>${((atleta.puntos || 0) / 5).toFixed(1)}</strong>
+                    <strong>${((atleta.puntos || 0)/5).toFixed(1)}</strong>
                 </div>
             </div>
 
             <button class="btn-toggle-details" onclick="toggleDetails(this)">
-                Ver estadísticas <i class="fa-solid fa-chevron-down"></i>
+                Ver análisis <i class="fa-solid fa-chart-simple"></i>
             </button>
 
             <div class="card-details">
                 
                 <div class="details-block">
-                    <div class="details-title">Puntos últ. 5 Jornadas</div>
-                    <div class="history-list">
-                        ${histPuntos.map((pt, i) => `
-                            <div class="history-item">
-                                <span class="history-val">${pt}</span>
-                                <span class="history-label">J${i+1}</span>
-                            </div>
-                        `).join('')}
+                    <div class="details-title">Rendimiento (Últ. 5)</div>
+                    <div class="chart-bar-container">
+                        ${barrasHTML}
                     </div>
                 </div>
 
                 <div class="details-block" style="margin-bottom:0;">
-                    <div class="details-title">Evolución Valor (M)</div>
-                    <div class="history-list">
-                        ${histValor.map((val, i) => {
-                            // Calcular flecha
-                            let icon = '<i class="fa-solid fa-minus trend-flat"></i>';
-                            if(i > 0 && val > histValor[i-1]) icon = '<i class="fa-solid fa-arrow-trend-up trend-up"></i>';
-                            if(i > 0 && val < histValor[i-1]) icon = '<i class="fa-solid fa-arrow-trend-down trend-down"></i>';
-                            
-                            return `
-                                <div class="history-item">
-                                    <span class="history-val" style="font-size:0.8rem;">${val}M</span>
-                                    <span class="history-label">${icon}</span>
-                                </div>
-                            `;
-                        }).join('')}
+                    <div class="details-title">Evolución Valor</div>
+                    <div class="chart-line-container">
+                        ${svgHTML}
                     </div>
                 </div>
 
@@ -158,21 +153,52 @@ function renderizarAtletas(lista, contenedor) {
     });
 }
 
-// Función global para el botón de acordeón
+// --- FUNCIÓN MATEMÁTICA PARA EL SVG DE PRECIOS ---
+function generarGraficoLinea(datos) {
+    const width = 100; // Unidades SVG (porcentaje relativo)
+    const height = 100;
+    
+    // Encontrar min y max para escalar el gráfico verticalmente
+    const minVal = Math.min(...datos) - 1; // Un poco de margen abajo
+    const maxVal = Math.max(...datos) + 1; // Un poco de margen arriba
+    const range = maxVal - minVal;
+
+    // Calcular coordenadas (x, y)
+    // X va de 10 a 90 para dejar margen a los lados
+    const points = datos.map((val, i) => {
+        const x = (i / (datos.length - 1)) * 80 + 10; 
+        // Y se invierte porque en SVG 0 es arriba y 100 abajo
+        const y = 100 - ((val - minVal) / range) * 80 - 10; 
+        return { x, y, val };
+    });
+
+    // Crear la línea polilínea
+    const polylinePoints = points.map(p => `${p.x},${p.y}`).join(' ');
+
+    // Crear puntos y textos
+    const dotsAndText = points.map(p => `
+        <circle cx="${p.x}%" cy="${p.y}%" r="3" class="price-dot" />
+        <text x="${p.x}%" y="${p.y - 12}%" class="price-text">${p.val}M</text>
+    `).join('');
+
+    return `
+        <svg class="price-chart" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polyline points="${polylinePoints}" class="price-line" vector-effect="non-scaling-stroke"/>
+            ${dotsAndText}
+        </svg>
+    `;
+}
+
+// GLOBAL: Acordeón
 window.toggleDetails = function(btn) {
     const details = btn.nextElementSibling;
-    const icon = btn.querySelector('i');
-    
     if (details.style.display === "block") {
         details.style.display = "none";
-        icon.className = "fa-solid fa-chevron-down";
-        btn.innerHTML = 'Ver estadísticas <i class="fa-solid fa-chevron-down"></i>';
+        btn.innerHTML = 'Ver análisis <i class="fa-solid fa-chart-simple"></i>';
     } else {
         details.style.display = "block";
-        icon.className = "fa-solid fa-chevron-up";
         btn.innerHTML = 'Ocultar <i class="fa-solid fa-chevron-up"></i>';
     }
 };
 
-// INICIAR
 document.addEventListener('DOMContentLoaded', cargarMercado);
