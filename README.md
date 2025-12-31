@@ -1,12 +1,12 @@
-### 🏃‍♂️ Fantasy Orcasitas
+# 🏃‍♂️ Fantasy Orcasitas
 Fantasy Track es una aplicación web de gestión deportiva (Fantasy Manager) enfocada en el mundo del atletismo. Los usuarios pueden crear su propio equipo de atletas, gestionar un presupuesto dinámico, competir en ligas y seguir los resultados de competiciones reales en tiempo real.
 
 
 ## 🚀 Características Principales
 👤 Para el Usuario (Manager)
-# Gestión de Equipo: Selección de 3 atletas titulares con formación visual tipo pizarra.
+### Gestión de Equipo: Selección de 3 atletas titulares con formación visual tipo pizarra.
 
-# Economía Realista:
+### Economía Realista:
 
 Presupuesto inicial de 100M.
 
@@ -14,13 +14,13 @@ Sistema de deuda permitida (hasta un 7% del patrimonio).
 
 Mercado de fichajes con buscador y filtros.
 
-# Estadísticas Avanzadas:
+### Estadísticas Avanzadas:
 
 Gráficas de rendimiento (puntos últimas 5 jornadas).
 
 Gráficas de evolución de valor de mercado.
 
-# Competición:
+### Competición:
 
 Ranking de Managers y Atletas.
 
@@ -31,7 +31,7 @@ Diseño Responsive: Interfaz 100% adaptada a móviles (Menú hamburguesa, tablas
 ## 🛡️ Para el Administrador
 Panel de Control (secret.html): Acceso restringido por rol de usuario.
 
-# Gestión de Base de Datos:
+### Gestión de Base de Datos:
 
 Crear y editar Atletas (Foto, Precio, Categoría).
 
