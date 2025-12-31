@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- ESTILOS RESPONSIVE PARA EL MENÚ --- */
+        /* --- ESTILOS RESPONSIVE (MÓVIL) --- */
         .menu-toggle {
             display: none;
             background: none;
@@ -20,21 +20,16 @@
             cursor: pointer;
         }
 
+        /* Ajuste específico para las tarjetas en móvil */
         @media (max-width: 768px) {
+            /* NAVBAR MÓVIL */
             .navbar {
                 flex-wrap: wrap;
                 padding: 15px;
             }
-
-            .nav-logo {
-                flex-grow: 1;
-            }
-
-            .menu-toggle {
-                display: block;
-                margin-left: 15px;
-            }
-
+            .nav-logo { flex-grow: 1; }
+            .menu-toggle { display: block; margin-left: 15px; }
+            
             .nav-links {
                 display: none;
                 width: 100%;
@@ -45,11 +40,7 @@
                 padding: 10px;
                 border: 1px solid #333;
             }
-
-            .nav-links.active {
-                display: flex;
-            }
-
+            .nav-links.active { display: flex; }
             .nav-links a {
                 padding: 15px;
                 border-bottom: 1px solid #222;
@@ -58,17 +49,27 @@
                 display: block;
             }
 
-            /* Ajustes del Mercado en móvil */
+            /* CUERPO Y GRID MÓVIL */
             .dashboard-container {
-                padding-top: 20px; /* Menos padding en móvil porque la barra cambia */
-            }
-            
-            h1 {
-                font-size: 1.5rem; /* Título más pequeño */
+                padding-top: 20px !important;
             }
 
+            h1 { font-size: 1.5rem; }
+
+            /* Grid: Forzamos 1 columna y quitamos tamaños fijos grandes */
+            .market-grid {
+                grid-template-columns: 1fr !important; /* Una sola columna */
+                padding: 0 10px 80px 10px !important; /* Espacio lateral pequeño */
+                gap: 15px;
+            }
+
+            .athlete-card {
+                width: 100%; /* Que ocupe todo el ancho disponible */
+            }
+
+            /* Ajuste del buscador */
             #buscadorAtleta {
-                font-size: 1rem; /* Texto legible */
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -103,17 +104,17 @@
         </div>
     </nav>
 
-    <div class="dashboard-container" style="flex-direction: column; padding-top: 100px;">
+    <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 90px;">
         
         <h1 style="color:white; text-transform: uppercase; margin-bottom: 20px; text-align: center;">
             <i class="fa-solid fa-shop"></i> Mercado
         </h1>
 
-        <div style="width: 100%; max-width: 600px; margin-bottom: 30px; padding: 0 20px;">
+        <div style="width: 100%; max-width: 600px; margin-bottom: 25px; padding: 0 15px;">
             <div style="position: relative;">
                 <i class="fa-solid fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888;"></i>
-                <input type="text" id="buscadorAtleta" placeholder="Buscar por nombre..." 
-                style="width: 100%; padding: 15px 15px 15px 45px; border-radius: 50px; border: 1px solid #444; background: rgba(0,0,0,0.8); color: white; outline: none;">
+                <input type="text" id="buscadorAtleta" placeholder="Buscar atleta..." 
+                style="width: 100%; padding: 12px 15px 12px 45px; border-radius: 50px; border: 1px solid #444; background: rgba(0,0,0,0.8); color: white; outline: none;">
             </div>
         </div>
 
