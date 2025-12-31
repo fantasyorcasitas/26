@@ -15,49 +15,62 @@ const db = getFirestore(app);
 
 // --- VARIABLES DE ESTADO ---
 let currentUserData = null;
-let allAthletes = []; // Catálogo completo
-let myTeam = []; // Array de objetos atletas seleccionados actualmente
-let initialTeamValue = 0; // Valor del equipo al cargar la página (para calcular cambios)
-let totalPatrimony = 0; // Presupuesto + Valor Equipo Inicial
-let currentBudget = 0; // Presupuesto dinámico
+let allAthletes = []; 
+let myTeam = []; 
+let totalPatrimony = 0; 
+let currentBudget = 0; 
 let isMarketClosed = false;
 
 // --- 1. VERIFICAR MERCADO CERRADO ---
 function checkMarketStatus() {
     const now = new Date();
-    const day = now.getDay(); // 0 Domingo, 1 Lunes, 2 Martes, ..., 6 Sábado
+    const day = now.getDay(); 
     const hour = now.getHours();
 
     // Sábado (6), Domingo (0), Lunes (1) -> CERRADO
     // Martes (2) antes de las 10:00 -> CERRADO
     if (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 10)) {
         isMarketClosed = true;
-        document.getElementById('marketClosedMsg').style.display = 'flex';
-        document.getElementById('btnSaveTeam').disabled = true;
-        document.getElementById('btnSaveTeam').innerText = "MERCADO CERRADO";
+        const msg = document.getElementById('marketClosedMsg');
+        const btn = document.getElementById('btnSaveTeam');
+        if(msg) msg.style.display = 'flex';
+        if(btn) {
+            btn.disabled = true;
+            btn.innerText = "MERCADO CERRADO";
+        }
         return false;
     }
     return true;
 }
 
-// --- 2. CARGAR DATOS ---
+// --- 2. CARGAR DATOS (INIT) ---
 async function init() {
+    // A. SEGURIDAD: Comprobamos si hay usuario
     const userNick = localStorage.getItem('fantasy_user');
+    
+    console.log("--> Iniciando Mi Equipo. Usuario detectado:", userNick);
+
     if (!userNick) {
-        window.location.href = '../login.html';
+        console.warn("⛔ No estás logueado. Redirigiendo a la portada...");
+        alert("Debes iniciar sesión para gestionar tu equipo.");
+        window.location.href = '../index.html'; // CORREGIDO: Te manda al index (login)
         return;
     }
 
-    // A. Comprobar Horario
+    // B. Comprobar Horario
     checkMarketStatus();
 
     try {
-        // B. Cargar Usuario
+        // C. Cargar datos del Usuario desde Firebase
         const userDoc = await getDoc(doc(db, "usuarios", userNick));
-        if (!userDoc.exists()) return;
+        
+        if (!userDoc.exists()) {
+            console.error("El usuario no existe en la BD.");
+            return;
+        }
         currentUserData = userDoc.data();
 
-        // C. Cargar TODOS los atletas (para tener precios actualizados)
+        // D. Cargar TODOS los atletas
         const athSnap = await getDocs(collection(db, "atletas"));
         allAthletes = [];
         athSnap.forEach(d => {
@@ -66,16 +79,14 @@ async function init() {
             allAthletes.push(a);
         });
 
-        // D. Reconstruir Equipo Actual
-        // El usuario tiene un array de IDs en 'equipo'
+        // E. Reconstruir Equipo Actual
         const savedTeamIds = currentUserData.equipo || []; 
-        
-        // Convertimos IDs en objetos reales con precio ACTUALIZADO
-        myTeam = savedTeamIds.map(id => allAthletes.find(a => a.id === id)).filter(a => a); // Filtramos nulos por si se borró un atleta
+        // Convertimos IDs en objetos reales
+        myTeam = savedTeamIds.map(id => allAthletes.find(a => a.id === id)).filter(a => a);
 
-        // E. Cálculos Financieros Iniciales
-        // Patrimonio = Dinero en Caja + Valor de Jugadores que ya tienes
-        initialTeamValue = myTeam.reduce((sum, p) => sum + p.precio, 0);
+        // F. Cálculos Financieros Iniciales
+        // Patrimonio Total = Lo que tienes en caja + Lo que valen tus jugadores hoy
+        const initialTeamValue = myTeam.reduce((sum, p) => sum + p.precio, 0);
         totalPatrimony = (currentUserData.presupuesto || 0) + initialTeamValue;
 
         updateUI();
@@ -85,98 +96,97 @@ async function init() {
     }
 }
 
-// --- 3. ACTUALIZAR INTERFAZ Y CÁLCULOS ---
+// --- 3. ACTUALIZAR INTERFAZ ---
 function updateUI() {
-    // 1. Calcular Coste del Equipo Seleccionado Actualmente
+    // Coste actual de los 3 (o menos) jugadores seleccionados
     const currentTeamCost = myTeam.reduce((sum, p) => sum + p.precio, 0);
     
-    // 2. Calcular Presupuesto Restante
+    // Presupuesto Restante = Patrimonio - Coste Equipo
     currentBudget = totalPatrimony - currentTeamCost;
 
-    // 3. Validar Deuda (Regla del 7%)
-    // Límite de deuda = 7% del Presupuesto (asumimos presupuesto base 100M o patrimonio?)
-    // El usuario dijo: "Si tengo 100M puedo quedarme hasta -7M".
-    // Usaremos el Patrimonio Total como referencia de "lo que tienes".
+    // Regla del 7%: Deuda máxima permitida
     const maxDebt = totalPatrimony * 0.07; 
     const isValidDebt = currentBudget >= -maxDebt;
 
-    // 4. Renderizar Barra Presupuesto
+    // Pintar Barra Presupuesto
     const budgetEl = document.getElementById('budgetValue');
-    budgetEl.innerText = currentBudget.toFixed(1) + "M";
+    if(budgetEl) {
+        budgetEl.innerText = currentBudget.toFixed(1) + "M";
+        budgetEl.className = 'budget-value ' + (currentBudget < 0 ? 'negative' : 'positive');
+    }
     
-    // Colores y Avisos
+    // Avisos de Deuda
     const warningEl = document.getElementById('debtWarning');
-    const btnSave = document.getElementById('btnSaveTeam');
-
-    budgetEl.className = 'budget-value ' + (currentBudget < 0 ? 'negative' : 'positive');
-
-    if (currentBudget < 0) {
-        warningEl.style.display = 'block';
-        if (isValidDebt) {
-            warningEl.innerText = `⚠️ En deuda (Permitido hasta -${maxDebt.toFixed(1)}M)`;
-            warningEl.style.color = "orange";
+    if(warningEl) {
+        if (currentBudget < 0) {
+            warningEl.style.display = 'block';
+            if (isValidDebt) {
+                warningEl.innerText = `⚠️ En deuda (Ok hasta -${maxDebt.toFixed(1)}M)`;
+                warningEl.style.color = "orange";
+            } else {
+                warningEl.innerText = `⛔ Deuda excesiva (Máx -${maxDebt.toFixed(1)}M)`;
+                warningEl.style.color = "red";
+            }
         } else {
-            warningEl.innerText = `⛔ Deuda excesiva (Máx -${maxDebt.toFixed(1)}M)`;
-            warningEl.style.color = "red";
+            warningEl.style.display = 'none';
         }
-    } else {
-        warningEl.style.display = 'none';
     }
 
-    // 5. Renderizar Slots del Equipo (Arriba)
+    // Pintar Slots (Huecos)
     const slotsContainer = document.getElementById('teamSlots');
-    slotsContainer.innerHTML = "";
-
-    // Siempre pintamos 3 huecos
-    for (let i = 0; i < 3; i++) {
-        const player = myTeam[i];
-        const div = document.createElement('div');
-        
-        if (player) {
-            // Hueco Lleno
-            div.className = "team-slot filled";
-            div.innerHTML = `
-                <button class="btn-remove-player" onclick="removePlayer('${player.id}')">X</button>
-                <img src="${player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" class="slot-player-img">
-                <div class="slot-player-name">${player.nombre}</div>
-                <div class="slot-player-price">${player.precio}M</div>
-            `;
-        } else {
-            // Hueco Vacío
-            div.className = "team-slot";
-            div.innerHTML = `<span style="color:#444; font-size:2rem;">+</span><span style="color:#666; font-size:0.8rem;">Vacío</span>`;
+    if(slotsContainer) {
+        slotsContainer.innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+            const player = myTeam[i];
+            const div = document.createElement('div');
+            
+            if (player) {
+                div.className = "team-slot filled";
+                div.innerHTML = `
+                    <button class="btn-remove-player" onclick="removePlayer('${player.id}')">X</button>
+                    <img src="${player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" class="slot-player-img">
+                    <div class="slot-player-name">${player.nombre}</div>
+                    <div class="slot-player-price">${player.precio}M</div>
+                `;
+            } else {
+                div.className = "team-slot";
+                div.innerHTML = `<span style="color:#444; font-size:2rem;">+</span><span style="color:#666; font-size:0.8rem;">Vacío</span>`;
+            }
+            slotsContainer.appendChild(div);
         }
-        slotsContainer.appendChild(div);
     }
 
-    // 6. Renderizar Mercado (Abajo)
+    // Renderizar Mercado
     renderMarket();
 
-    // 7. Activar/Desactivar Botón Guardar
-    if (isMarketClosed) {
-        btnSave.disabled = true;
-    } else {
-        // Se puede guardar si:
-        // a) El equipo está lleno (3 jugadores) O incompleto (se permite guardar incompleto?) -> Asumimos que sí.
-        // b) La deuda es válida
-        if (!isValidDebt) {
+    // Botón Guardar
+    const btnSave = document.getElementById('btnSaveTeam');
+    if(btnSave) {
+        if (isMarketClosed) {
             btnSave.disabled = true;
-            btnSave.innerText = "DEUDA EXCESIVA";
         } else {
-            btnSave.disabled = false;
-            btnSave.innerText = "GUARDAR CAMBIOS";
+            if (!isValidDebt) {
+                btnSave.disabled = true;
+                btnSave.innerText = "DEUDA EXCESIVA";
+            } else {
+                btnSave.disabled = false;
+                btnSave.innerText = "GUARDAR CAMBIOS";
+            }
         }
     }
 }
 
-// --- 4. RENDERIZAR LISTA DE MERCADO ---
+// --- 4. RENDERIZAR MERCADO ---
 function renderMarket() {
     const container = document.getElementById('marketList');
-    const searchTerm = document.getElementById('marketSearch').value.toLowerCase();
+    const searchInput = document.getElementById('marketSearch');
+    if(!container) return;
+
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
     
     container.innerHTML = "";
 
-    // Filtramos: Que NO esté ya en mi equipo Y que coincida con búsqueda
+    // Filtramos jugadores disponibles
     const availablePlayers = allAthletes.filter(a => {
         const inTeam = myTeam.find(p => p.id === a.id);
         const matchesName = a.nombre.toLowerCase().includes(searchTerm) || a.apellidos.toLowerCase().includes(searchTerm);
@@ -190,7 +200,6 @@ function renderMarket() {
         const item = document.createElement('div');
         item.className = "market-item";
         
-        // Comprobar si podemos ficharlo (si hay hueco)
         const canBuy = myTeam.length < 3 && !isMarketClosed;
 
         item.innerHTML = `
@@ -207,7 +216,7 @@ function renderMarket() {
     });
 }
 
-// --- 5. ACCIONES (Globales para HTML) ---
+// --- 5. ACCIONES GLOBALES (Para que funcione el onclick del HTML) ---
 
 window.addPlayer = (id) => {
     if (myTeam.length >= 3) return;
@@ -228,36 +237,36 @@ window.filtrarMercado = () => {
 };
 
 // --- 6. GUARDAR EN FIREBASE ---
-document.getElementById('btnSaveTeam').addEventListener('click', async () => {
-    const btn = document.getElementById('btnSaveTeam');
-    btn.innerText = "Guardando...";
-    btn.disabled = true;
+const saveBtn = document.getElementById('btnSaveTeam');
+if(saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+        const btn = document.getElementById('btnSaveTeam');
+        btn.innerText = "Guardando...";
+        btn.disabled = true;
 
-    try {
-        const userNick = localStorage.getItem('fantasy_user');
-        
-        // Guardamos:
-        // 1. Array de IDs
-        const teamIds = myTeam.map(p => p.id);
-        
-        // 2. Nuevo Presupuesto (Lo que queda en caja)
-        // OJO: Si entra en negativo válido (-5M), se guarda así.
-        
-        await updateDoc(doc(db, "usuarios", userNick), {
-            equipo: teamIds,
-            presupuesto: Number(currentBudget.toFixed(1)) // Guardamos el float limpio
-        });
+        try {
+            const userNick = localStorage.getItem('fantasy_user');
+            
+            // 1. Array de IDs
+            const teamIds = myTeam.map(p => p.id);
+            
+            // 2. Nuevo Presupuesto
+            await updateDoc(doc(db, "usuarios", userNick), {
+                equipo: teamIds,
+                presupuesto: Number(currentBudget.toFixed(1))
+            });
 
-        alert("✅ Equipo guardado correctamente.");
+            alert("✅ Equipo guardado correctamente.");
+            window.location.reload();
 
-    } catch (error) {
-        console.error(error);
-        alert("Error al guardar.");
-    } finally {
-        // Recargar para confirmar datos
-        window.location.reload();
-    }
-});
+        } catch (error) {
+            console.error(error);
+            alert("Error al guardar: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "GUARDAR CAMBIOS";
+        }
+    });
+}
 
-// Arrancar
+// ARRANCAR
 document.addEventListener('DOMContentLoaded', init);
