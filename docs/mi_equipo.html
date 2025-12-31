@@ -6,20 +6,168 @@
     <title>Mi Equipo | Fantasy Track</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../css/style.css">
+
     <style>
-        /* Ajustes menores específicos */
-        html, body { overflow-y: auto !important; min-height: 100vh; }
-        .dashboard-container { padding-top: 20px !important; padding-bottom: 100px; }
+        /* --- ESTILOS "CLEAN" ESPECÍFICOS --- */
+        
+        /* Ajustes generales */
+        html, body { 
+            overflow-y: auto !important; 
+            min-height: 100vh; 
+            background-color: #0a0a0a; /* Fondo muy oscuro */
+        }
+        
+        .dashboard-container { 
+            padding-top: 0 !important; /* El padding lo gestiona la barra sticky */
+            padding-bottom: 120px; /* Espacio para el botón flotante */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* NAVBAR MÓVIL */
         .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
         @media (max-width: 768px) {
-            .navbar { flex-wrap: wrap; padding: 15px; }
+            .navbar { flex-wrap: wrap; padding: 15px; position:relative; z-index: 1001; }
             .nav-logo { flex-grow: 1; }
             .menu-toggle { display: block; margin-left: 15px; }
             .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); border-radius: 8px; padding: 10px; border: 1px solid #333; }
             .nav-links.active { display: flex; }
             .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
         }
+
+        /* 1. BARRA PRESUPUESTO "CLEAN" (Sticky) */
+        .budget-header {
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.85); /* Semitransparente */
+            backdrop-filter: blur(10px); /* Efecto cristal */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .budget-content {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .budget-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .budget-number {
+            font-size: 1.8rem;
+            font-weight: 300; /* Fuente fina y elegante */
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .budget-number.positive { color: #4cd137; }
+        .budget-number.negative { color: #e84118; }
+
+        .debt-pill {
+            background: rgba(232, 65, 24, 0.2);
+            color: #e84118;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: none; /* Se activa con JS */
+            border: 1px solid rgba(232, 65, 24, 0.5);
+        }
+
+        /* 2. CAMPO DE JUEGO MINIMALISTA */
+        .pitch-area {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 500px;
+            padding: 0 20px;
+        }
+
+        .pitch-bg {
+            background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 30px 20px;
+            position: relative;
+            /* Líneas sutiles del campo */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* 3. BOTÓN GUARDAR FLOTANTE (Estilo App) */
+        .fab-save-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .btn-save-fab {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(255, 94, 0, 0.3);
+            transition: transform 0.2s, background 0.2s;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-save-fab:active { transform: scale(0.98); }
+        .btn-save-fab:disabled { background: #444; color: #888; box-shadow: none; }
+
+        /* Estilos heredados del dibujo (Formación) */
+        .formation-wrapper { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .formation-row { display: flex; justify-content: center; gap: 30px; width: 100%; }
+
+        .player-card-slot {
+            width: 90px; height: 130px; /* Un pelín más pequeño para que quepa bien */
+            background: rgba(255,255,255,0.03);
+            border: 2px dashed #444;
+            border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .player-card-slot.filled { border: 2px solid var(--primary); background: #1a1a1a; cursor: default; }
+        .slot-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .slot-name { font-size: 0.7rem; color: white; font-weight: bold; text-align: center; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 80px; }
+        .slot-price { font-size: 0.65rem; color: #4cd137; margin-bottom: 5px; }
+
+        /* Botoncitos dentro de la carta */
+        .card-actions { display: flex; gap: 5px; margin-top: 5px; }
+        .btn-mini { border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.6rem; cursor: pointer; font-weight: bold; }
+        .btn-remove { background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: 1px solid #ff3b30; }
+        .btn-captain { background: transparent; color: #666; border: 1px solid #666; }
+        .btn-captain.active { background: #f1c40f; color: black; border-color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.4); }
+
     </style>
 </head>
 <body>
@@ -51,37 +199,42 @@
         </div>
     </nav>
 
-    <div class="budget-bar">
-        <div class="budget-info">
-            <span class="budget-label">Presupuesto</span>
-            <span id="budgetValue" class="budget-value">---M</span>
-            <span id="debtWarning" class="debt-warning" style="display:none;"></span>
+    <div class="budget-header">
+        <div class="budget-content">
+            <div style="display:flex; flex-direction:column;">
+                <span class="budget-label">Presupuesto</span>
+                <span id="budgetValue" class="budget-number">---</span>
+            </div>
+            
+            <div id="debtWarning" class="debt-pill">
+                ⚠️ EN DEUDA
+            </div>
         </div>
-        </div>
+    </div>
 
-    <div class="dashboard-container" style="flex-direction: column;">
+    <div class="dashboard-container">
         
-        <h2 style="text-align: center; color: white; margin-bottom: 20px; text-transform: uppercase;">Alineación</h2>
+        <div class="pitch-area">
+            <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                Tu Alineación
+            </div>
 
-        <div class="pitch-container">
-            <div class="formation-wrapper">
-                
-                <div class="formation-row">
-                    <div id="slot0" class="player-card-slot">
-                        </div>
+            <div class="pitch-bg">
+                <div class="formation-wrapper">
+                    <div class="formation-row">
+                        <div id="slot0" class="player-card-slot"></div>
+                    </div>
+                    <div class="formation-row">
+                        <div id="slot1" class="player-card-slot"></div>
+                        <div id="slot2" class="player-card-slot"></div>
+                    </div>
                 </div>
-
-                <div class="formation-row">
-                    <div id="slot1" class="player-card-slot"></div>
-                    <div id="slot2" class="player-card-slot"></div>
-                </div>
-
             </div>
         </div>
 
-        <div style="width: 100%; max-width: 500px; margin: 0 auto;">
-            <button id="btnSaveTeam" class="btn-action" style="width: 100%; font-size: 1.2rem;">
-                GUARDAR EQUIPO
+        <div class="fab-save-container">
+            <button id="btnSaveTeam" class="btn-save-fab">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
             </button>
         </div>
 
@@ -90,16 +243,14 @@
     <div id="playerModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="color:white; margin:0;">Seleccionar Jugador</h3>
+                <h3 style="color:white; margin:0; font-size:1.1rem;">Seleccionar Jugador</h3>
                 <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
             </div>
-            
             <div style="padding:10px; background:#1a1a1a;">
-                <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar..." 
-                       style="width:100%; padding:10px; border-radius:5px; border:1px solid #333; background:#000; color:white;">
+                <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar atleta..." 
+                       style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#000; color:white; outline:none;">
             </div>
-
-            <div id="modalPlayerList" class="modal-body">
+            <div id="modalPlayerList" class="modal-body" style="max-height: 60vh;">
                 </div>
         </div>
     </div>

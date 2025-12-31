@@ -10,7 +10,20 @@
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- ESTILOS RESPONSIVE (MÓVIL) --- */
+        /* --- 1. SOLUCIÓN AL SCROLL BLOQUEADO --- */
+        html, body {
+            overflow-y: auto !important; /* Permite deslizar verticalmente siempre */
+            height: auto !important;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            height: auto !important; /* Que crezca según el contenido */
+            padding-bottom: 80px !important; /* Espacio extra abajo */
+            overflow: visible !important;
+        }
+
+        /* --- 2. ESTILOS RESPONSIVE (MÓVIL) --- */
         .menu-toggle {
             display: none;
             background: none;
@@ -23,16 +36,14 @@
         /* Contenedor de tabla para scroll horizontal en móvil */
         .table-responsive {
             width: 100%;
-            overflow-x: auto;
+            overflow-x: auto; /* Si la tabla es ancha, desliza lateralmente */
             -webkit-overflow-scrolling: touch; /* Suavidad en iPhone */
+            margin-bottom: 0;
         }
 
         @media (max-width: 768px) {
             /* Navbar Móvil */
-            .navbar {
-                flex-wrap: wrap;
-                padding: 15px;
-            }
+            .navbar { flex-wrap: wrap; padding: 15px; }
             .nav-logo { flex-grow: 1; }
             .menu-toggle { display: block; margin-left: 15px; }
             
@@ -47,34 +58,31 @@
                 border: 1px solid #333;
             }
             .nav-links.active { display: flex; }
-            .nav-links a {
-                padding: 15px;
-                border-bottom: 1px solid #222;
-                text-align: center;
-                width: 100%;
-                display: block;
-            }
+            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
 
             /* Ajustes de contenido */
             .dashboard-container {
-                padding-top: 20px !important; /* Menos espacio arriba en móvil */
+                padding-top: 20px !important;
+                flex-direction: column;
                 align-items: center;
             }
 
             .rankings-wrapper {
+                flex-direction: column; /* Una tabla debajo de otra */
                 width: 100%;
-                padding: 0 10px;
+                padding: 0 15px;
             }
 
             /* Tarjetas de ranking */
             .ranking-card {
                 width: 100%;
-                margin-bottom: 20px;
+                margin-bottom: 25px;
+                padding: 15px !important; /* Menos padding interno */
             }
 
-            /* Ajuste de fuente en tablas para móvil */
+            /* Texto más pequeño en tablas móvil */
             .ranking-table th, .ranking-table td {
-                padding: 10px 8px;
+                padding: 10px 5px;
                 font-size: 0.85rem;
             }
         }
@@ -106,25 +114,30 @@
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html" class="active">Ranking</a>
             <a href="calendario.html">Calendario</a>
+            <a href="stats.html">Stats</a>
         </div>
     </nav>
 
     <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 90px;">
         
+        <h1 style="color:white; text-transform: uppercase; margin-bottom: 30px; text-align: center;">
+            <i class="fa-solid fa-chart-line"></i> Clasificaciones
+        </h1>
+
         <div class="rankings-wrapper" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1200px;">
             
-            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 20px; border: 1px solid #333;">
+            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 25px; border: 1px solid #333;">
                 <div class="ranking-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px;">
-                    <i class="fa-solid fa-users"></i> Managers
+                    <i class="fa-solid fa-users"></i> Liga Managers
                 </div>
                 
                 <div class="table-responsive">
                     <table class="ranking-table" style="width: 100%; border-collapse: collapse; color: white;">
                         <thead>
                             <tr style="border-bottom: 1px solid #444;">
-                                <th class="rank-col" style="padding: 10px; text-align: center;">#</th>
-                                <th style="padding: 10px; text-align: left;">Nombre</th>
-                                <th style="padding: 10px; text-align: right;">Pts</th>
+                                <th class="rank-col" style="padding: 10px; text-align: center; width: 50px;">#</th>
+                                <th style="padding: 10px; text-align: left;">Manager</th>
+                                <th style="padding: 10px; text-align: right; width: 70px;">Pts</th>
                             </tr>
                         </thead>
                         <tbody id="managersBody">
@@ -133,18 +146,18 @@
                 </div>
             </div>
 
-            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 20px; border: 1px solid #333;">
+            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 25px; border: 1px solid #333;">
                 <div class="ranking-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px;">
-                    <i class="fa-solid fa-medal"></i> Atletas
+                    <i class="fa-solid fa-medal"></i> Ranking Atletas
                 </div>
                 
                 <div class="table-responsive">
                     <table class="ranking-table" style="width: 100%; border-collapse: collapse; color: white;">
                         <thead>
                             <tr style="border-bottom: 1px solid #444;">
-                                <th class="rank-col" style="padding: 10px; text-align: center;">#</th>
+                                <th class="rank-col" style="padding: 10px; text-align: center; width: 50px;">#</th>
                                 <th style="padding: 10px; text-align: left;">Atleta</th>
-                                <th style="padding: 10px; text-align: right;">Pts</th>
+                                <th style="padding: 10px; text-align: right; width: 70px;">Pts</th>
                             </tr>
                         </thead>
                         <tbody id="atletasBody">
