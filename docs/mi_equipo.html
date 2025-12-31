@@ -2,91 +2,103 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Equipo | Fantasy Athletics</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Equipo | Fantasy Track</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css"> </head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        /* Ajustes responsive específicos para este HTML */
+        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        
+        /* Asegurar scroll */
+        html, body { overflow-y: auto !important; min-height: 100vh; }
+        .dashboard-container { padding-top: 20px !important; padding-bottom: 100px; }
+
+        @media (max-width: 768px) {
+            .navbar { flex-wrap: wrap; padding: 15px; }
+            .nav-logo { flex-grow: 1; }
+            .menu-toggle { display: block; margin-left: 15px; }
+            .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); border-radius: 8px; padding: 10px; border: 1px solid #333; }
+            .nav-links.active { display: flex; }
+            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
+        }
+    </style>
+</head>
 <body>
+
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
+    <div id="marketClosedMsg" class="market-closed-overlay" style="display: none;">
+        <i class="fa-solid fa-lock" style="font-size: 4rem; color: #e84118; margin-bottom: 20px;"></i>
+        <h2>MERCADO CERRADO</h2>
+        <p>Los cambios están bloqueados durante la jornada.</p>
+        <p style="color: #aaa; font-size: 0.9rem; margin-top: 10px;">Abre: Martes 10:00h - Cierra: Viernes 23:59h</p>
+        <a href="home.html" class="btn-action" style="margin-top: 20px; display: inline-block; width: auto; text-decoration: none;">Volver al Inicio</a>
+    </div>
+
     <nav class="navbar">
-        <a href="../home.html" class="nav-logo"><i class="fa-solid fa-stopwatch"></i> Fantasy <span>Athletics</span></a>
-        <div class="nav-links">
-            <a href="../home.html">Inicio</a>
+        <div class="nav-logo">
+            <a href="home.html" style="color:white; text-decoration:none;">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
+            </a>
+        </div>
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="home.html">Inicio</a>
             <a href="mi_equipo.html" class="active">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
             <a href="calendario.html">Calendario</a>
+            <a href="stats.html">Stats</a>
         </div>
-        <div style="color: white;"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 15.000.000 €</div>
     </nav>
 
-    <div class="main-container">
-        <h2 class="page-title">Alineación Jornada</h2>
+    <div class="budget-bar">
+        <div class="budget-info">
+            <span class="budget-label">Presupuesto</span>
+            <span id="budgetValue" class="budget-value">---M</span>
+            <span id="debtWarning" class="debt-warning">⚠️ En deuda</span>
+        </div>
+        <button id="btnSaveTeam" class="btn-action" style="width: auto; padding: 10px 20px; font-size: 0.8rem; margin: 0;">
+            GUARDAR
+        </button>
+    </div>
+
+    <div class="dashboard-container" style="flex-direction: column;">
         
-        <div class="alert-box">
-            <i class="fa-solid fa-lock"></i> <strong>RECUERDA:</strong> El equipo se bloquea el Viernes a las 23:59.
-            <span id="lockStatus" style="float: right; font-weight: bold; color: var(--success);">MERCADO ABIERTO</span>
+        <div style="width: 100%; max-width: 800px; padding: 0 15px;">
+            <h3 style="color: white; margin-bottom: 15px; text-transform: uppercase;">Alineación (3 Atletas)</h3>
+            <div id="teamSlots" class="my-team-grid">
+                <div class="team-slot"><span style="color:white;">Cargando...</span></div>
+                <div class="team-slot"><span style="color:white;">Cargando...</span></div>
+                <div class="team-slot"><span style="color:white;">Cargando...</span></div>
+            </div>
         </div>
 
-        <div class="grid-3">
-            <div class="athlete-card" style="border-color: var(--gold); box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);">
-                <div class="captain-badge"><i class="fa-solid fa-crown"></i></div>
-                <div class="role">Capitán (x1.5 Pts)</div>
-                <div class="name">Jakob Ingebrigtsen</div>
-                <div style="color: #aaa; font-size: 0.9rem; margin-bottom: 10px;">1500m | MMP: 3:27.14</div>
-                <div class="price">12.500.000 €</div>
-                <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-                        <span>Forma: <span style="color: var(--success);">Excelente</span></span>
-                        <span>Pts últ: 25</span>
-                    </div>
+        <div style="width: 100%; max-width: 800px; padding: 0 15px; margin-top: 20px;">
+            <div class="market-section-title">
+                <span>Mercado Disponible</span>
+            </div>
+            
+            <input type="text" id="marketSearch" onkeyup="filtrarMercado()" placeholder="Buscar jugador..." 
+                style="width: 100%; padding: 10px; border-radius: 5px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px;">
+
+            <div id="marketList" class="market-list">
                 </div>
-                <button class="btn-login" style="background: transparent; border: 1px solid #d63031; color: #d63031; margin-top: 10px; padding: 10px;">VENDER</button>
-            </div>
-
-            <div class="athlete-card">
-                <div class="role">Selección 2</div>
-                <div class="name">Femke Bol</div>
-                <div style="color: #aaa; font-size: 0.9rem; margin-bottom: 10px;">400m Vallas | MMP: 51.45</div>
-                <div class="price">8.200.000 €</div>
-                <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-                        <span>Forma: <span style="color: #aaa;">Normal</span></span>
-                        <span>Pts últ: 12</span>
-                    </div>
-                </div>
-                <button class="btn-login" style="background: transparent; border: 1px solid #d63031; color: #d63031; margin-top: 10px; padding: 10px;">VENDER</button>
-            </div>
-
-            <div class="athlete-card" style="border: 2px dashed #444; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 250px; opacity: 0.7;">
-                <i class="fa-solid fa-plus-circle" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
-                <h3>Añadir Atleta</h3>
-                <p style="color: #888;">Te quedan: 4.3M €</p>
-                <a href="mercado.html" class="btn-login" style="padding: 10px 20px; width: auto; margin-top: 10px;">IR AL MERCADO</a>
-            </div>
         </div>
 
-        <div style="margin-top: 30px;">
-            <button class="btn-login" onclick="guardarEquipo()">GUARDAR ALINEACIÓN</button>
-        </div>
     </div>
 
     <script>
-        function guardarEquipo() {
-            // Lógica para bloquear si es viernes > 23:59
-            const ahora = new Date();
-            const dia = ahora.getDay(); // 5 es viernes
-            const hora = ahora.getHours();
-            
-            // Simulación: Si es sábado (6) o domingo (0), no deja guardar
-            if(dia === 6 || dia === 0) {
-                alert("El mercado está cerrado por competición.");
-            } else {
-                alert("¡Equipo guardado correctamente!");
-            }
-        }
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
     </script>
+    <script type="module" src="../js/mi_equipo.js"></script>
 </body>
 </html>

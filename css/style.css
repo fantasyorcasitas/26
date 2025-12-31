@@ -905,3 +905,352 @@ svg.price-chart {
     font-weight: bold;
     text-anchor: middle; /* Centrar texto */
 }
+
+/* --- ESTILOS DEL CALENDARIO --- */
+
+.calendar-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 50px;
+}
+
+.event-card {
+    background: rgba(20, 20, 20, 0.95);
+    border-left: 5px solid var(--primary); /* Borde naranja a la izquierda */
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+.event-card:hover {
+    transform: translateX(5px); /* Efecto de movimiento al pasar ratón */
+}
+
+/* Cabecera del evento */
+.event-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Cuadrado de la fecha */
+.date-box {
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 8px;
+    min-width: 70px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.date-day {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.date-month {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Info principal */
+.event-info h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: white;
+    text-transform: uppercase;
+}
+
+.event-info p {
+    margin: 5px 0 0;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+.event-info i {
+    color: var(--primary);
+    margin-right: 5px;
+    width: 15px;
+    text-align: center;
+}
+
+/* Detalles desplegables */
+.event-details {
+    display: none; /* Oculto por defecto */
+    background: #111;
+    border-top: 1px solid #333;
+    padding: 20px;
+    animation: fadeIn 0.3s;
+}
+
+/* Tabla de participantes (Start List) */
+.start-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.start-list-table th {
+    text-align: left;
+    color: #666;
+    border-bottom: 1px solid #333;
+    padding: 8px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.start-list-table td {
+    padding: 10px 8px;
+    color: white;
+    border-bottom: 1px solid #222;
+}
+
+.start-list-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Botón desplegar */
+.btn-event-toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-top: 1px solid #333;
+    color: #888;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-event-toggle:hover {
+    background: rgba(255,255,255,0.05);
+    color: white;
+}
+
+/* Responsivo móvil */
+@media (max-width: 600px) {
+    .event-header {
+        padding: 15px;
+        gap: 15px;
+    }
+    .date-box {
+        min-width: 60px;
+        height: 60px;
+    }
+    .date-day { font-size: 1.5rem; }
+    .event-info h3 { font-size: 1rem; }
+}
+
+/* --- AJUSTES EXTRA MÓVIL CALENDARIO --- */
+@media (max-width: 600px) {
+    /* 1. Que la caja de fecha nunca se aplaste */
+    .date-box {
+        min-width: 60px !important;
+        height: 60px !important;
+        flex-shrink: 0; /* Clave: impide que se encoja */
+    }
+    
+    .date-day { font-size: 1.4rem; }
+    .date-month { font-size: 0.7rem; }
+
+    /* 2. Ajuste de textos largos */
+    .event-header {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .event-info h3 {
+        font-size: 1rem;
+        line-height: 1.2;
+        word-wrap: break-word; /* Si el nombre es larguísimo, baja de línea */
+    }
+
+    /* 3. Tabla con scroll horizontal (por si hay nombres muy largos) */
+    .event-details {
+        padding: 15px;
+        overflow-x: auto; /* Permite deslizar la tabla a los lados si no cabe */
+    }
+    
+    .start-list-table {
+        min-width: 300px; /* Asegura un ancho mínimo para leer bien */
+    }
+}
+
+/* --- ESTILOS MI EQUIPO (LA JOYA) --- */
+
+/* Barra de Presupuesto Pegajosa */
+.budget-bar {
+    position: sticky;
+    top: 60px; /* Debajo de la navbar */
+    z-index: 900;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 2px solid var(--primary);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+.budget-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.budget-label { font-size: 0.75rem; color: #aaa; text-transform: uppercase; }
+.budget-value { font-size: 1.5rem; font-weight: 800; color: white; }
+.budget-value.negative { color: #e84118; } /* Rojo si hay deuda */
+.budget-value.positive { color: #4cd137; } /* Verde si sobra */
+
+.debt-warning {
+    font-size: 0.7rem;
+    color: #e84118;
+    display: none; /* Se activa con JS */
+}
+
+/* Contenedor del Equipo (Los 3 huecos) */
+.my-team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.team-slot {
+    background: #151515;
+    border: 2px dashed #444;
+    border-radius: 10px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: 0.3s;
+    overflow: hidden;
+}
+
+.team-slot.filled {
+    border: 2px solid var(--primary);
+    background: #222;
+}
+
+/* Tarjeta dentro del slot */
+.slot-player-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    margin-bottom: 10px;
+}
+
+.slot-player-name { font-weight: bold; color: white; font-size: 0.9rem; text-align: center; }
+.slot-player-price { color: var(--primary); font-size: 0.8rem; }
+
+.btn-remove-player {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255,0,0,0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+/* Mercado debajo */
+.market-section-title {
+    color: white;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.market-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.market-item {
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.market-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.market-info { flex-grow: 1; }
+.market-name { color: white; font-weight: 600; font-size: 0.9rem; }
+.market-price { color: #4cd137; font-size: 0.85rem; }
+
+.btn-add-player {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-add-player:disabled {
+    background: #444;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Overlay de Mercado Cerrado */
+.market-closed-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .budget-bar { top: 0; /* En móvil la navbar cambia, ajustamos si es necesario */ }
+    .my-team-grid { gap: 10px; }
+    .team-slot { min-height: 140px; }
+    .slot-player-img { width: 45px; height: 45px; }
+    .slot-player-name { font-size: 0.75rem; }
+}

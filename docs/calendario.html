@@ -2,51 +2,87 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calendario | Fantasy Track</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        /* CSS EXTRA RESPONSIVE PARA NAV (Igual que home/mercado) */
+        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        
+        /* Asegurar scroll */
+        html, body { overflow-y: auto !important; height: auto !important; min-height: 100vh; }
+        .dashboard-container { height: auto !important; padding-bottom: 80px !important; }
+
+        @media (max-width: 768px) {
+            .navbar { flex-wrap: wrap; padding: 15px; }
+            .nav-logo { flex-grow: 1; }
+            .menu-toggle { display: block; margin-left: 15px; }
+            .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); border-radius: 8px; padding: 10px; border: 1px solid #333; }
+            .nav-links.active { display: flex; }
+            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
+            .dashboard-container { padding-top: 20px !important; }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
-        <div class="container">
-             <a class="navbar-brand" href="home.html">La Liga</a>
-             <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="home.html">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mi_equipo.html">Mi Equipo</a></li>
-                    <li class="nav-item"><a class="nav-link" href="mercado.html">Mercado</a></li>
-                    <li class="nav-item"><a class="nav-link" href="clasificaciones.html">Clasificación</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="calendario.html">Calendario</a></li>
-                    <li class="nav-item"><a class="nav-link" href="stats.html">Stats</a></li>
-                </ul>
-            </div>
+
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <nav class="navbar">
+        <div class="nav-logo">
+            <a href="home.html" style="color:white; text-decoration:none;">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
+            </a>
+        </div>
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;">
+            <i class="fa-solid fa-power-off"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="home.html">Inicio</a>
+            <a href="mi_equipo.html">Mi Equipo</a>
+            <a href="mercado.html">Mercado</a>
+            <a href="clasificaciones.html">Ranking</a>
+            <a href="calendario.html" class="active">Calendario</a>
+            <a href="stats.html">Stats</a>
         </div>
     </nav>
 
-    <div class="container">
-        <h2 class="mb-4">Próxima Jornada</h2>
+    <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 90px;">
         
-        <div class="card mb-3 player-card">
-            <div class="card-header bg-light fw-bold">Sábado, 12 Octubre</div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Equipo A <span class="badge bg-secondary rounded-pill">16:00</span> Equipo B
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Equipo C <span class="badge bg-secondary rounded-pill">18:30</span> Equipo D
-                </li>
-            </ul>
+        <h1 style="color:white; text-transform: uppercase; margin-bottom: 30px; text-align: center;">
+            <i class="fa-regular fa-calendar-days"></i> Calendario
+        </h1>
+
+        <div id="calendarContainer" class="calendar-container">
+            <p style="color: white; text-align: center;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Buscando competiciones...
+            </p>
         </div>
 
-        <div class="card mb-3 player-card">
-            <div class="card-header bg-light fw-bold">Domingo, 13 Octubre</div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Equipo E <span class="badge bg-secondary rounded-pill">21:00</span> Equipo F
-                </li>
-            </ul>
-        </div>
     </div>
+
+    <script>
+        function toggleMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+        function cerrarSesion() {
+            localStorage.removeItem('fantasy_user');
+            window.location.href = '../index.html';
+        }
+    </script>
+
+    <script type="module" src="../js/calendario.js"></script>
 </body>
 </html>
