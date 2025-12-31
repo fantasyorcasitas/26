@@ -6,51 +6,39 @@
     <title>Mi Equipo | Fantasy Orcasitas</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- ESTILOS "CLEAN" ESPECÍFICOS --- */
+        /* --- ARREGLO DE EMERGENCIA PARA MÓVIL --- */
         
-        /* Ajustes generales */
-        html, body { 
-            overflow-y: auto !important; 
-            min-height: 100vh; 
-            background-color: #0a0a0a; /* Fondo muy oscuro */
+        /* 1. Reset para que nada se salga de la pantalla */
+        html, body {
+            overflow-x: hidden !important; /* Prohibido scroll horizontal */
+            width: 100%;
+            background-color: #0a0a0a;
         }
-        
-        .dashboard-container { 
-            padding-top: 0 !important; /* El padding lo gestiona la barra sticky */
+
+        .dashboard-container {
+            width: 100%;
+            padding: 10px;
             padding-bottom: 120px; /* Espacio para el botón flotante */
             display: flex;
             flex-direction: column;
             align-items: center;
+            box-sizing: border-box;
         }
 
-        /* NAVBAR MÓVIL */
-        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-        @media (max-width: 768px) {
-            .navbar { flex-wrap: wrap; padding: 15px; position:relative; z-index: 1001; }
-            .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block; margin-left: 15px; }
-            .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); border-radius: 8px; padding: 10px; border: 1px solid #333; }
-            .nav-links.active { display: flex; }
-            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
-        }
-
-        /* 1. BARRA PRESUPUESTO "CLEAN" (Sticky) */
+        /* 2. BARRA DE PRESUPUESTO */
+        /* La sacamos del sticky problemático y la ponemos fija pero limpia */
         .budget-header {
-            position: sticky;
-            top: 0;
-            z-index: 900;
+            background: #111;
+            border-bottom: 1px solid #333;
             width: 100%;
-            background: rgba(10, 10, 10, 0.85); /* Semitransparente */
-            backdrop-filter: blur(10px); /* Efecto cristal */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
             display: flex;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 50;
         }
 
         .budget-content {
@@ -61,21 +49,8 @@
             align-items: center;
         }
 
-        .budget-label {
-            font-size: 0.75rem;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-        }
-
-        .budget-number {
-            font-size: 1.8rem;
-            font-weight: 300; /* Fuente fina y elegante */
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-        }
-        
+        .budget-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .budget-number { font-size: 1.5rem; font-weight: 700; color: white; font-family: 'Montserrat', sans-serif; }
         .budget-number.positive { color: #4cd137; }
         .budget-number.negative { color: #e84118; }
 
@@ -86,32 +61,89 @@
             border-radius: 20px;
             font-size: 0.7rem;
             font-weight: bold;
-            display: none; /* Se activa con JS */
+            display: none;
             border: 1px solid rgba(232, 65, 24, 0.5);
         }
 
-        /* 2. CAMPO DE JUEGO MINIMALISTA */
+        /* 3. EL CAMPO (PIZARRA) - AHORA RESPONSIVE */
         .pitch-area {
-            margin-top: 30px;
             width: 100%;
-            max-width: 500px;
-            padding: 0 20px;
+            max-width: 500px; /* No más ancho que esto */
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .pitch-bg {
+            width: 100%;
             background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
             border: 1px solid #333;
-            border-radius: 20px;
-            padding: 30px 20px;
+            border-radius: 15px;
+            padding: 25px 10px; /* Menos padding lateral */
             position: relative;
-            /* Líneas sutiles del campo */
+            box-sizing: border-box; /* CLAVE: Para que el padding no ensanche la caja */
+            
+            /* Dibujo sutil de líneas */
             background-image: 
                 linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
-        /* 3. BOTÓN GUARDAR FLOTANTE (Estilo App) */
+        /* FORMACIÓN Y CARTAS */
+        .formation-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .formation-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Separación más pequeña para que quepan */
+            width: 100%;
+        }
+
+        /* LAS CARTAS DE JUGADOR (SLOTS) */
+        .player-card-slot {
+            width: 90px;
+            height: 130px;
+            background: rgba(255,255,255,0.03);
+            border: 2px dashed #444;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            /* Aseguramos que no se rompa */
+            flex-shrink: 0; 
+        }
+
+        /* Ajuste para móviles muy pequeños */
+        @media (max-width: 380px) {
+            .player-card-slot { width: 80px; height: 120px; }
+            .formation-row { gap: 10px; }
+        }
+
+        .player-card-slot.filled { border: 2px solid var(--primary); background: #1a1a1a; cursor: default; }
+        
+        .slot-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .slot-name { font-size: 0.7rem; color: white; font-weight: bold; text-align: center; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 75px; }
+        .slot-price { font-size: 0.65rem; color: #4cd137; margin-bottom: 5px; }
+
+        /* BOTONES DENTRO DE LA CARTA */
+        .card-actions { display: flex; gap: 4px; margin-top: 4px; }
+        .btn-mini { border: none; border-radius: 4px; padding: 2px 5px; font-size: 0.6rem; cursor: pointer; font-weight: bold; }
+        .btn-remove { background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: 1px solid #ff3b30; }
+        .btn-captain { background: transparent; color: #666; border: 1px solid #666; }
+        .btn-captain.active { background: #f1c40f; color: black; border-color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.4); }
+
+        /* BOTÓN FLOTANTE GUARDAR */
         .fab-save-container {
             position: fixed;
             bottom: 20px;
@@ -133,41 +165,26 @@
             font-weight: 800;
             text-transform: uppercase;
             box-shadow: 0 10px 20px rgba(255, 94, 0, 0.3);
-            transition: transform 0.2s, background 0.2s;
+            transition: transform 0.2s;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
         }
-
         .btn-save-fab:active { transform: scale(0.98); }
         .btn-save-fab:disabled { background: #444; color: #888; box-shadow: none; }
 
-        /* Estilos heredados del dibujo (Formación) */
-        .formation-wrapper { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .formation-row { display: flex; justify-content: center; gap: 30px; width: 100%; }
-
-        .player-card-slot {
-            width: 90px; height: 130px; /* Un pelín más pequeño para que quepa bien */
-            background: rgba(255,255,255,0.03);
-            border: 2px dashed #444;
-            border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s; position: relative;
+        /* NAVBAR MÓVIL ESTILOS */
+        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        @media (max-width: 768px) {
+            .navbar { flex-wrap: wrap; padding: 15px; }
+            .nav-logo { flex-grow: 1; }
+            .menu-toggle { display: block; margin-left: 15px; }
+            .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); border-radius: 8px; padding: 10px; border: 1px solid #333; position: relative; z-index: 9999;}
+            .nav-links.active { display: flex; }
+            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
         }
-        .player-card-slot.filled { border: 2px solid var(--primary); background: #1a1a1a; cursor: default; }
-        .slot-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .slot-name { font-size: 0.7rem; color: white; font-weight: bold; text-align: center; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 80px; }
-        .slot-price { font-size: 0.65rem; color: #4cd137; margin-bottom: 5px; }
-
-        /* Botoncitos dentro de la carta */
-        .card-actions { display: flex; gap: 5px; margin-top: 5px; }
-        .btn-mini { border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.6rem; cursor: pointer; font-weight: bold; }
-        .btn-remove { background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: 1px solid #ff3b30; }
-        .btn-captain { background: transparent; color: #666; border: 1px solid #666; }
-        .btn-captain.active { background: #f1c40f; color: black; border-color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.4); }
-
     </style>
 </head>
 <body>
@@ -189,6 +206,7 @@
         </div>
         <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
         <button onclick="localStorage.removeItem('fantasy_user'); window.location.href='../index.html'" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
+        
         <div class="nav-links" id="navLinks">
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html" class="active">Mi Equipo</a>
@@ -215,7 +233,7 @@
         
         <div class="pitch-area">
             <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
-                Tu Alineación
+                Tu Alineación (3)
             </div>
 
             <div class="pitch-bg">
