@@ -13,64 +13,54 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- VARIABLES DE ESTADO ---
+// --- ESTADO ---
 let currentUserData = null;
-let allAthletes = []; 
-let myTeam = []; 
-let totalPatrimony = 0; 
-let currentBudget = 0; 
+let allAthletes = [];
+// El equipo son 3 huecos. Si hay jugador es un objeto, si no es null.
+let teamSlots = [null, null, null]; 
+let captainId = null; // ID del capitán
+let totalPatrimony = 0;
+let currentBudget = 0;
 let isMarketClosed = false;
 
-// --- 1. VERIFICAR MERCADO CERRADO ---
+// Variable para saber qué hueco estamos llenando (0, 1 o 2)
+let currentSlotIndex = -1;
+
+// --- 1. COMPROBAR MERCADO ---
 function checkMarketStatus() {
     const now = new Date();
-    const day = now.getDay(); 
+    const day = now.getDay();
     const hour = now.getHours();
 
-    // Sábado (6), Domingo (0), Lunes (1) -> CERRADO
-    // Martes (2) antes de las 10:00 -> CERRADO
+    // Sábado(6), Domingo(0), Lunes(1) o Martes(2)<10:00
     if (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 10)) {
         isMarketClosed = true;
-        const msg = document.getElementById('marketClosedMsg');
-        const btn = document.getElementById('btnSaveTeam');
-        if(msg) msg.style.display = 'flex';
-        if(btn) {
-            btn.disabled = true;
-            btn.innerText = "MERCADO CERRADO";
-        }
+        document.getElementById('marketClosedMsg').style.display = 'flex';
+        document.getElementById('btnSaveTeam').disabled = true;
+        document.getElementById('btnSaveTeam').innerText = "MERCADO CERRADO";
         return false;
     }
     return true;
 }
 
-// --- 2. CARGAR DATOS (INIT) ---
+// --- 2. INIT ---
 async function init() {
-    // A. SEGURIDAD: Comprobamos si hay usuario
     const userNick = localStorage.getItem('fantasy_user');
-    
-    console.log("--> Iniciando Mi Equipo. Usuario detectado:", userNick);
-
     if (!userNick) {
-        console.warn("⛔ No estás logueado. Redirigiendo a la portada...");
-        alert("Debes iniciar sesión para gestionar tu equipo.");
-        window.location.href = '../index.html'; // CORREGIDO: Te manda al index (login)
+        alert("Inicia sesión primero");
+        window.location.href = '../index.html';
         return;
     }
 
-    // B. Comprobar Horario
     checkMarketStatus();
 
     try {
-        // C. Cargar datos del Usuario desde Firebase
+        // Cargar Usuario
         const userDoc = await getDoc(doc(db, "usuarios", userNick));
-        
-        if (!userDoc.exists()) {
-            console.error("El usuario no existe en la BD.");
-            return;
-        }
+        if (!userDoc.exists()) return;
         currentUserData = userDoc.data();
 
-        // D. Cargar TODOS los atletas
+        // Cargar Atletas
         const athSnap = await getDocs(collection(db, "atletas"));
         allAthletes = [];
         athSnap.forEach(d => {
@@ -79,194 +69,221 @@ async function init() {
             allAthletes.push(a);
         });
 
-        // E. Reconstruir Equipo Actual
-        const savedTeamIds = currentUserData.equipo || []; 
-        // Convertimos IDs en objetos reales
-        myTeam = savedTeamIds.map(id => allAthletes.find(a => a.id === id)).filter(a => a);
+        // RECONSTRUIR EQUIPO Y CAPITÁN
+        const savedIds = currentUserData.equipo || [];
+        captainId = currentUserData.capitanId || null; // Leemos el capitán guardado
 
-        // F. Cálculos Financieros Iniciales
-        // Patrimonio Total = Lo que tienes en caja + Lo que valen tus jugadores hoy
-        const initialTeamValue = myTeam.reduce((sum, p) => sum + p.precio, 0);
+        // Rellenar los slots (máximo 3)
+        savedIds.forEach((id, index) => {
+            if (index < 3) {
+                const player = allAthletes.find(a => a.id === id);
+                if (player) teamSlots[index] = player;
+            }
+        });
+
+        // Si el capitán guardado ya no está en el equipo, resetearlo
+        if (captainId && !teamSlots.some(p => p && p.id === captainId)) {
+            captainId = null;
+        }
+
+        // Cálculos
+        const initialTeamValue = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
         totalPatrimony = (currentUserData.presupuesto || 0) + initialTeamValue;
 
         updateUI();
 
     } catch (error) {
-        console.error("Error cargando equipo:", error);
+        console.error("Error:", error);
     }
 }
 
-// --- 3. ACTUALIZAR INTERFAZ ---
+// --- 3. ACTUALIZAR UI ---
 function updateUI() {
-    // Coste actual de los 3 (o menos) jugadores seleccionados
-    const currentTeamCost = myTeam.reduce((sum, p) => sum + p.precio, 0);
-    
-    // Presupuesto Restante = Patrimonio - Coste Equipo
+    const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
     currentBudget = totalPatrimony - currentTeamCost;
 
-    // Regla del 7%: Deuda máxima permitida
-    const maxDebt = totalPatrimony * 0.07; 
+    const maxDebt = totalPatrimony * 0.07;
     const isValidDebt = currentBudget >= -maxDebt;
 
-    // Pintar Barra Presupuesto
+    // Presupuesto
     const budgetEl = document.getElementById('budgetValue');
-    if(budgetEl) {
-        budgetEl.innerText = currentBudget.toFixed(1) + "M";
-        budgetEl.className = 'budget-value ' + (currentBudget < 0 ? 'negative' : 'positive');
-    }
-    
-    // Avisos de Deuda
-    const warningEl = document.getElementById('debtWarning');
-    if(warningEl) {
-        if (currentBudget < 0) {
-            warningEl.style.display = 'block';
-            if (isValidDebt) {
-                warningEl.innerText = `⚠️ En deuda (Ok hasta -${maxDebt.toFixed(1)}M)`;
-                warningEl.style.color = "orange";
-            } else {
-                warningEl.innerText = `⛔ Deuda excesiva (Máx -${maxDebt.toFixed(1)}M)`;
-                warningEl.style.color = "red";
-            }
-        } else {
-            warningEl.style.display = 'none';
-        }
+    budgetEl.innerText = currentBudget.toFixed(1) + "M";
+    budgetEl.className = 'budget-value ' + (currentBudget < 0 ? 'negative' : 'positive');
+
+    // Warning Deuda
+    const warnEl = document.getElementById('debtWarning');
+    if (currentBudget < 0) {
+        warnEl.style.display = 'block';
+        warnEl.innerText = isValidDebt ? `⚠️ Deuda OK (Máx -${maxDebt.toFixed(1)}M)` : `⛔ Deuda Excesiva`;
+        warnEl.style.color = isValidDebt ? 'orange' : 'red';
+    } else {
+        warnEl.style.display = 'none';
     }
 
-    // Pintar Slots (Huecos)
-    const slotsContainer = document.getElementById('teamSlots');
-    if(slotsContainer) {
-        slotsContainer.innerHTML = "";
-        for (let i = 0; i < 3; i++) {
-            const player = myTeam[i];
-            const div = document.createElement('div');
-            
-            if (player) {
-                div.className = "team-slot filled";
-                div.innerHTML = `
-                    <button class="btn-remove-player" onclick="removePlayer('${player.id}')">X</button>
-                    <img src="${player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" class="slot-player-img">
-                    <div class="slot-player-name">${player.nombre}</div>
-                    <div class="slot-player-price">${player.precio}M</div>
-                `;
-            } else {
-                div.className = "team-slot";
-                div.innerHTML = `<span style="color:#444; font-size:2rem;">+</span><span style="color:#666; font-size:0.8rem;">Vacío</span>`;
-            }
-            slotsContainer.appendChild(div);
-        }
-    }
-
-    // Renderizar Mercado
-    renderMarket();
+    // PINTAR LOS 3 SLOTS
+    renderSlot(0, 'slot0'); // Arriba
+    renderSlot(1, 'slot1'); // Abajo Izq
+    renderSlot(2, 'slot2'); // Abajo Der
 
     // Botón Guardar
     const btnSave = document.getElementById('btnSaveTeam');
-    if(btnSave) {
-        if (isMarketClosed) {
+    if (!isMarketClosed) {
+        if (!isValidDebt) {
             btnSave.disabled = true;
+            btnSave.innerText = "DEUDA EXCESIVA";
         } else {
-            if (!isValidDebt) {
-                btnSave.disabled = true;
-                btnSave.innerText = "DEUDA EXCESIVA";
-            } else {
-                btnSave.disabled = false;
-                btnSave.innerText = "GUARDAR CAMBIOS";
-            }
+            btnSave.disabled = false;
+            btnSave.innerText = "GUARDAR CAMBIOS";
         }
     }
 }
 
-// --- 4. RENDERIZAR MERCADO ---
-function renderMarket() {
-    const container = document.getElementById('marketList');
-    const searchInput = document.getElementById('marketSearch');
-    if(!container) return;
+function renderSlot(index, elementId) {
+    const container = document.getElementById(elementId);
+    const player = teamSlots[index];
 
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
-    
     container.innerHTML = "";
 
-    // Filtramos jugadores disponibles
-    const availablePlayers = allAthletes.filter(a => {
-        const inTeam = myTeam.find(p => p.id === a.id);
-        const matchesName = a.nombre.toLowerCase().includes(searchTerm) || a.apellidos.toLowerCase().includes(searchTerm);
-        return !inTeam && matchesName;
-    });
-
-    // Ordenar por precio
-    availablePlayers.sort((a, b) => b.precio - a.precio);
-
-    availablePlayers.forEach(p => {
-        const item = document.createElement('div');
-        item.className = "market-item";
+    if (player) {
+        // ESTADO: LLENO
+        container.className = "player-card-slot filled";
         
-        const canBuy = myTeam.length < 3 && !isMarketClosed;
+        // ¿Es capitán?
+        const isCapi = (player.id === captainId);
+        const capiClass = isCapi ? "active" : "";
 
-        item.innerHTML = `
-            <img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}">
-            <div class="market-info">
-                <div class="market-name">${p.nombre} ${p.apellidos}</div>
-                <div class="market-price">${p.precio}M</div>
+        container.innerHTML = `
+            <img src="${player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" class="slot-img">
+            <div class="slot-name">${player.nombre}</div>
+            <div class="slot-price">${player.precio}M</div>
+            
+            <div class="card-actions">
+                <button class="btn-mini btn-captain ${capiClass}" onclick="toggleCaptain('${player.id}', event)">C</button>
+                <button class="btn-mini btn-remove" onclick="clearSlot(${index}, event)">X</button>
             </div>
-            <button class="btn-add-player" ${canBuy ? '' : 'disabled'} onclick="addPlayer('${p.id}')">
-                ${canBuy ? '+' : 'LLENO'}
-            </button>
         `;
-        container.appendChild(item);
-    });
+        // Quitamos el onclick del contenedor padre para que no abra el modal si pulsamos botones
+        container.onclick = null; 
+
+    } else {
+        // ESTADO: VACÍO
+        container.className = "player-card-slot";
+        container.innerHTML = `
+            <i class="fa-solid fa-plus" style="font-size: 2rem; color: #444;"></i>
+            <span style="font-size: 0.8rem; color: #666; margin-top:5px;">Fichar</span>
+        `;
+        // Al hacer click en lo vacío, abrimos modal
+        container.onclick = () => openModal(index);
+    }
 }
 
-// --- 5. ACCIONES GLOBALES (Para que funcione el onclick del HTML) ---
-
-window.addPlayer = (id) => {
-    if (myTeam.length >= 3) return;
-    const player = allAthletes.find(a => a.id === id);
-    if (player) {
-        myTeam.push(player);
-        updateUI();
+// --- 4. GESTIÓN DEL CAPITÁN ---
+window.toggleCaptain = (pid, event) => {
+    event.stopPropagation(); // Evita abrir modal si hubiera click
+    if (captainId === pid) {
+        captainId = null; // Quitar capi
+    } else {
+        captainId = pid; // Nuevo capi
     }
-};
-
-window.removePlayer = (id) => {
-    myTeam = myTeam.filter(p => p.id !== id);
     updateUI();
 };
 
-window.filtrarMercado = () => {
-    renderMarket();
+window.clearSlot = (index, event) => {
+    event.stopPropagation();
+    const p = teamSlots[index];
+    if (p && p.id === captainId) captainId = null; // Si borras al capi, adiós capi
+    
+    teamSlots[index] = null;
+    updateUI();
 };
 
-// --- 6. GUARDAR EN FIREBASE ---
-const saveBtn = document.getElementById('btnSaveTeam');
-if(saveBtn) {
-    saveBtn.addEventListener('click', async () => {
-        const btn = document.getElementById('btnSaveTeam');
-        btn.innerText = "Guardando...";
-        btn.disabled = true;
+// --- 5. MODAL DE FICHAJES ---
+window.openModal = (index) => {
+    if (isMarketClosed) return alert("Mercado Cerrado");
+    currentSlotIndex = index;
+    renderMarketList();
+    document.getElementById('playerModal').style.display = 'flex';
+};
 
-        try {
-            const userNick = localStorage.getItem('fantasy_user');
-            
-            // 1. Array de IDs
-            const teamIds = myTeam.map(p => p.id);
-            
-            // 2. Nuevo Presupuesto
-            await updateDoc(doc(db, "usuarios", userNick), {
-                equipo: teamIds,
-                presupuesto: Number(currentBudget.toFixed(1))
-            });
+window.closeModal = () => {
+    document.getElementById('playerModal').style.display = 'none';
+};
 
-            alert("✅ Equipo guardado correctamente.");
-            window.location.reload();
+function renderMarketList() {
+    const listContainer = document.getElementById('modalPlayerList');
+    const search = document.getElementById('modalSearch').value.toLowerCase();
+    listContainer.innerHTML = "";
 
-        } catch (error) {
-            console.error(error);
-            alert("Error al guardar: " + error.message);
-            btn.disabled = false;
-            btn.innerText = "GUARDAR CAMBIOS";
-        }
+    // Filtro: No mostrar los que YA están en el equipo (en otros slots)
+    const currentIds = teamSlots.filter(p => p).map(p => p.id);
+
+    const available = allAthletes.filter(a => {
+        return !currentIds.includes(a.id) && 
+               (a.nombre.toLowerCase().includes(search) || a.apellidos.toLowerCase().includes(search));
+    });
+
+    available.sort((a,b) => b.precio - a.precio);
+
+    available.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'player-list-item';
+        div.innerHTML = `
+            <img src="${p.foto}">
+            <div style="flex-grow:1;">
+                <div style="color:white; font-weight:bold;">${p.nombre} ${p.apellidos}</div>
+                <div style="color:#4cd137; font-size:0.8rem;">${p.precio}M - ${p.categoria}</div>
+            </div>
+            <i class="fa-solid fa-plus" style="color:var(--primary);"></i>
+        `;
+        div.onclick = () => {
+            selectPlayer(p);
+        };
+        listContainer.appendChild(div);
     });
 }
 
-// ARRANCAR
+function selectPlayer(player) {
+    teamSlots[currentSlotIndex] = player;
+    closeModal();
+    updateUI();
+}
+
+// Búsqueda en modal
+window.filtrarModal = () => renderMarketList();
+
+
+// --- 6. GUARDAR ---
+document.getElementById('btnSaveTeam').addEventListener('click', async () => {
+    const btn = document.getElementById('btnSaveTeam');
+    btn.innerText = "Guardando...";
+    btn.disabled = true;
+
+    try {
+        const userNick = localStorage.getItem('fantasy_user');
+        
+        // Guardamos IDs
+        const finalIds = teamSlots.filter(p => p).map(p => p.id);
+        
+        await updateDoc(doc(db, "usuarios", userNick), {
+            equipo: finalIds,
+            capitanId: captainId || null, // Guardamos también el capitán
+            presupuesto: Number(currentBudget.toFixed(1))
+        });
+
+        alert("✅ Equipo guardado.");
+        // NO recargamos la página para que se vea el resultado. 
+        // Solo actualizamos el botón.
+        btn.innerText = "GUARDADO CON ÉXITO";
+        setTimeout(() => {
+            btn.innerText = "GUARDAR CAMBIOS";
+            btn.disabled = false;
+        }, 2000);
+
+    } catch (error) {
+        console.error(error);
+        alert("Error al guardar");
+        btn.disabled = false;
+    }
+});
+
 document.addEventListener('DOMContentLoaded', init);

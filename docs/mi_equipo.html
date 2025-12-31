@@ -6,17 +6,12 @@
     <title>Mi Equipo | Fantasy Track</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="../css/style.css">
-
     <style>
-        /* Ajustes responsive específicos para este HTML */
-        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-        
-        /* Asegurar scroll */
+        /* Ajustes menores específicos */
         html, body { overflow-y: auto !important; min-height: 100vh; }
         .dashboard-container { padding-top: 20px !important; padding-bottom: 100px; }
-
+        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
         @media (max-width: 768px) {
             .navbar { flex-wrap: wrap; padding: 15px; }
             .nav-logo { flex-grow: 1; }
@@ -35,9 +30,7 @@
     <div id="marketClosedMsg" class="market-closed-overlay" style="display: none;">
         <i class="fa-solid fa-lock" style="font-size: 4rem; color: #e84118; margin-bottom: 20px;"></i>
         <h2>MERCADO CERRADO</h2>
-        <p>Los cambios están bloqueados durante la jornada.</p>
-        <p style="color: #aaa; font-size: 0.9rem; margin-top: 10px;">Abre: Martes 10:00h - Cierra: Viernes 23:59h</p>
-        <a href="home.html" class="btn-action" style="margin-top: 20px; display: inline-block; width: auto; text-decoration: none;">Volver al Inicio</a>
+        <a href="home.html" class="btn-action" style="margin-top: 20px; width: auto; text-decoration: none;">Volver</a>
     </div>
 
     <nav class="navbar">
@@ -46,9 +39,8 @@
                 <i class="fa-solid fa-person-running"></i> FANTASY <span>TRACK</span>
             </a>
         </div>
-        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
-
+        <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
+        <button onclick="localStorage.removeItem('fantasy_user'); window.location.href='../index.html'" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
         <div class="nav-links" id="navLinks">
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html" class="active">Mi Equipo</a>
@@ -63,42 +55,55 @@
         <div class="budget-info">
             <span class="budget-label">Presupuesto</span>
             <span id="budgetValue" class="budget-value">---M</span>
-            <span id="debtWarning" class="debt-warning">⚠️ En deuda</span>
+            <span id="debtWarning" class="debt-warning" style="display:none;"></span>
         </div>
-        <button id="btnSaveTeam" class="btn-action" style="width: auto; padding: 10px 20px; font-size: 0.8rem; margin: 0;">
-            GUARDAR
-        </button>
-    </div>
+        </div>
 
     <div class="dashboard-container" style="flex-direction: column;">
         
-        <div style="width: 100%; max-width: 800px; padding: 0 15px;">
-            <h3 style="color: white; margin-bottom: 15px; text-transform: uppercase;">Alineación (3 Atletas)</h3>
-            <div id="teamSlots" class="my-team-grid">
-                <div class="team-slot"><span style="color:white;">Cargando...</span></div>
-                <div class="team-slot"><span style="color:white;">Cargando...</span></div>
-                <div class="team-slot"><span style="color:white;">Cargando...</span></div>
+        <h2 style="text-align: center; color: white; margin-bottom: 20px; text-transform: uppercase;">Alineación</h2>
+
+        <div class="pitch-container">
+            <div class="formation-wrapper">
+                
+                <div class="formation-row">
+                    <div id="slot0" class="player-card-slot">
+                        </div>
+                </div>
+
+                <div class="formation-row">
+                    <div id="slot1" class="player-card-slot"></div>
+                    <div id="slot2" class="player-card-slot"></div>
+                </div>
+
             </div>
         </div>
 
-        <div style="width: 100%; max-width: 800px; padding: 0 15px; margin-top: 20px;">
-            <div class="market-section-title">
-                <span>Mercado Disponible</span>
-            </div>
-            
-            <input type="text" id="marketSearch" onkeyup="filtrarMercado()" placeholder="Buscar jugador..." 
-                style="width: 100%; padding: 10px; border-radius: 5px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px;">
-
-            <div id="marketList" class="market-list">
-                </div>
+        <div style="width: 100%; max-width: 500px; margin: 0 auto;">
+            <button id="btnSaveTeam" class="btn-action" style="width: 100%; font-size: 1.2rem;">
+                GUARDAR EQUIPO
+            </button>
         </div>
 
     </div>
 
-    <script>
-        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
-        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
-    </script>
+    <div id="playerModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color:white; margin:0;">Seleccionar Jugador</h3>
+                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
+            </div>
+            
+            <div style="padding:10px; background:#1a1a1a;">
+                <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar..." 
+                       style="width:100%; padding:10px; border-radius:5px; border:1px solid #333; background:#000; color:white;">
+            </div>
+
+            <div id="modalPlayerList" class="modal-body">
+                </div>
+        </div>
+    </div>
+
     <script type="module" src="../js/mi_equipo.js"></script>
 </body>
 </html>
