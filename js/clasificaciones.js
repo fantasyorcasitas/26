@@ -32,7 +32,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // --- LÓGICA MANAGERS (USUARIOS) ---
                 // Buscamos 'nombre_usuario' o 'nombre'
                 const nombreReal = data.nombre_usuario || data.nombre;
-                const puntosReales = data.puntos_totales || data.puntos || 0;
+                const puntosReales = data.puntos_total || data.puntos || 0;
 
                 if (nombreReal) {
                     objetoLimpio.nombre = nombreReal;
