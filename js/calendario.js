@@ -58,7 +58,7 @@ async function cargarCalendario() {
                 htmlLinks = `
                     <div style="margin-top:15px; padding-top:10px; border-top:1px dashed #333;">
                         <a href="${data.links}" target="_blank" style="color: #4cd137; text-decoration:none; font-size:0.9rem;">
-                            <i class="fa-solid fa-video"></i> Links
+                            <i class="fa-solid fa-link"></i> Links
                         </a>
                     </div>
                 `;
