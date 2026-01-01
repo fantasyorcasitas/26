@@ -16,7 +16,7 @@ const db = getFirestore(app);
 
 async function cargarRanking(coleccionNombre, bodyId) {
     const tbody = document.getElementById(bodyId);
-    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#888;">Cargando...</td></tr>`;
+    if(tbody) tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:#888;">Cargando...</td></tr>`;
 
     try {
         // Forzamos la descarga real de datos
@@ -30,9 +30,11 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
             if (coleccionNombre === 'usuarios') {
                 // --- LÓGICA MANAGERS (USUARIOS) ---
-                // Buscamos 'nombre_usuario' o 'nombre'
-                const nombreReal = data.nombre_usuario || data.nombre;
-                const puntosReales = data.puntos_total || data.puntos || 0;
+                // Buscamos 'nick', 'nombre_usuario' o 'nombre'
+                const nombreReal = data.nick || data.nombre_usuario || data.nombre || "Manager";
+                
+                // *** CORRECCIÓN AQUÍ: puntos_total (singular) ***
+                const puntosReales = data.puntos_total || 0; 
 
                 if (nombreReal) {
                     objetoLimpio.nombre = nombreReal;
@@ -42,14 +44,14 @@ async function cargarRanking(coleccionNombre, bodyId) {
             } else {
                 // --- LÓGICA ATLETAS (CON APELLIDOS) ---
                 const nombre = data.nombre || data.nombre_atleta || "Atleta";
-                const apellidos = data.apellidos || ""; // <--- Nuevo: Leemos apellidos
+                const apellidos = data.apellidos || ""; 
                 
                 // Juntamos Nombre + Apellido
                 objetoLimpio.nombre = `${nombre} ${apellidos}`.trim(); 
                 objetoLimpio.puntos = data.puntos || 0;
                 
                 // Incluimos en la tabla si tiene nombre válido
-                if (objetoLimpio.nombre !== "Atleta" || data.puntos !== undefined) {
+                if (objetoLimpio.nombre !== "Atleta" && objetoLimpio.nombre !== "") {
                      incluirEnTabla = true;
                 }
             }
@@ -62,35 +64,37 @@ async function cargarRanking(coleccionNombre, bodyId) {
         // Ordenar de Mayor a Menor
         listaDatos.sort((a, b) => b.puntos - a.puntos);
 
-        tbody.innerHTML = "";
-        
-        if (listaDatos.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">Esperando datos...</td></tr>`;
-            return;
+        if(tbody) {
+            tbody.innerHTML = "";
+            
+            if (listaDatos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;">Esperando datos...</td></tr>`;
+                return;
+            }
+
+            listaDatos.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                
+                let rankDisplay = index + 1;
+                if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1" style="color:#ffd700;"></i>';
+                if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2" style="color:#c0c0c0;"></i>';
+                if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3" style="color:#cd7f32;"></i>';
+
+                tr.innerHTML = `
+                    <td class="rank-col" style="text-align:center;">${rankDisplay}</td>
+                    <td style="font-weight:600; font-size: 0.9rem;">${item.nombre}</td>
+                    <td class="points-col" style="text-align:right; font-weight:800;">${item.puntos}</td>
+                `;
+                
+                tr.style.opacity = "0";
+                tr.style.animation = `slideIn 0.3s ease-out forwards ${index * 0.1}s`;
+                tbody.appendChild(tr);
+            });
         }
-
-        listaDatos.forEach((item, index) => {
-            const tr = document.createElement('tr');
-            
-            let rankDisplay = index + 1;
-            if(index === 0) rankDisplay = '<i class="fa-solid fa-medal medal-1"></i>';
-            if(index === 1) rankDisplay = '<i class="fa-solid fa-medal medal-2"></i>';
-            if(index === 2) rankDisplay = '<i class="fa-solid fa-medal medal-3"></i>';
-
-            tr.innerHTML = `
-                <td class="rank-col">${rankDisplay}</td>
-                <td style="font-weight:600; font-size: 0.9rem;">${item.nombre}</td>
-                <td class="points-col">${item.puntos}</td>
-            `;
-            
-            tr.style.opacity = "0";
-            tr.style.animation = `slideIn 0.3s ease-out forwards ${index * 0.1}s`;
-            tbody.appendChild(tr);
-        });
 
     } catch (error) {
         console.error("Error:", error);
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error conexión.</td></tr>`;
+        if(tbody) tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error conexión.</td></tr>`;
     }
 }
 
@@ -101,4 +105,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const styleSheet = document.createElement("style");
 styleSheet.innerText = `@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`;
-document.head.appendChild(styleSheet);  
+document.head.appendChild(styleSheet);
