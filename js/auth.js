@@ -41,7 +41,8 @@ registroForm.addEventListener('submit', async (e) => {
         await setDoc(doc(db, "usuarios", user.uid), {
             nombre_usuario: nombreOficial,
             email: email,
-            presupuesto: 100000,
+            presupuesto: 100,
+            puntos_total: 0,
             puntos_totales: 0,
             equipo: [],
             rol: "user"
