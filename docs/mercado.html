@@ -9,47 +9,59 @@
     
     <link rel="stylesheet" href="../css/style.css">
 
-    <style>
-        /* RESET BÁSICO */
-        * { box-sizing: border-box; }
-        
+<style>
+        /* =========================================
+           1. RESET Y ESTRUCTURA (Sobrescribe style.css)
+           ========================================= */
         html, body {
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100vh;
-            background-color: #000; /* Fondo negro */
+            background-color: #000 !important; /* Asegura fondo negro */
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
         }
 
-        /* NAVBAR (BARRA DE NAVEGACIÓN) SÓLIDA */
+        /* Quitamos el padding gigante del style.css global para esta página */
+        .dashboard-container {
+            padding-top: 20px !important; 
+            padding-bottom: 100px !important;
+            height: auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* =========================================
+           2. NAVBAR ESPECÍFICA PARA MERCADO
+           ========================================= */
+        /* Usamos !important para ganar al style.css */
         .navbar {
+            position: relative !important; /* Para que no se quede fija tapando cosas en esta vista */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #000;
-            padding: 15px 20px;
-            border-bottom: 2px solid #222;
+            background-color: #000 !important;
+            padding: 15px 20px !important;
+            border-bottom: 2px solid #222 !important;
             width: 100%;
-            position: sticky;
-            top: 0;
             z-index: 1000;
         }
 
         .nav-logo a {
             font-size: 1.2rem;
             font-weight: 800;
-            color: white;
+            color: white !important;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .nav-logo span { color: #ff5722; }
+        .nav-logo span { color: #ff5e00 !important; }
 
-        /* MENÚ DE ESCRITORIO */
+        /* Estilos de escritorio */
         .nav-links {
             display: flex;
             gap: 20px;
@@ -57,52 +69,45 @@
 
         .nav-links a {
             text-decoration: none;
-            color: #aaa;
+            color: #aaa !important;
             font-weight: 600;
             font-size: 0.9rem;
             transition: color 0.3s;
         }
 
         .nav-links a:hover, .nav-links a.active {
-            color: #ff5722;
+            color: #ff5e00 !important;
         }
 
         .btn-logout {
             background: none;
             border: none;
-            color: #d4af37;
+            color: #ff5e00 !important;
             cursor: pointer;
             font-size: 1.2rem;
             margin-left: 15px;
         }
 
+        /* Botón Hamburguesa (Móvil) */
         .menu-toggle {
             display: none; /* Oculto en PC */
             background: none;
             border: none;
-            color: white;
+            color: white !important;
             font-size: 1.5rem;
             cursor: pointer;
         }
 
-        /* CONTENEDOR PRINCIPAL */
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            padding-bottom: 100px !important;
-            width: 100%;
-        }
+        /* =========================================
+           3. DISEÑO DE TARJETAS (FANTASY)
+           ========================================= */
+        h1 { color: white; margin-bottom: 20px; text-transform: uppercase; text-align: center; }
 
-        h1 { color: white; margin-bottom: 20px; text-transform: uppercase; }
-
-        /* BUSCADOR */
         .search-container {
             width: 100%;
             max-width: 600px;
-            position: relative;
             margin-bottom: 25px;
+            padding: 0 15px;
         }
         
         #buscadorAtleta {
@@ -116,16 +121,16 @@
             font-size: 1rem;
         }
 
-        /* REJILLA DE TARJETAS */
         .market-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             width: 100%;
             max-width: 1200px;
+            padding: 0 20px;
         }
 
-        /* DISEÑO DE LA TARJETA (VERDE, NEGRO Y NARANJA) */
+        /* Tarjeta */
         .athlete-card {
             background-color: #151515;
             border: 1px solid #333;
@@ -147,15 +152,9 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            border: 2px solid #ff5722;
+            border: 2px solid #ff5e00;
             object-fit: cover;
             background-color: #222;
-        }
-
-        .athlete-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         .athlete-info h3 {
@@ -167,7 +166,7 @@
 
         .badge-cat {
             background-color: #333;
-            color: #ff5722;
+            color: #ff5e00;
             font-size: 0.65rem;
             padding: 3px 8px;
             border-radius: 4px;
@@ -178,13 +177,13 @@
         }
 
         .price-tag {
-            color: #4ade80; /* Verde neón */
+            color: #4ade80; 
             font-size: 1.5rem;
             font-weight: 900;
             margin-top: 5px;
         }
 
-        /* ESTADÍSTICAS */
+        /* Stats */
         .stats-summary {
             display: flex;
             justify-content: space-between;
@@ -216,9 +215,10 @@
             color: #fff;
         }
 
+        /* Botones e Historial */
         .toggle-btn {
             text-align: center;
-            color: #ff5722;
+            color: #ff5e00;
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
@@ -226,7 +226,6 @@
         }
         .toggle-btn:hover { text-decoration: underline; }
 
-        /* DESPLEGABLE */
         .historial-desplegable {
             margin-top: 10px;
             border-top: 1px solid #333;
@@ -261,18 +260,21 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- RESPONSIVE (MÓVIL) --- */
+        /* =========================================
+           4. RESPONSIVE (MÓVIL) - CORRECCIÓN CLAVE
+           ========================================= */
         @media (max-width: 768px) {
             .navbar {
-                flex-wrap: wrap; 
-                padding: 15px;
+                flex-wrap: wrap; /* Permite que el menú caiga abajo */
+                padding: 15px !important;
             }
             
             .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block; }
+            .menu-toggle { display: block !important; } /* Mostrar hamburguesa */
             
+            /* El menú se oculta por defecto en móvil */
             .nav-links {
-                display: none;
+                display: none; 
                 width: 100%;
                 flex-direction: column;
                 margin-top: 15px;
@@ -282,6 +284,7 @@
                 border: 1px solid #333;
             }
 
+            /* Se muestra cuando añadimos la clase 'active' con JS */
             .nav-links.active { display: flex; }
 
             .nav-links a {
@@ -290,10 +293,12 @@
                 width: 100%;
                 display: block;
                 text-align: center;
+                margin: 0 !important;
             }
 
             .market-grid { 
                 grid-template-columns: 1fr; /* Una columna en móvil */
+                padding: 0 15px;
             }
         }
     </style>
