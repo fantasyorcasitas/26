@@ -285,78 +285,144 @@
             <a href="clasificaciones.html">RANKING</a>
             <a href="calendario.html">CALENDARIO</a>
 
-            <button onclick="cerrarSesion()" class="btn-logout">
-                <i class="fa-solid fa-power-off"></i> Salir
             </button>
+
+        <button onclick="localStorage.removeItem('fantasy_user'); window.location.href='../index.html'" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
+
+       
+
+        <div class="nav-links" id="navLinks">
+
+            <a href="home.html">Inicio</a>
+
+            <a href="mi_equipo.html" class="active">Mi Equipo</a>
+
+            <a href="mercado.html">Mercado</a>
+
+            <a href="clasificaciones.html">Ranking</a>
+
+            <a href="calendario.html">Calendario</a>
+
         </div>
+
     </nav>
 
+
+
     <div class="budget-header">
+
         <div class="budget-content">
+
             <div style="display:flex; flex-direction:column;">
+
                 <span class="budget-label">Presupuesto</span>
+
                 <span id="budgetValue" class="budget-number">---</span>
+
             </div>
-            
+
+           
+
             <div id="debtWarning" class="debt-pill">
+
                 ⚠️ EN DEUDA
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div class="dashboard-container">
-        
+
+       
+
         <div class="pitch-area">
+
             <div style="text-align: center; margin-bottom: 10px; color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+
                 Tu Alineación (3)
+
             </div>
+
+
 
             <div class="pitch-bg">
+
                 <div class="formation-wrapper">
+
                     <div class="formation-row">
+
                         <div id="slot0" class="player-card-slot"></div>
+
                     </div>
+
                     <div class="formation-row">
+
                         <div id="slot1" class="player-card-slot"></div>
+
                         <div id="slot2" class="player-card-slot"></div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
+
 
         <div class="fab-save-container">
+
             <button id="btnSaveTeam" class="btn-save-fab">
+
                 <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+
             </button>
+
         </div>
 
+
+
     </div>
+
+
 
     <div id="playerModal" class="modal-overlay">
+
         <div class="modal-content">
+
             <div class="modal-header">
+
                 <h3 style="color:white; margin:0; font-size:1.1rem;">Seleccionar Jugador</h3>
-                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+
+                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
+
             </div>
+
             <div style="padding:10px; background:#1a1a1a;">
-                <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar atleta..." 
+
+                <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar atleta..."
+
                        style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#000; color:white; outline:none;">
+
             </div>
-            <div id="modalPlayerList" class="modal-body">
+
+            <div id="modalPlayerList" class="modal-body" style="max-height: 60vh;">
+
                 </div>
+
         </div>
+
     </div>
 
-    <script>
-        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
-        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
-        
-        // Función global para cerrar modal (requerida por el HTML onclick)
-        window.closeModal = function() {
-            document.getElementById('playerModal').style.display = 'none';
-        }
-    </script>
+
 
     <script type="module" src="../js/mi_equipo.js"></script>
+
 </body>
+
 </html>
