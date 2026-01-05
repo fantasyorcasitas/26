@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* =========================================
-           1. RESET Y ESTRUCTURA BÁSICA
-           ========================================= */
+        /* RESET BÁSICO */
+        * { box-sizing: border-box; }
+        
         html, body {
             overflow-y: auto !important;
             height: auto !important;
@@ -23,27 +23,15 @@
             padding: 0;
         }
 
-        .dashboard-container {
-            height: auto !important;
-            padding-bottom: 100px !important;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* =========================================
-           2. BARRA DE NAVEGACIÓN (NAVBAR)
-           ========================================= */
+        /* NAVBAR (BARRA DE NAVEGACIÓN) SÓLIDA */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #000;
-            padding: 15px 30px;
-            border-bottom: 2px solid #333;
+            padding: 15px 20px;
+            border-bottom: 2px solid #222;
             width: 100%;
-            box-sizing: border-box;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -59,8 +47,9 @@
             gap: 10px;
         }
         
-        .nav-logo span { color: #ff5722; } /* ORCASITAS en naranja */
+        .nav-logo span { color: #ff5722; }
 
+        /* MENÚ DE ESCRITORIO */
         .nav-links {
             display: flex;
             gap: 20px;
@@ -84,11 +73,11 @@
             color: #d4af37;
             cursor: pointer;
             font-size: 1.2rem;
+            margin-left: 15px;
         }
 
-        /* Botón hamburguesa (oculto en PC) */
         .menu-toggle {
-            display: none;
+            display: none; /* Oculto en PC */
             background: none;
             border: none;
             color: white;
@@ -96,19 +85,47 @@
             cursor: pointer;
         }
 
-        /* =========================================
-           3. TARJETA DE JUGADOR (DISEÑO FANTASY)
-           ========================================= */
+        /* CONTENEDOR PRINCIPAL */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-bottom: 100px !important;
+            width: 100%;
+        }
+
+        h1 { color: white; margin-bottom: 20px; text-transform: uppercase; }
+
+        /* BUSCADOR */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        #buscadorAtleta {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border-radius: 50px;
+            border: 1px solid #444;
+            background: #151515;
+            color: white;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        /* REJILLA DE TARJETAS */
         .market-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             width: 100%;
             max-width: 1200px;
-            padding: 20px;
-            box-sizing: border-box;
         }
 
+        /* DISEÑO DE LA TARJETA (VERDE, NEGRO Y NARANJA) */
         .athlete-card {
             background-color: #151515;
             border: 1px solid #333;
@@ -161,13 +178,13 @@
         }
 
         .price-tag {
-            color: #4ade80; 
-            font-size: 1.3rem;
+            color: #4ade80; /* Verde neón */
+            font-size: 1.5rem;
             font-weight: 900;
             margin-top: 5px;
         }
 
-        /* ESTADÍSTICAS (Total / Media) */
+        /* ESTADÍSTICAS */
         .stats-summary {
             display: flex;
             justify-content: space-between;
@@ -199,7 +216,6 @@
             color: #fff;
         }
 
-        /* BOTÓN HISTORIAL */
         .toggle-btn {
             text-align: center;
             color: #ff5722;
@@ -218,9 +234,6 @@
             animation: fadeIn 0.3s;
         }
 
-        .stats-section { margin-bottom: 15px; width: 100%; }
-        .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; text-transform: uppercase;}
-        
         .history-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -229,9 +242,11 @@
             padding: 10px;
             border-radius: 8px;
             text-align: center;
+            margin-bottom: 10px;
         }
         .grid-value { color: white; font-weight: bold; font-size: 0.9rem; }
         .grid-label { color: #666; font-size: 0.6rem; }
+        .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; text-transform: uppercase;}
 
         .btn-comprar-mini {
             width: 100%;
@@ -246,25 +261,18 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* =========================================
-           4. RESPONSIVE (ARREGLO DEL MÓVIL)
-           ========================================= */
+        /* --- RESPONSIVE (MÓVIL) --- */
         @media (max-width: 768px) {
-            /* Navbar se adapta */
             .navbar {
                 flex-wrap: wrap; 
                 padding: 15px;
             }
             
-            /* Logo ocupa el espacio izquierdo */
             .nav-logo { flex-grow: 1; }
-
-            /* Aparece el botón menú */
             .menu-toggle { display: block; }
             
-            /* Los enlaces se esconden hasta que pulses */
             .nav-links {
-                display: none; /* Oculto por defecto */
+                display: none;
                 width: 100%;
                 flex-direction: column;
                 margin-top: 15px;
@@ -274,26 +282,19 @@
                 border: 1px solid #333;
             }
 
-            /* Clase 'active' (la pone el JS al pulsar) */
-            .nav-links.active {
-                display: flex;
-            }
+            .nav-links.active { display: flex; }
 
             .nav-links a {
-                padding: 10px;
+                padding: 12px;
                 border-bottom: 1px solid #333;
                 width: 100%;
                 display: block;
                 text-align: center;
             }
 
-            /* Ajustes generales móvil */
             .market-grid { 
-                grid-template-columns: 1fr; /* 1 sola columna */
-                padding: 10px;
+                grid-template-columns: 1fr; /* Una columna en móvil */
             }
-            
-            h1 { font-size: 1.5rem; }
         }
     </style>
 </head>

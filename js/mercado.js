@@ -5,7 +5,7 @@ const mercadoGrid = document.getElementById('mercadoGrid');
 const inputBuscador = document.getElementById('buscadorAtleta');
 let todosLosAtletas = [];
 
-// === 1. CARGAR MERCADO ===
+// === 1. CARGAR MERCADO Y ORDENAR ===
 async function cargarMercado() {
     try {
         mercadoGrid.innerHTML = '<p style="color:white; text-align:center">Cargando...</p>';
@@ -15,6 +15,9 @@ async function cargarMercado() {
         querySnapshot.forEach((doc) => {
             todosLosAtletas.push({ id: doc.id, ...doc.data() });
         });
+
+        // --- ORDENAR POR PRECIO (DE MAYOR A MENOR) ---
+        todosLosAtletas.sort((a, b) => Number(b.precio) - Number(a.precio));
 
         renderizarAtletas(todosLosAtletas);
     } catch (error) {
@@ -39,12 +42,13 @@ function renderizarAtletas(listaAtletas) {
         const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
         const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
         
-        // --- CORRECCIÓN PRECIO (Sin dividir, directo de la BD) ---
-        // Si en Firebase es 7, aquí mostramos "7M"
-        const precioDisplay = atleta.precio + 'M';
+        // --- PRECIO DIRECTO (SIN DIVIDIR) ---
+        // Si en Firebase es 7, se muestra "7M"
+        // Si es undefined o null, mostramos "0M"
+        const precioVal = atleta.precio !== undefined ? atleta.precio : 0;
+        const precioDisplay = precioVal + 'M';
 
         // --- B. PREPARAR GRÁFICAS (OCULTAS) ---
-        // 1. Puntos
         const puntosVisuales = prepararUltimos5(historial, false);
         const labelsPuntos = ['J-4', 'J-3', 'J-2', 'J-1', 'ÚLTIMA'];
         let htmlGridPuntos = '';
@@ -56,8 +60,7 @@ function renderizarAtletas(listaAtletas) {
                 </div>`;
         });
 
-        // 2. Valor
-        const valorVisuales = prepararUltimos5(atleta.historial_valor || [atleta.precio], true);
+        const valorVisuales = prepararUltimos5(atleta.historial_valor || [precioVal], true);
         let htmlGridValor = '';
         valorVisuales.forEach((val, i) => {
             htmlGridValor += `
@@ -68,6 +71,7 @@ function renderizarAtletas(listaAtletas) {
         });
 
         // --- C. CONSTRUIR HTML ---
+        // Nota: He añadido estilos inline al precio para asegurarme de que se vea verde
         htmlAcumulado += `
             <div class="athlete-card">
                 <div class="athlete-header">
@@ -117,7 +121,6 @@ function renderizarAtletas(listaAtletas) {
 }
 
 // === 3. FUNCIONES AUXILIARES ===
-
 window.toggleHistorial = (id) => {
     const el = document.getElementById(`historial-${id}`);
     const btn = event.currentTarget; 
@@ -143,7 +146,6 @@ inputBuscador.addEventListener('input', (e) => {
 
 window.addEventListener('DOMContentLoaded', cargarMercado);
 
-// --- FUNCIÓN QUE PREPARA LOS ARRAY DE 5 (SIN DECIMALES) ---
 function prepararUltimos5(arrayDatos, esMoneda = false) {
     const datos = arrayDatos || [];
     const ultimos = datos.slice(-5);
@@ -152,9 +154,7 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            // AQUÍ ESTABA EL ERROR: Ya no dividimos por 1 millón.
-            // Si el dato es 7, mostramos "7M". Sin decimales.
-            resultado[index + offset] = dato + 'M';
+            resultado[index + offset] = dato + 'M'; // Sin dividir
         } else {
             resultado[index + offset] = dato;
         }
