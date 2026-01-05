@@ -23,7 +23,7 @@ async function cargarMercado() {
     }
 }
 
-// === 2. RENDERIZAR TARJETAS (DISEÑO ORIGINAL + GRÁFICAS OCULTAS) ===
+// === 2. RENDERIZAR TARJETAS ===
 function renderizarAtletas(listaAtletas) {
     if (listaAtletas.length === 0) {
         mercadoGrid.innerHTML = '<p style="text-align:center; color:gray">No hay resultados.</p>';
@@ -33,20 +33,27 @@ function renderizarAtletas(listaAtletas) {
     let htmlAcumulado = '';
 
     listaAtletas.forEach(atleta => {
-        // --- A. CÁLCULOS DE ESTADÍSTICAS (TOTAL, MEDIA, ÚLTIMA) ---
+        // --- A. CÁLCULOS DE ESTADÍSTICAS ---
         const historial = atleta.historial_puntos || [];
-        // Sumar total
         const totalPuntos = historial.reduce((a, b) => a + b, 0);
-        // Última jornada (si no hay, es 0)
         const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
-        // Media (con 1 decimal)
         const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
         
-        // Precio formateado (Ej: 28M) - Sin decimales si es entero grande
-        const precioDisplay = (atleta.precio / 1000000).toFixed(0) + 'M';
+        // --- CORRECCIÓN DEL PRECIO AQUÍ ---
+        // 1. Aseguramos que sea un número (Number)
+        // 2. Usamos toFixed(1) para ver decimales (Ej: 0.5M en vez de 0M)
+        let precioNum = Number(atleta.precio);
+        let precioDisplay = (precioNum / 1000000).toFixed(1) + 'M';
 
-        // --- B. PREPARAR GRÁFICAS (OCULTAS POR DEFECTO) ---
-        // 1. Puntos (5 columnas)
+        // Opcional: Si prefieres ver "500k" en vez de "0.5M" para baratos, descomenta esto:
+        /*
+        if (precioNum < 1000000) {
+             precioDisplay = (precioNum / 1000).toFixed(0) + 'k';
+        }
+        */
+
+        // --- B. PREPARAR GRÁFICAS (OCULTAS) ---
+        // Puntos
         const puntosVisuales = prepararUltimos5(historial, false);
         const labelsPuntos = ['J-4', 'J-3', 'J-2', 'J-1', 'ÚLTIMA'];
         let htmlGridPuntos = '';
@@ -58,7 +65,7 @@ function renderizarAtletas(listaAtletas) {
                 </div>`;
         });
 
-        // 2. Valor (5 columnas)
+        // Valor
         const valorVisuales = prepararUltimos5(atleta.historial_valor || [atleta.precio], true);
         let htmlGridValor = '';
         valorVisuales.forEach((val, i) => {
@@ -69,7 +76,7 @@ function renderizarAtletas(listaAtletas) {
                 </div>`;
         });
 
-        // --- C. CONSTRUIR EL HTML DE LA TARJETA ---
+        // --- C. CONSTRUIR HTML ---
         htmlAcumulado += `
             <div class="athlete-card">
                 <div class="athlete-header">
@@ -101,17 +108,14 @@ function renderizarAtletas(listaAtletas) {
                 </div>
 
                 <div id="historial-${atleta.id}" class="historial-desplegable" style="display: none;">
-                    
                     <div class="stats-section">
                         <label class="section-label">Puntos (Últimas 5)</label>
                         <div class="history-grid">${htmlGridPuntos}</div>
                     </div>
-
                     <div class="stats-section">
                         <label class="section-label">Evolución Valor</label>
                         <div class="history-grid">${htmlGridValor}</div>
                     </div>
-
                     <button class="btn-comprar-mini" onclick="ficharAtleta('${atleta.id}', '${atleta.nombre}')">FICHAR</button>
                 </div>
             </div>
