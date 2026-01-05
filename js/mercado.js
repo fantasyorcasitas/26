@@ -1,158 +1,159 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+ import { db } from "./firebase-config.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
-  authDomain: "fantasy-atletismo-26.firebaseapp.com",
-  projectId: "fantasy-atletismo-26",
-  storageBucket: "fantasy-atletismo-26.firebasestorage.app",
-  messagingSenderId: "133833651406",
-  appId: "1:133833651406:web:4e2841f58fd2a288c30c9f"
-};
+// Variables globales
+const mercadoGrid = document.getElementById('mercadoGrid');
+const inputBuscador = document.getElementById('buscadorAtleta');
+let todosLosAtletas = []; // Aquí guardaremos los datos para no recargar Firebase al buscar
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// --- CARGAR MERCADO ---
+// === 1. FUNCIÓN PRINCIPAL: CARGAR MERCADO ===
 async function cargarMercado() {
-    const grid = document.getElementById('mercadoGrid');
-    const inputBuscador = document.getElementById('buscadorAtleta');
-    
-    grid.innerHTML = '<p style="color:white; text-align:center;">Cargando atletas...</p>';
-
     try {
+        mercadoGrid.innerHTML = '<p style="color:white; text-align:center">Cargando mercado...</p>';
+
+        // Obtenemos la colección "atletas"
         const querySnapshot = await getDocs(collection(db, "atletas"));
-        let atletas = [];
+        
+        todosLosAtletas = []; // Limpiamos array
 
         querySnapshot.forEach((doc) => {
-            let data = doc.data();
-            data.id = doc.id;
-            atletas.push(data);
+            // Guardamos los datos y el ID
+            todosLosAtletas.push({
+                id: doc.id,
+                ...doc.data()
+            });
         });
 
-        // Ordenar por precio (Los más caros primero)
-        atletas.sort((a, b) => b.precio - a.precio);
-        renderizarAtletas(atletas, grid);
-
-        // Buscador
-        inputBuscador.addEventListener('keyup', (e) => {
-            const termino = e.target.value.toLowerCase();
-            const filtrados = atletas.filter(atleta => 
-                atleta.nombre.toLowerCase().includes(termino) || 
-                atleta.apellidos.toLowerCase().includes(termino)
-            );
-            renderizarAtletas(filtrados, grid);
-        });
+        // Una vez cargados, los mostramos
+        renderizarAtletas(todosLosAtletas);
 
     } catch (error) {
-        console.error("Error mercado:", error);
-        grid.innerHTML = '<p style="color:red; text-align:center;">Error al cargar datos.</p>';
+        console.error("Error cargando mercado:", error);
+        mercadoGrid.innerHTML = '<p style="color:red; text-align:center">Error cargando datos.</p>';
     }
 }
 
-// --- RENDERIZAR TARJETAS (VERSIÓN TEXTO SIMPLE) ---
-function renderizarAtletas(lista, contenedor) {
-    contenedor.innerHTML = "";
-
-    if (lista.length === 0) {
-        contenedor.innerHTML = '<p style="color:#aaa; text-align:center;">No se encontraron atletas.</p>';
+// === 2. FUNCIÓN DE RENDERIZADO (PINTAR TARJETAS) ===
+function renderizarAtletas(listaAtletas) {
+    // Si no hay nadie (por búsqueda)
+    if (listaAtletas.length === 0) {
+        mercadoGrid.innerHTML = '<p style="color:gray; text-align:center">No se encontraron atletas.</p>';
         return;
     }
 
-    lista.forEach(atleta => {
+    let htmlAcumulado = '';
+
+    listaAtletas.forEach(atleta => {
         
-        // 1. PUNTOS REALES (Sin aleatorios)
-        // Como no hay jornadas, ponemos 0 o guiones
-        const ptsTotal = atleta.puntos || 0;
-        const ptsUltima = atleta.puntos_ultima_jornada || 0;
-        const media = (ptsTotal > 0) ? (ptsTotal / 1).toFixed(1) : "0.0"; // Ajustar divisor cuando haya jornadas
-
-        // 2. HTML PARA LISTA DE PUNTOS RECIENTES
-        // Mostramos marcadores vacíos "-" ya que no hay historial
-        const htmlPuntos = `
-            <div class="points-row">
-                <div class="point-item"><span class="point-val">-</span><span class="point-label">J-4</span></div>
-                <div class="point-item"><span class="point-val">-</span><span class="point-label">J-3</span></div>
-                <div class="point-item"><span class="point-val">-</span><span class="point-label">J-2</span></div>
-                <div class="point-item"><span class="point-val">-</span><span class="point-label">J-1</span></div>
-                <div class="point-item"><span class="point-val" style="color:#ffae00;">${ptsUltima}</span><span class="point-label">Última</span></div>
-            </div>
-        `;
-
-        // 3. HTML PARA HISTORIAL DE VALOR
-        // Mostramos el valor actual como "Inicio" y "Actual"
-        const htmlValor = `
-            <ul class="value-list">
-                <li class="value-item">
-                    <span>Valor Inicial</span>
-                    <span class="value-price" style="color:#888;">${atleta.precio}M</span>
-                </li>
-                <li class="value-item">
-                    <span>Valor Actual</span>
-                    <span class="value-price">${atleta.precio}M <i class="fa-solid fa-minus" style="font-size:0.7rem; color:#888; margin-left:5px;"></i></span>
-                </li>
-            </ul>
-        `;
-
-        // CREAR TARJETA
-        const card = document.createElement('div');
-        card.className = 'athlete-card';
-
-        card.innerHTML = `
-            <div class="card-header-flex">
-                <img src="${atleta.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" alt="Foto" class="card-img">
-                <div class="card-basic-info">
-                    <h3>${atleta.nombre} ${atleta.apellidos}</h3>
-                    <span class="card-category-badge">${atleta.categoria}</span>
-                    <p style="color: #4cd137; font-weight:bold; font-size: 1rem; margin-top:5px;">
-                        ${atleta.precio}M
-                    </p>
+        // --- AQUÍ ESTÁ LA LÓGICA DE LAS 5 COLUMNAS ---
+        
+        // 1. Preparamos PUNTOS (J-4 ... Última)
+        // Si no tiene historial, pasamos array vacío
+        const puntosVisuales = prepararUltimos5(atleta.historial_puntos || [], false);
+        const labelsPuntos = ['J-4', 'J-3', 'J-2', 'J-1', 'ÚLTIMA'];
+        
+        let htmlGridPuntos = '';
+        puntosVisuales.forEach((valor, i) => {
+            htmlGridPuntos += `
+                <div class="grid-item">
+                    <span class="grid-label">${labelsPuntos[i]}</span>
+                    <span class="grid-value">${valor}</span>
                 </div>
-            </div>
+            `;
+        });
 
-            <div class="card-main-stats">
-                <div class="stat-box">
-                    <span>Total</span>
-                    <strong>${ptsTotal}</strong>
+        // 2. Preparamos VALOR (Reg-1 ... Reg-5)
+        // Si no tiene historial, usamos su precio actual como único dato
+        const historialValor = atleta.historial_valor || [atleta.precio];
+        const valorVisuales = prepararUltimos5(historialValor, true);
+        
+        let htmlGridValor = '';
+        valorVisuales.forEach((valor, i) => {
+            // Lógica visual: Si no es un guión, pintamos en blanco (o verde/rojo si quisieras calcular cambios)
+            htmlGridValor += `
+                <div class="grid-item">
+                    <span class="grid-label">Reg-${i+1}</span>
+                    <span class="grid-value">${valor}</span>
                 </div>
-                <div class="stat-box">
-                    <span>Última</span>
-                    <strong>${ptsUltima}</strong>
-                </div>
-                <div class="stat-box">
-                    <span>Media</span>
-                    <strong>${media}</strong>
-                </div>
-            </div>
+            `;
+        });
 
-            <button class="btn-toggle-details" onclick="toggleDetails(this)">
-                Ver historial <i class="fa-solid fa-list-ul"></i>
-            </button>
+        // 3. Construimos la TARJETA
+        const precioFormateado = (atleta.precio / 1000000).toFixed(1) + 'M';
+        
+        htmlAcumulado += `
+            <div class="athlete-card">
+                <div class="athlete-header">
+                    <img src="${atleta.foto}" alt="${atleta.nombre}" class="athlete-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/74/74472.png'">
+                    <div>
+                        <h3>${atleta.nombre} ${atleta.apellidos || ''}</h3>
+                        <p class="athlete-pos">${atleta.categoria || 'Jugador'}</p>
+                    </div>
+                </div>
 
-            <div class="card-details">
+                <div class="stats-section">
+                    <label class="section-label">Puntos (Últimas 5 Jornadas)</label>
+                    <div class="history-grid">
+                        ${htmlGridPuntos}
+                    </div>
+                </div>
                 
-                <div class="details-block">
-                    <div class="details-title">Puntos por Jornada</div>
-                    ${htmlPuntos}
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
+
+                <div class="stats-section">
+                    <label class="section-label">Evolución de Valor</label>
+                    <div class="history-grid">
+                        ${htmlGridValor}
+                    </div>
                 </div>
 
-                <div class="details-block" style="margin-bottom:0;">
-                    <div class="details-title">Histórico de Valor</div>
-                    ${htmlValor}
-                </div>
-
+                <button class="btn-comprar" onclick="ficharAtleta('${atleta.id}', '${atleta.nombre}', ${atleta.precio})">
+                    Fichar (${precioFormateado})
+                </button>
             </div>
         `;
-
-        contenedor.appendChild(card);
     });
 
-    // --- FUNCIÓN AUXILIAR (Pégala al final del archivo) ---
+    mercadoGrid.innerHTML = htmlAcumulado;
+}
+
+// === 3. LÓGICA DEL BUSCADOR ===
+inputBuscador.addEventListener('input', (e) => {
+    const texto = e.target.value.toLowerCase();
+    
+    // Filtramos el array global
+    const filtrados = todosLosAtletas.filter(atleta => {
+        const nombreCompleto = `${atleta.nombre} ${atleta.apellidos || ''}`.toLowerCase();
+        return nombreCompleto.includes(texto);
+    });
+
+    renderizarAtletas(filtrados);
+});
+
+// === 4. FUNCIÓN TEMPORAL PARA FICHAR ===
+// Necesitamos ponerla en window para que el onclick del HTML funcione
+window.ficharAtleta = (id, nombre, precio) => {
+    // Aquí iría la lógica de comprobar dinero del usuario, restar saldo, etc.
+    alert(`Has solicitado fichar a ${nombre} por ${(precio/1000000).toFixed(1)}M.\n\n(Lógica de compra pendiente de implementar)`);
+};
+
+// === 5. INICIALIZACIÓN ===
+window.addEventListener('DOMContentLoaded', cargarMercado);
+
+
+// ======================================================
+// === FUNCIÓN AUXILIAR (LA MAGIA DE LAS 5 COLUMNAS) ===
+// ======================================================
 function prepararUltimos5(arrayDatos, esMoneda = false) {
     const datos = arrayDatos || [];
-    const ultimos = datos.slice(-5); // Coger los últimos 5
-    const resultado = Array(5).fill('-'); // Crear array de 5 guiones
-    const offset = 5 - ultimos.length; // Calcular desplazamiento
+    // Tomamos solo los últimos 5 datos reales
+    const ultimos = datos.slice(-5);
+    
+    // Creamos un array de 5 huecos llenos de guiones
+    const resultado = Array(5).fill('-');
+    
+    // Calculamos dónde empezar a rellenar (alineado a la derecha)
+    const offset = 5 - ultimos.length;
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
@@ -162,44 +163,6 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
             resultado[index + offset] = dato;
         }
     });
-    return resultado;
-}
-}
-// --- FUNCIÓN AUXILIAR: Rellena con guiones si faltan datos ---
-function prepararUltimos5(arrayDatos, esMoneda = false) {
-    // Si el array no existe, usamos uno vacío
-    const datos = arrayDatos || [];
-    
-    // Tomamos solo los últimos 5 datos reales
-    const ultimos = datos.slice(-5);
-    
-    // Creamos un array de 5 huecos llenos de guiones
-    const resultado = Array(5).fill('-');
-    
-    // Calculamos dónde empezar a rellenar (para que quede alineado a la derecha)
-    const offset = 5 - ultimos.length;
-    
-    ultimos.forEach((dato, index) => {
-        if (esMoneda) {
-            // Convierte 61000000 en "61.0M"
-            resultado[index + offset] = (dato / 1000000).toFixed(1) + 'M';
-        } else {
-            resultado[index + offset] = dato;
-        }
-    });
     
     return resultado;
 }
-// GLOBAL: Acordeón
-window.toggleDetails = function(btn) {
-    const details = btn.nextElementSibling;
-    if (details.style.display === "block") {
-        details.style.display = "none";
-        btn.innerHTML = 'Ver historial <i class="fa-solid fa-list-ul"></i>';
-    } else {
-        details.style.display = "block";
-        btn.innerHTML = 'Ocultar <i class="fa-solid fa-chevron-up"></i>';
-    }
-};
-
-document.addEventListener('DOMContentLoaded', cargarMercado);
