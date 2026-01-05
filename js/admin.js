@@ -1,8 +1,16 @@
-import { db } from "./firebase-config.js";
-import { collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { db, auth } from "./firebase-config.js"; // Asegúrate de importar auth también
-import { collection, addDoc, getDocs, orderBy, query, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db, auth } from "./firebase-config.js"; 
+import { 
+    collection, 
+    addDoc, 
+    getDocs, 
+    orderBy, 
+    query, 
+    doc, 
+    getDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// ... el resto de tu código ...
 
 // === SEGURIDAD: EL PORTERO DE DISCOTECA ===
 onAuthStateChanged(auth, async (user) => {
