@@ -2,19 +2,106 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <title>Calendario | Fantasy Orcasitas</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        html, body { overflow-y: auto !important; height: auto !important; min-height: 100vh; }
-        .dashboard-container { padding-top: 90px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; }
+        /* =========================================
+           1. ESTILOS BASE (ARQUITECTURA COMÚN)
+           ========================================= */
+        * { box-sizing: border-box; }
 
-        /* Estilos Tarjetas Competición */
+        html { background-color: #000000 !important; }
+
+        body {
+            display: block !important;
+            height: auto !important;
+            min-height: 100vh;
+            overflow-y: auto !important;
+            background-color: transparent !important;
+            margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            position: relative; 
+        }
+
+        /* FONDO */
+        .bg-image {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: -2;
+            opacity: 0.4;
+        }
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+            z-index: -1;
+        }
+
+        .dashboard-container {
+            padding-top: 40px !important;
+            padding-bottom: 100px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding-left: 15px; /* Margen seguro a los lados */
+            padding-right: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* =========================================
+           2. NAVBAR (ESTANDARIZADA)
+           ========================================= */
+        .navbar {
+            position: sticky !important;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000 !important;
+            padding: 15px 20px !important;
+            border-bottom: 2px solid #222 !important;
+            width: 100%;
+            height: 70px !important;
+            z-index: 5000;
+        }
+
+        .nav-logo a {
+            text-decoration: none; color: white !important; font-size: 1.2rem; font-weight: 800;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-logo span { color: #ff5e00 !important; }
+
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; color: #aaa !important; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
+
+        .btn-logout { background: none; border: none; color: #ff5e00 !important; font-size: 1.2rem; cursor: pointer; margin-left: 15px; }
+        .menu-toggle { display: none !important; background: none; border: none; color: white !important; font-size: 1.5rem; cursor: pointer; }
+
+        /* =========================================
+           3. ESTILOS CALENDARIO
+           ========================================= */
+        h1 {
+            color: white; text-transform: uppercase; margin-bottom: 25px; text-align: center;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5); font-size: 2rem; font-weight: 800;
+        }
+
+        /* Tarjeta de Competición */
         .compe-card {
-            background: #111;
+            background: rgba(20, 20, 20, 0.95);
             border: 1px solid #333;
             border-radius: 12px;
             width: 100%;
@@ -22,63 +109,63 @@
             margin-bottom: 20px;
             overflow: hidden;
             position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        .compe-header {
-            padding: 15px;
-            background: linear-gradient(90deg, #1a1a1a, #111);
-            border-bottom: 1px solid #222;
-        }
-        .compe-date { color: var(--primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        .compe-name { color: white; font-size: 1.2rem; font-weight: 800; margin-bottom: 5px; }
-        .compe-location { color: #888; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
 
-        /* Estado */
+        .compe-header { padding: 20px; border-bottom: 1px solid #333; }
+        .compe-date { color: #ff5e00; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .compe-name { color: white; font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+        .compe-location { color: #aaa; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+        /* Etiquetas de Estado */
         .status-badge {
-            position: absolute; top: 15px; right: 15px;
-            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase;
+            position: absolute; top: 20px; right: 20px;
+            padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;
         }
-        .status-pending { background: rgba(255, 174, 0, 0.2); color: #ffae00; border: 1px solid #ffae00; }
-        .status-finished { background: rgba(76, 209, 55, 0.2); color: #4cd137; border: 1px solid #4cd137; }
+        .status-pending { background: rgba(255, 174, 0, 0.15); color: #ffae00; border: 1px solid #ffae00; }
+        .status-finished { background: rgba(76, 209, 55, 0.15); color: #4cd137; border: 1px solid #4cd137; }
 
-        /* Detalles (Acordeón) */
-        details { width: 100%; max-width: 600px; margin-bottom: 10px; }
+        /* Detalles / Acordeón */
+        .history-section { width: 100%; max-width: 600px; margin-top: 30px; }
+        
+        details { width: 100%; margin-bottom: 10px; }
         summary {
-            background: #222; color: white; padding: 15px; border-radius: 8px;
-            cursor: pointer; font-weight: bold; border: 1px solid #333;
+            background: rgba(30, 30, 30, 0.9); color: white; padding: 15px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; border: 1px solid #444;
             list-style: none; display: flex; justify-content: space-between; align-items: center;
+            text-transform: uppercase; font-size: 0.9rem;
         }
         summary::-webkit-details-marker { display: none; }
-        summary::after { content: '▼'; font-size: 0.8rem; color: #666; }
+        summary::after { content: '▼'; color: #ff5e00; }
         details[open] summary::after { content: '▲'; }
 
-        /* Tabla de Resultados dentro de la tarjeta */
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            color: #ddd;
-        }
+        /* Tabla de Resultados */
+        .results-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #ddd; }
         .results-table th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid #333; font-size: 0.7rem; text-transform: uppercase; }
-        .results-table td { padding: 10px; border-bottom: 1px solid #222; }
+        .results-table td { padding: 12px 10px; border-bottom: 1px solid #222; }
         .results-table tr:last-child td { border-bottom: none; }
         .res-mark { color: white; font-weight: bold; }
-        .res-pts { color: var(--primary); font-weight: 800; text-align: right; }
+        .res-pts { color: #ff5e00; font-weight: 800; text-align: right; }
 
-        /* Sección Oculta de Finalizadas */
-        .history-section {
-            width: 100%; max-width: 600px; margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;
-        }
-        .history-title { color: #666; font-size: 1rem; text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-
-        /* Navbar móvil */
-        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; }
+        /* =========================================
+           4. RESPONSIVE MÓVIL (MENU OVERLAY)
+           ========================================= */
         @media (max-width: 768px) {
-            .navbar { flex-wrap: wrap; padding: 15px; }
-            .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block; margin-left: 15px; }
-            .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); padding: 10px; border: 1px solid #333; border-radius: 8px;}
-            .nav-links.active { display: flex; }
-            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
+            .navbar { padding: 10px 15px !important; }
+            .menu-toggle { display: block !important; }
+
+            .nav-links {
+                position: fixed; top: 0; left: 0;
+                width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98);
+                flex-direction: column; justify-content: center; align-items: center;
+                z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out;
+            }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
+
+            h1 { font-size: 1.8rem; margin-top: 10px; margin-bottom: 20px; }
         }
     </style>
 </head>
@@ -89,27 +176,37 @@
 
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html" style="color:white; text-decoration:none;">
+            <a href="home.html">
                 <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
             </a>
         </div>
-        <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
-        <button onclick="localStorage.removeItem('fantasy_user'); window.location.href='../index.html'" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
         <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
             <a href="calendario.html" class="active">Calendario</a>
+
+            <button onclick="cerrarSesion()" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i> Salir
+            </button>
         </div>
     </nav>
 
     <div class="dashboard-container">
-        
-        <h1 style="color:white; margin-bottom: 20px; text-transform: uppercase;">Próximas Competiciones</h1>
+        <h1><i class="fa-regular fa-calendar-days"></i> Calendario</h1>
         
         <div id="pendingList" style="width: 100%; max-width: 600px;">
-            <p style="color:#666; text-align:center;">Cargando...</p>
+            <p style="color:#aaa; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</p>
         </div>
 
         <div class="history-section">
@@ -119,8 +216,12 @@
                     </div>
             </details>
         </div>
-
     </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -142,11 +243,10 @@
             const pendingContainer = document.getElementById('pendingList');
             const finishedContainer = document.getElementById('finishedList');
             
-            pendingContainer.innerHTML = '<p style="text-align:center; color:#666;">Cargando...</p>';
+            pendingContainer.innerHTML = '<p style="text-align:center; color:#aaa;"><i class="fa-solid fa-spinner fa-spin"></i> Cargando competiciones...</p>';
             finishedContainer.innerHTML = '';
 
             try {
-                // Ordenar por fecha
                 const q = query(collection(db, "competiciones"), orderBy("fecha", "asc"));
                 const snapshot = await getDocs(q);
                 
@@ -159,23 +259,19 @@
                     const fechaStr = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 
                     if (data.estado === 'finalizada') {
-                        // TARJETA DE FINALIZADA (CON RESULTADOS)
                         let rows = '';
                         if(data.participantes && data.participantes.length > 0) {
-                            // Ordenar por puntos (mejor rendimiento arriba)
                             const sorted = data.participantes.sort((a,b) => b.puntos - a.puntos);
-                            
                             sorted.forEach(p => {
                                 rows += `
                                     <tr>
                                         <td class="res-mark">${p.resultado || '-'}</td>
                                         <td>
                                             <div style="color:white; font-weight:bold;">${p.nombre_completo}</div>
-                                            <div style="color:#666; font-size:0.75rem;">${p.prueba}</div>
+                                            <div style="color:#888; font-size:0.75rem;">${p.prueba}</div>
                                         </td>
                                         <td class="res-pts">+${p.puntos}</td>
-                                    </tr>
-                                `;
+                                    </tr>`;
                             });
                         } else {
                             rows = '<tr><td colspan="3" style="text-align:center; color:#666;">Sin datos detallados</td></tr>';
@@ -189,35 +285,30 @@
                                     <div class="compe-name">${data.nombre}</div>
                                     <div class="compe-location"><i class="fa-solid fa-location-dot"></i> ${data.lugar}</div>
                                 </div>
-                                <div style="padding: 10px; background: #151515;">
+                                <div style="padding: 15px; background: rgba(0,0,0,0.3);">
                                     <table class="results-table">
                                         <thead><tr><th>Marca/Pos</th><th>Atleta</th><th style="text-align:right;">Pts</th></tr></thead>
                                         <tbody>${rows}</tbody>
                                     </table>
                                 </div>
-                            </div>
-                        `;
-
+                            </div>`;
                     } else {
-                        // TARJETA PENDIENTE (NORMAL)
                         const pruebas = data.pruebas_resumen ? `<div style="margin-top:10px; font-size:0.8rem; color:#aaa;"><i class="fa-solid fa-list"></i> ${data.pruebas_resumen}</div>` : '';
-                        
                         pendingHTML += `
                             <div class="compe-card">
-                                <div class="compe-header">
+                                <div class="compe-header" style="border-bottom:none;">
                                     <div class="status-badge status-pending">PENDIENTE</div>
                                     <div class="compe-date">${fechaStr}</div>
                                     <div class="compe-name">${data.nombre}</div>
                                     <div class="compe-location"><i class="fa-solid fa-location-dot"></i> ${data.lugar}</div>
                                     ${pruebas}
                                 </div>
-                            </div>
-                        `;
+                            </div>`;
                     }
                 });
 
-                pendingContainer.innerHTML = pendingHTML || '<p style="text-align:center; color:#666;">No hay competiciones pendientes.</p>';
-                finishedContainer.innerHTML = finishedHTML || '<p style="text-align:center; color:#666;">Aún no hay resultados.</p>';
+                pendingContainer.innerHTML = pendingHTML || '<p style="text-align:center; color:#888; padding:20px;">No hay competiciones pendientes.</p>';
+                finishedContainer.innerHTML = finishedHTML || '<p style="text-align:center; color:#888; padding:20px;">Aún no hay resultados.</p>';
 
             } catch (error) {
                 console.error(error);
