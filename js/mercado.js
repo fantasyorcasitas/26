@@ -147,7 +147,31 @@ function renderizarAtletas(lista, contenedor) {
         contenedor.appendChild(card);
     });
 }
-
+// --- FUNCIÓN AUXILIAR: Rellena con guiones si faltan datos ---
+function prepararUltimos5(arrayDatos, esMoneda = false) {
+    // Si el array no existe, usamos uno vacío
+    const datos = arrayDatos || [];
+    
+    // Tomamos solo los últimos 5 datos reales
+    const ultimos = datos.slice(-5);
+    
+    // Creamos un array de 5 huecos llenos de guiones
+    const resultado = Array(5).fill('-');
+    
+    // Calculamos dónde empezar a rellenar (para que quede alineado a la derecha)
+    const offset = 5 - ultimos.length;
+    
+    ultimos.forEach((dato, index) => {
+        if (esMoneda) {
+            // Convierte 61000000 en "61.0M"
+            resultado[index + offset] = (dato / 1000000).toFixed(1) + 'M';
+        } else {
+            resultado[index + offset] = dato;
+        }
+    });
+    
+    return resultado;
+}
 // GLOBAL: Acordeón
 window.toggleDetails = function(btn) {
     const details = btn.nextElementSibling;

@@ -22,6 +22,55 @@
             overflow: visible !important; 
             padding-bottom: 100px !important; /* Espacio extra abajo para que no se corte el final */
         }
+        <style>
+        /* ... TUS ESTILOS ANTERIORES ... */
+
+        .stats-section {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .section-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 columnas exactas */
+            gap: 4px;
+            background-color: rgba(255, 255, 255, 0.05); /* Fondo sutil */
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-label {
+            font-size: 0.6rem;
+            color: #888;
+            margin-bottom: 2px;
+        }
+
+        .grid-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Colores opcionales para valores positivos/negativos */
+        .positive { color: #4ade80; } 
+        .negative { color: #f87171; }
 
         /* --- ESTILOS RESPONSIVE (MÓVIL) --- */
         .menu-toggle {

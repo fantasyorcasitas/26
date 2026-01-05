@@ -71,6 +71,7 @@ window.addEventListener('DOMContentLoaded', cargarSelectorAtletas);
 
 
 // === 2. GUARDAR NUEVO ATLETA ===
+// === 2. GUARDAR NUEVO ATLETA ===
 const formAtleta = document.getElementById('formAtleta');
 
 formAtleta.addEventListener('submit', async (e) => {
@@ -80,19 +81,28 @@ formAtleta.addEventListener('submit', async (e) => {
     btn.disabled = true;
 
     try {
+        // Capturamos el precio en una variable para usarlo en el array también
+        const precioInicial = Number(document.getElementById('atlPrecio').value);
+
         await addDoc(collection(db, "atletas"), {
             nombre: document.getElementById('atlNombre').value,
             apellidos: document.getElementById('atlApellidos').value,
             categoria: document.getElementById('atlCategoria').value,
-            precio: Number(document.getElementById('atlPrecio').value),
+            precio: precioInicial,
             foto: document.getElementById('atlFoto').value || "https://cdn-icons-png.flaticon.com/512/74/74472.png",
-            puntos: 0, // Siempre empieza en 0
-            tendencia: "neutral"
+            
+            // Campos básicos
+            puntos: 0, 
+            tendencia: "neutral",
+
+            // --- NUEVOS CAMPOS PARA LAS GRÁFICAS ---
+            historial_puntos: [],            // Array vacío (aún no ha jugado)
+            historial_valor: [precioInicial] // Array con el primer precio (el de salida)
         });
 
         alert("✅ Atleta creado correctamente");
         formAtleta.reset();
-        cargarSelectorAtletas(); // Recargamos el selector para que salga el nuevo
+        cargarSelectorAtletas(); 
 
     } catch (error) {
         alert("Error: " + error.message);
