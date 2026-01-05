@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <link rel="stylesheet" href="../css/style.css">
 
     <style>
         /* =========================================
@@ -40,15 +41,16 @@
         }
 
         .dashboard-container {
-            padding-top: 20px !important;
+            /* AJUSTE 2: Más separación de la barra superior (antes 20px) */
+            padding-top: 40px !important;
             padding-bottom: 80px !important;
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             box-sizing: border-box;
-            position: relative; /* Para que el z-index funcione */
-            z-index: 1; /* Por encima del fondo */
+            position: relative;
+            z-index: 1;
         }
 
         /* =========================================
@@ -65,7 +67,7 @@
             border-bottom: 2px solid #222 !important;
             width: 100%;
             height: 70px !important;
-            z-index: 5000; /* Muy por encima de todo */
+            z-index: 5000;
             box-sizing: border-box;
         }
 
@@ -101,7 +103,14 @@
         /* =========================================
            3. ESTILOS CLASIFICACIÓN
            ========================================= */
-        h1 { color: white; text-transform: uppercase; margin-bottom: 30px; text-align: center; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        /* AJUSTE 1: Título más grande, negrita y menos espacio debajo */
+        h1 {
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
 
         .rankings-wrapper {
             display: flex; 
@@ -193,7 +202,8 @@
 
             /* Ajustes Ranking Móvil */
             .ranking-card { width: 100%; margin-bottom: 20px; min-width: auto; }
-            h1 { font-size: 1.5rem; margin-top: 10px; }
+            /* Ajuste título móvil también */
+            h1 { font-size: 1.8rem; margin-top: 10px; margin-bottom: 15px; }
         }
     </style>
 </head>
@@ -218,11 +228,11 @@
                 <i class="fa-solid fa-times"></i>
             </button>
 
-            <a href="home.html">INICIO</a>
-            <a href="mi_equipo.html">MI EQUIPO</a>
-            <a href="mercado.html">MERCADO</a>
-            <a href="clasificaciones.html" class="active">RANKING</a>
-            <a href="calendario.html">CALENDARIO</a>
+            <a href="home.html">Inicio</a>
+            <a href="mi_equipo.html">Mi Equipo</a>
+            <a href="mercado.html">Mercado</a>
+            <a href="clasificaciones.html" class="active">Ranking</a>
+            <a href="calendario.html">Calendario</a>
 
             <button onclick="cerrarSesion()" class="btn-logout">
                 <i class="fa-solid fa-power-off"></i> Salir
