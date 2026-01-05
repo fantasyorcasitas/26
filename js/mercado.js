@@ -39,21 +39,12 @@ function renderizarAtletas(listaAtletas) {
         const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
         const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
         
-        // --- CORRECCIÓN DEL PRECIO AQUÍ ---
-        // 1. Aseguramos que sea un número (Number)
-        // 2. Usamos toFixed(1) para ver decimales (Ej: 0.5M en vez de 0M)
-        let precioNum = Number(atleta.precio);
-        let precioDisplay = (precioNum / 1000000).toFixed(1) + 'M';
-
-        // Opcional: Si prefieres ver "500k" en vez de "0.5M" para baratos, descomenta esto:
-        /*
-        if (precioNum < 1000000) {
-             precioDisplay = (precioNum / 1000).toFixed(0) + 'k';
-        }
-        */
+        // --- CORRECCIÓN PRECIO (Sin dividir, directo de la BD) ---
+        // Si en Firebase es 7, aquí mostramos "7M"
+        const precioDisplay = atleta.precio + 'M';
 
         // --- B. PREPARAR GRÁFICAS (OCULTAS) ---
-        // Puntos
+        // 1. Puntos
         const puntosVisuales = prepararUltimos5(historial, false);
         const labelsPuntos = ['J-4', 'J-3', 'J-2', 'J-1', 'ÚLTIMA'];
         let htmlGridPuntos = '';
@@ -65,7 +56,7 @@ function renderizarAtletas(listaAtletas) {
                 </div>`;
         });
 
-        // Valor
+        // 2. Valor
         const valorVisuales = prepararUltimos5(atleta.historial_valor || [atleta.precio], true);
         let htmlGridValor = '';
         valorVisuales.forEach((val, i) => {
@@ -127,10 +118,9 @@ function renderizarAtletas(listaAtletas) {
 
 // === 3. FUNCIONES AUXILIARES ===
 
-// Función GLOBAL para abrir/cerrar el acordeón (importante que esté en window)
 window.toggleHistorial = (id) => {
     const el = document.getElementById(`historial-${id}`);
-    const btn = event.currentTarget; // El elemento que se clickeó
+    const btn = event.currentTarget; 
     
     if (el.style.display === "none") {
         el.style.display = "block";
@@ -153,6 +143,7 @@ inputBuscador.addEventListener('input', (e) => {
 
 window.addEventListener('DOMContentLoaded', cargarMercado);
 
+// --- FUNCIÓN QUE PREPARA LOS ARRAY DE 5 (SIN DECIMALES) ---
 function prepararUltimos5(arrayDatos, esMoneda = false) {
     const datos = arrayDatos || [];
     const ultimos = datos.slice(-5);
@@ -161,7 +152,9 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            resultado[index + offset] = (dato / 1000000).toFixed(1) + 'M';
+            // AQUÍ ESTABA EL ERROR: Ya no dividimos por 1 millón.
+            // Si el dato es 7, mostramos "7M". Sin decimales.
+            resultado[index + offset] = dato + 'M';
         } else {
             resultado[index + offset] = dato;
         }
