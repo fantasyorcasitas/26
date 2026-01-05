@@ -10,138 +10,177 @@
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- CORRECCIÓN DE SCROLL (IMPORTANTE) --- */
-        /* --- PEGA ESTO DENTRO DE TU <STYLE> EN MERCADO.HTML --- */
+        /* =========================================
+           1. CORRECCIONES ESTRUCTURALES (SCROLL)
+           ========================================= */
+        html, body {
+            overflow-y: auto !important;
+            height: auto !important;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
 
-        /* Estilo de la tarjeta completa */
+        .dashboard-container {
+            height: auto !important;
+            overflow: visible !important;
+            padding-bottom: 100px !important;
+        }
+
+        /* =========================================
+           2. NUEVO DISEÑO TARJETA (TIPO FANTASY)
+           ========================================= */
+        
+        /* Contenedor de la tarjeta */
         .athlete-card {
-            background-color: #222; /* Fondo oscuro */
+            background-color: #151515; /* Negro casi puro */
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 15px;
+            margin-bottom: 15px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-        
-        .athlete-card:hover {
-            transform: translateY(-2px);
-            border-color: #555;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
         }
 
-        /* Cabecera con Foto y Nombre */
+        /* Cabecera (Foto + Info) */
         .athlete-header {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
         }
 
         .athlete-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%; /* Foto redonda */
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid #ff5722; /* Naranja Fantasy */
             object-fit: cover;
-            border: 2px solid #d4af37; /* Borde dorado */
             background-color: #333;
         }
 
-        .athlete-header h3 {
+        .athlete-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .athlete-info h3 {
             margin: 0;
-            font-size: 1.1rem;
             color: white;
-            font-weight: 700;
-        }
-
-        .athlete-pos {
-            margin: 2px 0 0 0;
-            font-size: 0.85rem;
-            color: #aaa;
-            text-transform: uppercase;
-        }
-
-        /* Botón de Fichar */
-        .btn-comprar {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #d4af37, #f2c94c); /* Dorado */
-            border: none;
-            border-radius: 8px;
-            color: black;
+            font-size: 1.1rem;
             font-weight: 800;
-            cursor: pointer;
-            margin-top: 10px;
+        }
+
+        /* Etiqueta de Categoría (Saltos, Velocidad...) */
+        .badge-cat {
+            background-color: #333;
+            color: #ff5722;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
             text-transform: uppercase;
-            font-size: 0.9rem;
-            transition: filter 0.2s;
+            font-weight: bold;
+            width: fit-content;
+            margin-top: 4px;
         }
 
-        .btn-comprar:hover {
-            filter: brightness(1.1);
-        }
-        html, body {
-            overflow-y: auto !important; /* Obliga a permitir deslizar verticalmente */
-            height: auto !important;
-            min-height: 100vh;
-        }
-
-        .dashboard-container {
-            height: auto !important; /* Que crezca todo lo que necesite */
-            overflow: visible !important; 
-            padding-bottom: 100px !important; /* Espacio extra abajo para que no se corte el final */
-        }
-        /* ... TUS ESTILOS ANTERIORES ... */
-
-        .stats-section {
-            margin-top: 10px;
-            width: 100%;
+        /* Precio grande y verde */
+        .price-tag {
+            color: #4ade80; 
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-top: 5px;
         }
 
-        .section-label {
-            display: block;
-            font-size: 0.75rem;
-            color: #aaa;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .history-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr); /* 5 columnas exactas */
-            gap: 4px;
-            background-color: rgba(255, 255, 255, 0.05); /* Fondo sutil */
-            padding: 8px;
-            border-radius: 6px;
+        /* =========================================
+           3. RESUMEN DE ESTADÍSTICAS (3 COLUMNAS)
+           ========================================= */
+        .stats-summary {
+            display: flex;
+            justify-content: space-between;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 8px;
             margin-bottom: 10px;
+            border: 1px solid #333;
         }
 
-        .grid-item {
+        .stat-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            width: 33%;
         }
 
-        .grid-label {
-            font-size: 0.6rem;
+        .stat-label {
+            font-size: 0.65rem;
             color: #888;
+            text-transform: uppercase;
             margin-bottom: 2px;
         }
 
-        .grid-value {
-            font-size: 0.9rem;
+        .stat-num {
+            font-size: 1.2rem;
             font-weight: bold;
             color: white;
         }
 
-        /* Colores opcionales para valores positivos/negativos */
-        .positive { color: #4ade80; } 
-        .negative { color: #f87171; }
+        /* =========================================
+           4. SECCIÓN HISTORIAL DESPLEGABLE
+           ========================================= */
+        
+        /* Botón "Ver historial" */
+        .toggle-btn {
+            text-align: center;
+            color: #ff5722;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 5px;
+            margin-top: 5px;
+            transition: color 0.2s;
+        }
+        
+        .toggle-btn:hover {
+            color: #ff8a65;
+            text-decoration: underline;
+        }
 
-        /* --- ESTILOS RESPONSIVE (MÓVIL) --- */
+        /* Contenedor oculto */
+        .historial-desplegable {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* La rejilla de 5 columnas para J-4, J-3... */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .grid-value { font-weight: bold; color: white; font-size: 0.9rem; }
+        .grid-label { font-size: 0.6rem; color: #777; margin-bottom: 2px; }
+        
+        .stats-section { margin-top: 10px; width: 100%; }
+        .section-label { color: #aaa; font-size: 0.7rem; margin-bottom: 5px; display: block; text-transform: uppercase; font-weight: 600; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================
+           5. RESPONSIVE (MÓVIL)
+           ========================================= */
         .menu-toggle {
             display: none;
             background: none;
@@ -152,11 +191,8 @@
         }
 
         @media (max-width: 768px) {
-            /* NAVBAR */
-            .navbar {
-                flex-wrap: wrap;
-                padding: 15px;
-            }
+            /* Navbar Móvil */
+            .navbar { flex-wrap: wrap; padding: 15px; }
             .nav-logo { flex-grow: 1; }
             .menu-toggle { display: block; margin-left: 15px; }
             
@@ -179,30 +215,19 @@
                 display: block;
             }
 
-            /* CONTENIDO */
-            .dashboard-container {
-                padding-top: 20px !important;
-            }
-
+            /* Ajustes del Dashboard */
+            .dashboard-container { padding-top: 20px !important; }
             h1 { font-size: 1.5rem; }
 
-            /* REJILLA: 1 Columna y márgenes seguros */
             .market-grid {
-                grid-template-columns: 1fr !important;
+                grid-template-columns: 1fr !important; /* 1 Columna en móvil */
                 padding: 0 15px !important;
                 gap: 20px;
-                display: block; /* A veces block va mejor que grid para scroll en móviles antiguos */
+                display: block; 
             }
             
-            /* Separación entre tarjetas en modo bloque */
-            .athlete-card {
-                width: 100%;
-                margin-bottom: 20px;
-            }
-
-            #buscadorAtleta {
-                font-size: 1rem;
-            }
+            .athlete-card { width: 100%; margin-bottom: 20px; }
+            #buscadorAtleta { font-size: 1rem; }
         }
     </style>
 </head>

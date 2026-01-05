@@ -1,115 +1,112 @@
- import { db } from "./firebase-config.js";
+import { db } from "./firebase-config.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Variables globales
 const mercadoGrid = document.getElementById('mercadoGrid');
 const inputBuscador = document.getElementById('buscadorAtleta');
-let todosLosAtletas = []; // Aquí guardaremos los datos para no recargar Firebase al buscar
+let todosLosAtletas = [];
 
-// === 1. FUNCIÓN PRINCIPAL: CARGAR MERCADO ===
+// === 1. CARGAR MERCADO ===
 async function cargarMercado() {
     try {
-        mercadoGrid.innerHTML = '<p style="color:white; text-align:center">Cargando mercado...</p>';
-
-        // Obtenemos la colección "atletas"
+        mercadoGrid.innerHTML = '<p style="color:white; text-align:center">Cargando...</p>';
         const querySnapshot = await getDocs(collection(db, "atletas"));
         
-        todosLosAtletas = []; // Limpiamos array
-
+        todosLosAtletas = [];
         querySnapshot.forEach((doc) => {
-            // Guardamos los datos y el ID
-            todosLosAtletas.push({
-                id: doc.id,
-                ...doc.data()
-            });
+            todosLosAtletas.push({ id: doc.id, ...doc.data() });
         });
 
-        // Una vez cargados, los mostramos
         renderizarAtletas(todosLosAtletas);
-
     } catch (error) {
-        console.error("Error cargando mercado:", error);
+        console.error("Error:", error);
         mercadoGrid.innerHTML = '<p style="color:red; text-align:center">Error cargando datos.</p>';
     }
 }
 
-// === 2. FUNCIÓN DE RENDERIZADO (PINTAR TARJETAS) ===
+// === 2. RENDERIZAR TARJETAS (DISEÑO ANTIGUO + GRÁFICAS OCULTAS) ===
 function renderizarAtletas(listaAtletas) {
-    // Si no hay nadie (por búsqueda)
     if (listaAtletas.length === 0) {
-        mercadoGrid.innerHTML = '<p style="color:gray; text-align:center">No se encontraron atletas.</p>';
+        mercadoGrid.innerHTML = '<p style="text-align:center; color:gray">No hay resultados.</p>';
         return;
     }
 
     let htmlAcumulado = '';
 
     listaAtletas.forEach(atleta => {
+        // --- CÁLCULOS DE ESTADÍSTICAS (TOTAL, MEDIA, ÚLTIMA) ---
+        const historial = atleta.historial_puntos || [];
+        const totalPuntos = historial.reduce((a, b) => a + b, 0);
+        const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
+        const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
         
-        // --- AQUÍ ESTÁ LA LÓGICA DE LAS 5 COLUMNAS ---
-        
-        // 1. Preparamos PUNTOS (J-4 ... Última)
-        // Si no tiene historial, pasamos array vacío
-        const puntosVisuales = prepararUltimos5(atleta.historial_puntos || [], false);
+        // Precio formateado (Ej: 28M)
+        const precioDisplay = (atleta.precio / 1000000).toFixed(0) + 'M';
+
+        // --- PREPARAR GRÁFICAS (OCULTAS POR DEFECTO) ---
+        // Puntos
+        const puntosVisuales = prepararUltimos5(historial, false);
         const labelsPuntos = ['J-4', 'J-3', 'J-2', 'J-1', 'ÚLTIMA'];
-        
         let htmlGridPuntos = '';
-        puntosVisuales.forEach((valor, i) => {
+        puntosVisuales.forEach((val, i) => {
             htmlGridPuntos += `
                 <div class="grid-item">
                     <span class="grid-label">${labelsPuntos[i]}</span>
-                    <span class="grid-value">${valor}</span>
-                </div>
-            `;
+                    <span class="grid-value">${val}</span>
+                </div>`;
         });
 
-        // 2. Preparamos VALOR (Reg-1 ... Reg-5)
-        // Si no tiene historial, usamos su precio actual como único dato
-        const historialValor = atleta.historial_valor || [atleta.precio];
-        const valorVisuales = prepararUltimos5(historialValor, true);
-        
+        // Valor
+        const valorVisuales = prepararUltimos5(atleta.historial_valor || [atleta.precio], true);
         let htmlGridValor = '';
-        valorVisuales.forEach((valor, i) => {
-            // Lógica visual: Si no es un guión, pintamos en blanco (o verde/rojo si quisieras calcular cambios)
+        valorVisuales.forEach((val, i) => {
             htmlGridValor += `
                 <div class="grid-item">
                     <span class="grid-label">Reg-${i+1}</span>
-                    <span class="grid-value">${valor}</span>
-                </div>
-            `;
+                    <span class="grid-value">${val}</span>
+                </div>`;
         });
 
-        // 3. Construimos la TARJETA
-        const precioFormateado = (atleta.precio / 1000000).toFixed(1) + 'M';
-        
+        // --- HTML DE LA TARJETA ---
         htmlAcumulado += `
             <div class="athlete-card">
                 <div class="athlete-header">
-                    <img src="${atleta.foto}" alt="${atleta.nombre}" class="athlete-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/74/74472.png'">
-                    <div>
+                    <img src="${atleta.foto}" class="athlete-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/74/74472.png'">
+                    <div class="athlete-info">
                         <h3>${atleta.nombre} ${atleta.apellidos || ''}</h3>
-                        <p class="athlete-pos">${atleta.categoria || 'Jugador'}</p>
+                        <span class="badge-cat">${atleta.categoria || 'JUGADOR'}</span>
+                        <div class="price-tag">${precioDisplay}</div>
                     </div>
                 </div>
 
-                <div class="stats-section">
-                    <label class="section-label">Puntos (Últimas 5 Jornadas)</label>
-                    <div class="history-grid">
-                        ${htmlGridPuntos}
+                <div class="stats-summary">
+                    <div class="stat-box">
+                        <span class="stat-label">TOTAL</span>
+                        <span class="stat-num">${totalPuntos}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">ÚLTIMA</span>
+                        <span class="stat-num">${ultimaJornada}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">MEDIA</span>
+                        <span class="stat-num">${media}</span>
                     </div>
                 </div>
-                
-                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0;">
 
-                <div class="stats-section">
-                    <label class="section-label">Evolución de Valor</label>
-                    <div class="history-grid">
-                        ${htmlGridValor}
-                    </div>
+                <div class="toggle-btn" onclick="toggleHistorial('${atleta.id}')">
+                    Ver historial <i class="fa-solid fa-list-ul"></i>
                 </div>
 
-                <button class="btn-comprar" onclick="ficharAtleta('${atleta.id}', '${atleta.nombre}', ${atleta.precio})">
-                    Fichar (${precioFormateado})
-                </button>
+                <div id="historial-${atleta.id}" class="historial-desplegable" style="display: none;">
+                    <div class="stats-section">
+                        <label class="section-label">Puntos (Últimas 5)</label>
+                        <div class="history-grid">${htmlGridPuntos}</div>
+                    </div>
+                    <div class="stats-section">
+                        <label class="section-label">Evolución Valor</label>
+                        <div class="history-grid">${htmlGridValor}</div>
+                    </div>
+                </div>
             </div>
         `;
     });
@@ -117,52 +114,37 @@ function renderizarAtletas(listaAtletas) {
     mercadoGrid.innerHTML = htmlAcumulado;
 }
 
-// === 3. LÓGICA DEL BUSCADOR ===
+// === 3. FUNCIONES AUXILIARES ===
+// Función para abrir/cerrar el acordeón
+window.toggleHistorial = (id) => {
+    const el = document.getElementById(`historial-${id}`);
+    if (el.style.display === "none") {
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
+    }
+};
+
 inputBuscador.addEventListener('input', (e) => {
     const texto = e.target.value.toLowerCase();
-    
-    // Filtramos el array global
-    const filtrados = todosLosAtletas.filter(atleta => {
-        const nombreCompleto = `${atleta.nombre} ${atleta.apellidos || ''}`.toLowerCase();
-        return nombreCompleto.includes(texto);
-    });
-
+    const filtrados = todosLosAtletas.filter(a => (a.nombre + ' ' + a.apellidos).toLowerCase().includes(texto));
     renderizarAtletas(filtrados);
 });
 
-// === 4. FUNCIÓN TEMPORAL PARA FICHAR ===
-// Necesitamos ponerla en window para que el onclick del HTML funcione
-window.ficharAtleta = (id, nombre, precio) => {
-    // Aquí iría la lógica de comprobar dinero del usuario, restar saldo, etc.
-    alert(`Has solicitado fichar a ${nombre} por ${(precio/1000000).toFixed(1)}M.\n\n(Lógica de compra pendiente de implementar)`);
-};
-
-// === 5. INICIALIZACIÓN ===
 window.addEventListener('DOMContentLoaded', cargarMercado);
 
-
-// ======================================================
-// === FUNCIÓN AUXILIAR (LA MAGIA DE LAS 5 COLUMNAS) ===
-// ======================================================
 function prepararUltimos5(arrayDatos, esMoneda = false) {
     const datos = arrayDatos || [];
-    // Tomamos solo los últimos 5 datos reales
     const ultimos = datos.slice(-5);
-    
-    // Creamos un array de 5 huecos llenos de guiones
     const resultado = Array(5).fill('-');
-    
-    // Calculamos dónde empezar a rellenar (alineado a la derecha)
     const offset = 5 - ultimos.length;
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            // Convierte 56000000 -> 56.0M
             resultado[index + offset] = (dato / 1000000).toFixed(1) + 'M';
         } else {
             resultado[index + offset] = dato;
         }
     });
-    
     return resultado;
 }
