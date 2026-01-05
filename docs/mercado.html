@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Mercado | Fantasy Orcasitas</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
@@ -16,15 +20,20 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
+        html {
+            background-color: #000000 !important; /* El fondo "detrás" de la web será negro */
+        }
+
+        body {
+            display: block !important;
+            height: auto !important;
             min-height: 100vh;
+            overflow-y: auto !important;
+            background-color: transparent !important; /* Transparente para ver la imagen */
+            margin: 0; padding: 0;
             font-family: 'Montserrat', sans-serif;
-            color: white;
-            overflow-x: hidden; /* Evita scroll lateral */
-            overflow-y: auto;   /* Scroll vertical permitido */
+            /* Asegura que ocupe todo el alto para evitar cortes */
+            position: relative; 
         }
 
         /* FONDO DE PANTALLA (Recuperado de tu estilo original pero arreglado) */
