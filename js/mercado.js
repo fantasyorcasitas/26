@@ -23,7 +23,7 @@ async function cargarMercado() {
     }
 }
 
-// === 2. RENDERIZAR TARJETAS (DISEÑO ANTIGUO + GRÁFICAS OCULTAS) ===
+// === 2. RENDERIZAR TARJETAS (DISEÑO ORIGINAL + GRÁFICAS OCULTAS) ===
 function renderizarAtletas(listaAtletas) {
     if (listaAtletas.length === 0) {
         mercadoGrid.innerHTML = '<p style="text-align:center; color:gray">No hay resultados.</p>';
@@ -33,17 +33,20 @@ function renderizarAtletas(listaAtletas) {
     let htmlAcumulado = '';
 
     listaAtletas.forEach(atleta => {
-        // --- CÁLCULOS DE ESTADÍSTICAS (TOTAL, MEDIA, ÚLTIMA) ---
+        // --- A. CÁLCULOS DE ESTADÍSTICAS (TOTAL, MEDIA, ÚLTIMA) ---
         const historial = atleta.historial_puntos || [];
+        // Sumar total
         const totalPuntos = historial.reduce((a, b) => a + b, 0);
+        // Última jornada (si no hay, es 0)
         const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
+        // Media (con 1 decimal)
         const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
         
-        // Precio formateado (Ej: 28M)
+        // Precio formateado (Ej: 28M) - Sin decimales si es entero grande
         const precioDisplay = (atleta.precio / 1000000).toFixed(0) + 'M';
 
-        // --- PREPARAR GRÁFICAS (OCULTAS POR DEFECTO) ---
-        // Puntos
+        // --- B. PREPARAR GRÁFICAS (OCULTAS POR DEFECTO) ---
+        // 1. Puntos (5 columnas)
         const puntosVisuales = prepararUltimos5(historial, false);
         const labelsPuntos = ['J-4', 'J-3', 'J-2', 'J-1', 'ÚLTIMA'];
         let htmlGridPuntos = '';
@@ -55,7 +58,7 @@ function renderizarAtletas(listaAtletas) {
                 </div>`;
         });
 
-        // Valor
+        // 2. Valor (5 columnas)
         const valorVisuales = prepararUltimos5(atleta.historial_valor || [atleta.precio], true);
         let htmlGridValor = '';
         valorVisuales.forEach((val, i) => {
@@ -66,7 +69,7 @@ function renderizarAtletas(listaAtletas) {
                 </div>`;
         });
 
-        // --- HTML DE LA TARJETA ---
+        // --- C. CONSTRUIR EL HTML DE LA TARJETA ---
         htmlAcumulado += `
             <div class="athlete-card">
                 <div class="athlete-header">
@@ -98,14 +101,18 @@ function renderizarAtletas(listaAtletas) {
                 </div>
 
                 <div id="historial-${atleta.id}" class="historial-desplegable" style="display: none;">
+                    
                     <div class="stats-section">
                         <label class="section-label">Puntos (Últimas 5)</label>
                         <div class="history-grid">${htmlGridPuntos}</div>
                     </div>
+
                     <div class="stats-section">
                         <label class="section-label">Evolución Valor</label>
                         <div class="history-grid">${htmlGridValor}</div>
                     </div>
+
+                    <button class="btn-comprar-mini" onclick="ficharAtleta('${atleta.id}', '${atleta.nombre}')">FICHAR</button>
                 </div>
             </div>
         `;
@@ -115,14 +122,23 @@ function renderizarAtletas(listaAtletas) {
 }
 
 // === 3. FUNCIONES AUXILIARES ===
-// Función para abrir/cerrar el acordeón
+
+// Función GLOBAL para abrir/cerrar el acordeón (importante que esté en window)
 window.toggleHistorial = (id) => {
     const el = document.getElementById(`historial-${id}`);
+    const btn = event.currentTarget; // El elemento que se clickeó
+    
     if (el.style.display === "none") {
         el.style.display = "block";
+        btn.innerHTML = 'Ocultar <i class="fa-solid fa-chevron-up"></i>';
     } else {
         el.style.display = "none";
+        btn.innerHTML = 'Ver historial <i class="fa-solid fa-list-ul"></i>';
     }
+};
+
+window.ficharAtleta = (id, nombre) => {
+    alert("Has pulsado fichar a " + nombre);
 };
 
 inputBuscador.addEventListener('input', (e) => {

@@ -10,40 +10,32 @@
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* =========================================
-           1. CORRECCIONES ESTRUCTURALES (SCROLL)
-           ========================================= */
+        /* CORRECCIÓN DE SCROLL */
         html, body {
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100vh;
-            margin: 0;
+            background-color: #000; /* Fondo de la página negro */
             font-family: 'Montserrat', sans-serif;
         }
-
         .dashboard-container {
             height: auto !important;
-            overflow: visible !important;
             padding-bottom: 100px !important;
         }
 
-        /* =========================================
-           2. NUEVO DISEÑO TARJETA (TIPO FANTASY)
-           ========================================= */
-        
-        /* Contenedor de la tarjeta */
+        /* --- TARJETA DE JUGADOR (Estilo Paula Crespo/Sara Amezcua) --- */
         .athlete-card {
-            background-color: #151515; /* Negro casi puro */
+            background-color: #151515; /* Gris muy oscuro/Negro */
             border: 1px solid #333;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
         }
 
-        /* Cabecera (Foto + Info) */
+        /* CABECERA: Foto izquierda, Info derecha */
         .athlete-header {
             display: flex;
             align-items: center;
@@ -55,107 +47,103 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            border: 2px solid #ff5722; /* Naranja Fantasy */
+            border: 2px solid #ff5722; /* El borde naranja de la foto */
             object-fit: cover;
-            background-color: #333;
+            background-color: #222;
         }
 
         .athlete-info {
             display: flex;
             flex-direction: column;
+            justify-content: center;
         }
 
         .athlete-info h3 {
             margin: 0;
-            color: white;
+            color: #ffffff; /* Nombre en BLANCO */
             font-size: 1.1rem;
             font-weight: 800;
         }
 
-        /* Etiqueta de Categoría (Saltos, Velocidad...) */
+        /* La etiqueta de categoría (ej: VELOCIDAD CORTA) */
         .badge-cat {
             background-color: #333;
-            color: #ff5722;
-            font-size: 0.7rem;
-            padding: 2px 6px;
+            color: #ff5722; /* Texto naranja */
+            font-size: 0.65rem;
+            padding: 3px 8px;
             border-radius: 4px;
             text-transform: uppercase;
             font-weight: bold;
             width: fit-content;
-            margin-top: 4px;
+            margin-top: 5px;
         }
 
-        /* Precio grande y verde */
+        /* Precio en VERDE GRANDE */
         .price-tag {
             color: #4ade80; 
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 900;
             margin-top: 5px;
         }
 
-        /* =========================================
-           3. RESUMEN DE ESTADÍSTICAS (3 COLUMNAS)
-           ========================================= */
+        /* --- FILA DE RESUMEN (TOTAL / ÚLTIMA / MEDIA) --- */
         .stats-summary {
             display: flex;
             justify-content: space-between;
-            background-color: #222;
-            padding: 10px;
-            border-radius: 8px;
+            background-color: #1a1a1a; /* Ligeramente diferente al fondo */
+            padding: 12px 0;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
             margin-bottom: 10px;
-            border: 1px solid #333;
         }
 
         .stat-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             width: 33%;
+            text-align: center;
+            border-right: 1px solid #333; /* Línea separadora vertical */
         }
+        .stat-box:last-child { border-right: none; }
 
         .stat-label {
+            display: block;
             font-size: 0.65rem;
-            color: #888;
+            color: #888; /* Gris claro para el título */
             text-transform: uppercase;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .stat-num {
             font-size: 1.2rem;
             font-weight: bold;
-            color: white;
+            color: #fff; /* Número en BLANCO */
         }
 
-        /* =========================================
-           4. SECCIÓN HISTORIAL DESPLEGABLE
-           ========================================= */
-        
-        /* Botón "Ver historial" */
+        /* --- BOTÓN DE VER HISTORIAL --- */
         .toggle-btn {
             text-align: center;
-            color: #ff5722;
-            font-weight: 600;
+            color: #ff5722; /* Naranja */
             font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            padding: 5px;
-            margin-top: 5px;
-            transition: color 0.2s;
+            padding: 8px;
+            user-select: none;
         }
-        
         .toggle-btn:hover {
-            color: #ff8a65;
             text-decoration: underline;
         }
 
-        /* Contenedor oculto */
+        /* --- SECCIÓN DESPLEGABLE --- */
         .historial-desplegable {
-            margin-top: 15px;
-            padding-top: 10px;
+            margin-top: 10px;
             border-top: 1px solid #333;
-            animation: fadeIn 0.3s ease-in-out;
+            padding-top: 15px;
+            animation: fadeIn 0.3s;
         }
 
-        /* La rejilla de 5 columnas para J-4, J-3... */
+        /* Las rejillas de 5 columnas */
+        .stats-section { margin-bottom: 15px; }
+        .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; text-transform: uppercase;}
+        
         .history-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -164,70 +152,28 @@
             padding: 10px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 10px;
         }
+        .grid-value { color: white; font-weight: bold; font-size: 0.9rem; }
+        .grid-label { color: #666; font-size: 0.6rem; }
 
-        .grid-value { font-weight: bold; color: white; font-size: 0.9rem; }
-        .grid-label { font-size: 0.6rem; color: #777; margin-bottom: 2px; }
-        
-        .stats-section { margin-top: 10px; width: 100%; }
-        .section-label { color: #aaa; font-size: 0.7rem; margin-bottom: 5px; display: block; text-transform: uppercase; font-weight: 600; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* =========================================
-           5. RESPONSIVE (MÓVIL)
-           ========================================= */
-        .menu-toggle {
-            display: none;
-            background: none;
+        /* Botón pequeño de fichar dentro del desplegable */
+        .btn-comprar-mini {
+            width: 100%;
+            background-color: #eee;
             border: none;
-            color: white;
-            font-size: 1.5rem;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
+            margin-top: 5px;
         }
 
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            /* Navbar Móvil */
-            .navbar { flex-wrap: wrap; padding: 15px; }
-            .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block; margin-left: 15px; }
-            
-            .nav-links {
-                display: none;
-                width: 100%;
-                flex-direction: column;
-                margin-top: 15px;
-                background: rgba(0, 0, 0, 0.95);
-                border-radius: 8px;
-                padding: 10px;
-                border: 1px solid #333;
-            }
-            .nav-links.active { display: flex; }
-            .nav-links a {
-                padding: 15px;
-                border-bottom: 1px solid #222;
-                text-align: center;
-                width: 100%;
-                display: block;
-            }
-
-            /* Ajustes del Dashboard */
-            .dashboard-container { padding-top: 20px !important; }
-            h1 { font-size: 1.5rem; }
-
-            .market-grid {
-                grid-template-columns: 1fr !important; /* 1 Columna en móvil */
-                padding: 0 15px !important;
-                gap: 20px;
-                display: block; 
-            }
-            
-            .athlete-card { width: 100%; margin-bottom: 20px; }
-            #buscadorAtleta { font-size: 1rem; }
+            .market-grid { display: block; padding: 0 15px; }
+            .athlete-card { width: 100%; }
         }
     </style>
 </head>
