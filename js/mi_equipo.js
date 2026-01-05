@@ -26,7 +26,37 @@ let isMarketClosed = false;
 // Variable para saber qué hueco estamos llenando (0, 1 o 2)
 let currentSlotIndex = -1;
 
+// --- 1. COMPROBAR MERCADO ---
 
+function checkMarketStatus() {
+
+    const now = new Date();
+
+    const day = now.getDay();
+
+    const hour = now.getHours();
+
+
+
+    // Sábado(6), Domingo(0), Lunes(1) o Martes(2)<10:00
+
+    if (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 8)) {
+
+        isMarketClosed = true;
+
+        document.getElementById('marketClosedMsg').style.display = 'flex';
+
+        document.getElementById('btnSaveTeam').disabled = true;
+
+        document.getElementById('btnSaveTeam').innerText = "MERCADO CERRADO";
+
+        return false;
+
+    }
+
+    return true;
+
+}
 
 // --- 2. INIT ---
 async function init() {

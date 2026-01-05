@@ -11,8 +11,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="../css/style.css">
+
 
     <style>
         /* =========================================
@@ -225,12 +224,6 @@
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
-    <div id="marketClosedMsg" class="market-closed-overlay" style="display: none;">
-        <i class="fa-solid fa-lock" style="font-size: 4rem; color: #e84118; margin-bottom: 20px;"></i>
-        <h2>MERCADO CERRADO</h2>
-        <a href="home.html" class="btn-action" style="margin-top: 20px; width: auto; text-decoration: none;">Volver</a>
-    </div>
-
     <nav class="navbar">
         <div class="nav-logo">
             <a href="home.html">
@@ -319,7 +312,7 @@
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
         
-        // Funciones del Modal (Necesarias para el onclick del HTML)
+        // Función global para cerrar modal (requerida por el HTML onclick)
         window.closeModal = function() {
             document.getElementById('playerModal').style.display = 'none';
         }
