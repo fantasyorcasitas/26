@@ -8,52 +8,72 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link rel="stylesheet" href="../css/style.css">
-
     <style>
-        /* ESTILOS ESPECÍFICOS PARA MERCADO */
-
-        /* 1. CONTENEDOR PRINCIPAL */
-        .dashboard-container {
-            width: 100%;
-            padding-top: 20px !important;
-            padding-bottom: 100px !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* =========================================
+           1. ESTILOS BASE (RESET)
+           ========================================= */
+        * {
             box-sizing: border-box;
         }
 
-        /* 2. NAVBAR A PRUEBA DE BOMBAS */
-        .navbar {
-            position: sticky !important; /* Se pega arriba */
-            top: 0;
-            left: 0;
+        html, body {
+            margin: 0;
+            padding: 0;
             width: 100%;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #050505; /* Fondo negro de seguridad */
+            color: white;
+            overflow-x: hidden; /* Evita scroll lateral */
+            overflow-y: auto;   /* Scroll vertical permitido */
+        }
+
+        /* FONDO DE PANTALLA (Recuperado de tu estilo original pero arreglado) */
+        .bg-image {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: -2;
+            opacity: 0.4; /* Un poco más oscuro para leer mejor */
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+            z-index: -1;
+        }
+
+        /* =========================================
+           2. BARRA DE NAVEGACIÓN (NAVBAR)
+           ========================================= */
+        .navbar {
+            position: sticky; /* Se pega arriba al hacer scroll */
+            top: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #000 !important;
-            padding: 15px 20px !important;
-            border-bottom: 2px solid #222 !important;
-            z-index: 9999;
-            box-sizing: border-box;
-            height: auto !important;
+            background-color: #000;
+            border-bottom: 2px solid #222;
+            padding: 15px 20px;
+            z-index: 1000;
+            height: 70px;
+            width: 100%;
         }
 
         .nav-logo a {
+            text-decoration: none;
+            color: white;
             font-size: 1.2rem;
             font-weight: 800;
-            color: white !important;
-            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
-        .nav-logo span { color: #ff5e00 !important; }
 
-        /* Enlaces de PC */
+        .nav-logo span { color: #ff5e00; } /* Naranja */
+
+        /* MENÚ DE ESCRITORIO */
         .nav-links {
             display: flex;
             gap: 20px;
@@ -62,66 +82,97 @@
 
         .nav-links a {
             text-decoration: none;
-            color: #aaa !important;
+            color: #aaa;
             font-weight: 600;
             font-size: 0.9rem;
-            transition: color 0.3s;
+            transition: 0.3s;
         }
 
         .nav-links a:hover, .nav-links a.active {
-            color: #ff5e00 !important;
+            color: #ff5e00;
         }
 
         .btn-logout {
             background: none;
             border: none;
-            color: #ff5e00 !important;
-            cursor: pointer;
+            color: #ff5e00;
             font-size: 1.2rem;
-            margin-left: 15px;
+            cursor: pointer;
+            margin-left: 10px;
         }
 
-        /* Botón Hamburguesa */
         .menu-toggle {
-            display: none !important; 
+            display: none; /* Oculto en PC */
             background: none;
             border: none;
-            color: white !important;
+            color: white;
             font-size: 1.5rem;
             cursor: pointer;
         }
 
-        /* 3. ESTILOS DE TARJETA Y MERCADO */
-        h1 { color: white; margin: 20px 0; text-transform: uppercase; text-align: center; }
+        /* =========================================
+           3. CONTENIDO PRINCIPAL (DASHBOARD)
+           ========================================= */
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px; /* Espacio extra abajo */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
+        h1 {
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* BUSCADOR */
         .search-container {
             width: 100%;
             max-width: 600px;
-            margin-bottom: 25px;
-            padding: 0 15px;
-            box-sizing: border-box;
+            margin-bottom: 30px;
+            position: relative;
         }
-        
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
         #buscadorAtleta {
             width: 100%;
             padding: 12px 15px 12px 45px;
             border-radius: 50px;
             border: 1px solid #444;
-            background: #151515;
+            background: rgba(20, 20, 20, 0.9);
             color: white;
             outline: none;
             font-size: 1rem;
-            box-sizing: border-box;
+            transition: 0.3s;
         }
 
+        #buscadorAtleta:focus {
+            border-color: #ff5e00;
+            box-shadow: 0 0 10px rgba(255, 94, 0, 0.2);
+        }
+
+        /* =========================================
+           4. REJILLA Y TARJETAS (ESTILO FANTASY)
+           ========================================= */
         .market-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             width: 100%;
-            max-width: 1200px;
-            padding: 0 20px;
-            box-sizing: border-box;
         }
 
         .athlete-card {
@@ -129,65 +180,186 @@
             border: 1px solid #333;
             border-radius: 12px;
             padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s;
         }
 
-        .athlete-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .athlete-img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #ff5e00; object-fit: cover; background-color: #222; }
-        .athlete-info h3 { margin: 0; color: #ffffff; font-size: 1.1rem; font-weight: 800; }
-        .badge-cat { background: #333; color: #ff5e00; font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; margin-top: 5px; width: fit-content; }
-        .price-tag { color: #4ade80; font-size: 1.5rem; font-weight: 900; margin-top: 5px; }
+        .athlete-card:hover {
+            transform: translateY(-3px);
+            border-color: #444;
+        }
 
-        .stats-summary { display: flex; justify-content: space-between; background: #1a1a1a; padding: 12px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; margin-bottom: 10px; }
-        .stat-box { width: 33%; text-align: center; border-right: 1px solid #333; }
+        /* CABECERA TARJETA */
+        .athlete-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .athlete-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff5e00;
+            background-color: #222;
+        }
+
+        .athlete-info h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .badge-cat {
+            background-color: #333;
+            color: #ff5e00;
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .price-tag {
+            color: #4ade80; /* Verde */
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-top: 5px;
+        }
+
+        /* ESTADÍSTICAS */
+        .stats-summary {
+            display: flex;
+            justify-content: space-between;
+            background-color: #0a0a0a;
+            padding: 10px 0;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #222;
+        }
+
+        .stat-box {
+            width: 33%;
+            text-align: center;
+            border-right: 1px solid #333;
+        }
         .stat-box:last-child { border-right: none; }
-        .stat-label { display: block; font-size: 0.65rem; color: #888; margin-bottom: 3px; }
-        .stat-num { font-size: 1.2rem; font-weight: bold; color: #fff; }
 
-        .toggle-btn { text-align: center; color: #ff5e00; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 8px; }
-        .historial-desplegable { margin-top: 10px; border-top: 1px solid #333; padding-top: 15px; animation: fadeIn 0.3s; }
-        .history-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #222; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
-        .grid-value { color: white; font-weight: bold; font-size: 0.9rem; }
-        .grid-label { color: #666; font-size: 0.6rem; }
-        .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
+        .stat-label {
+            display: block;
+            font-size: 0.65rem;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .stat-num {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+        }
 
-        /* 4. RESPONSIVE MÓVIL */
+        /* BOTÓN HISTORIAL */
+        .toggle-btn {
+            text-align: center;
+            color: #ff5e00;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px;
+            user-select: none;
+        }
+        .toggle-btn:hover { text-decoration: underline; }
+
+        /* DESPLEGABLE */
+        .historial-desplegable {
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Rejillas de 5 columnas */
+        .stats-section { margin-bottom: 15px; }
+        .section-label { 
+            font-size: 0.7rem; color: #aaa; 
+            text-transform: uppercase; margin-bottom: 5px; display: block; 
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            text-align: center;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .grid-value { font-weight: bold; font-size: 0.9rem; color: white; }
+        .grid-label { font-size: 0.6rem; color: #777; margin-top: 2px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+
+        /* =========================================
+           5. RESPONSIVE MÓVIL (MENÚ OVERLAY)
+           ========================================= */
         @media (max-width: 768px) {
             .navbar {
-                justify-content: space-between;
-                padding: 10px 15px !important;
+                padding: 10px 15px;
+                height: 60px;
             }
-            
-            .menu-toggle { display: block !important; }
 
-            /* Menú superpuesto PANTALLA COMPLETA */
+            .menu-toggle { display: block; }
+            .nav-logo a { font-size: 1rem; }
+
+            /* MENÚ A PANTALLA COMPLETA */
             .nav-links {
                 position: fixed;
-                top: 0; 
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background-color: rgba(0,0,0,0.95);
+                top: 0; left: 0;
+                width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98);
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                z-index: 11000;
-                transform: translateX(100%); 
+                z-index: 5000;
+                transform: translateX(100%); /* Oculto a la derecha */
                 transition: transform 0.3s ease-in-out;
             }
 
-            .nav-links.active { transform: translateX(0); }
-            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
-            .market-grid { grid-template-columns: 1fr; } 
+            .nav-links.active {
+                transform: translateX(0); /* Visible */
+            }
+
+            .nav-links a {
+                font-size: 1.5rem;
+                margin: 20px 0;
+                color: white;
+            }
+
+            .btn-logout {
+                margin-top: 30px;
+                font-size: 1.5rem;
+            }
+
+            /* REJILLA A 1 COLUMNA */
+            .market-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 { font-size: 1.5rem; margin: 15px 0; }
         }
     </style>
 </head>
-
-<body style="display: block !important; height: auto !important; min-height: 100vh; overflow-y: auto !important; background-color: #000 !important; margin: 0; padding: 0;">
+<body>
 
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
@@ -224,24 +396,24 @@
         <h1><i class="fa-solid fa-shop"></i> Mercado</h1>
 
         <div class="search-container">
-            <div style="position: relative;">
-                <i class="fa-solid fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888;"></i>
-                <input type="text" id="buscadorAtleta" placeholder="Buscar atleta...">
-            </div>
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" id="buscadorAtleta" placeholder="Buscar atleta...">
         </div>
 
         <div id="mercadoGrid" class="market-grid">
-            <p style="color: white; text-align: center; padding: 20px;">
-                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+            <p style="color: white; text-align: center; margin-top: 50px;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Cargando mercado...
             </p>
         </div>
     </div>
 
     <script>
+        // Abrir/Cerrar menú móvil
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
         }
 
+        // Logout
         function cerrarSesion() {
             localStorage.removeItem('fantasy_user');
             window.location.href = '../index.html';
@@ -249,5 +421,6 @@
     </script>
 
     <script type="module" src="../js/mercado.js"></script>
+
 </body>
 </html>
