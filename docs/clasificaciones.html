@@ -4,165 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Clasificación | Fantasy Orcasitas</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- 1. SOLUCIÓN AL SCROLL BLOQUEADO --- */
-        .navbar {
-        position: sticky !important;
-        top: 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #000 !important;
-        padding: 15px 20px !important;
-        border-bottom: 2px solid #222 !important;
-        width: 100%;
-        height: 70px;
-        z-index: 5000; /* Asegura que esté por encima de todo */
-    }
-
-    .nav-logo a {
-        text-decoration: none;
-        color: white !important;
-        font-size: 1.2rem;
-        font-weight: 800;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .nav-logo span { color: #ff5e00 !important; }
-
-    /* Enlaces (PC) */
-    .nav-links {
-        display: flex; gap: 20px; align-items: center;
-    }
-    .nav-links a {
-        text-decoration: none; color: #aaa !important; font-weight: 600; font-size: 0.9rem; transition: 0.3s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
-
-    /* Botón Hamburguesa (Oculto en PC) */
-    .menu-toggle {
-        display: none; 
-        background: none; border: none; color: white !important;
-        font-size: 1.5rem; cursor: pointer;
-    }
-    
-    .btn-logout {
-        background: none; border: none; color: #ff5e00 !important;
-        font-size: 1.2rem; cursor: pointer; margin-left: 10px;
-    }
-
-    /* =========================================
-       PARTE CRÍTICA: EL MENÚ MÓVIL (OVERLAY)
-       ========================================= */
-    @media (max-width: 768px) {
-        .navbar { padding: 10px 15px !important; }
-        
-        /* Mostramos el botón hamburguesa */
-        .menu-toggle { display: block !important; }
-
-        /* Transformamos los enlaces en una PANTALLA NEGRA COMPLETA */
-        .nav-links {
-            position: fixed; /* Fijo a la pantalla */
-            top: 0; left: 0;
-            width: 100%; height: 100vh;
-            background-color: rgba(0,0,0,0.98); /* Fondo negro */
-            flex-direction: column; /* Lista vertical */
-            justify-content: center;
-            align-items: center;
-            z-index: 6000; /* Muy por encima */
-            
-            /* TRUCO: Lo escondemos a la derecha */
-            transform: translateX(100%); 
-            transition: transform 0.3s ease-in-out;
-        }
-
-        /* Cuando JS añade esta clase, el menú entra deslizando */
-        .nav-links.active {
-            transform: translateX(0);
-        }
-
-        .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
-        .btn-logout { margin-top: 30px; font-size: 1.5rem; }
-    }
-        
+        /* =========================================
+           1. RESET NUCLEAR (Igual que en Mercado)
+           ========================================= */
         html, body {
-            overflow-y: auto !important; /* Permite deslizar verticalmente siempre */
+            display: block !important;
             height: auto !important;
             min-height: 100vh;
+            overflow-y: auto !important;
+            background-color: #000 !important;
+            margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .dashboard-container {
-            height: auto !important; /* Que crezca según el contenido */
-            padding-bottom: 80px !important; /* Espacio extra abajo */
-            overflow: visible !important;
+            padding-top: 20px !important;
+            padding-bottom: 80px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* --- 2. ESTILOS RESPONSIVE (MÓVIL) --- */
+        /* =========================================
+           2. NAVBAR ROBUSTA
+           ========================================= */
+        .navbar {
+            position: sticky !important;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000 !important;
+            padding: 15px 20px !important;
+            border-bottom: 2px solid #222 !important;
+            width: 100%;
+            height: 70px !important;
+            z-index: 5000;
+            box-sizing: border-box;
+        }
+
+        .nav-logo a {
+            text-decoration: none;
+            color: white !important;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-logo span { color: #ff5e00 !important; }
+
+        /* Links PC */
+        .nav-links {
+            display: flex; gap: 20px; align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none; color: #aaa !important; font-weight: 600; font-size: 0.9rem; transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
+
+        .btn-logout {
+            background: none; border: none; color: #ff5e00 !important;
+            font-size: 1.2rem; cursor: pointer; margin-left: 15px;
+        }
+
         .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
+            display: none !important;
+            background: none; border: none; color: white !important;
+            font-size: 1.5rem; cursor: pointer;
         }
 
-        /* Contenedor de tabla para scroll horizontal en móvil */
+        /* =========================================
+           3. ESTILOS CLASIFICACIÓN
+           ========================================= */
+        h1 { color: white; text-transform: uppercase; margin-bottom: 30px; text-align: center; }
+
+        .rankings-wrapper {
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1200px;
+            padding: 0 10px;
+        }
+
+        .ranking-card {
+            flex: 1; 
+            min-width: 300px; 
+            background: rgba(20, 20, 20, 0.9); 
+            border-radius: 10px; 
+            padding: 25px; 
+            border: 1px solid #333;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .ranking-title {
+            color: #ff5e00; 
+            font-size: 1.2rem; 
+            margin-bottom: 15px; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            border-bottom: 1px solid #444; 
+            padding-bottom: 10px;
+        }
+
+        .ranking-table {
+            width: 100%; 
+            border-collapse: collapse; 
+            color: white;
+        }
+
+        .ranking-table th {
+            padding: 10px; 
+            text-align: left; 
+            color: #888; 
+            font-size: 0.85rem; 
+            text-transform: uppercase;
+        }
+        
+        .ranking-table td {
+            padding: 12px 10px; 
+            border-bottom: 1px solid #333;
+            font-weight: 600;
+        }
+
+        .rank-col { text-align: center; width: 50px; color: #666; }
+        .pts-col { text-align: right; width: 70px; color: #ff5e00; font-weight: 800; }
+
+        /* Scroll horizontal para tablas en móvil */
         .table-responsive {
             width: 100%;
-            overflow-x: auto; /* Si la tabla es ancha, desliza lateralmente */
-            -webkit-overflow-scrolling: touch; /* Suavidad en iPhone */
-            margin-bottom: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
+        /* =========================================
+           4. RESPONSIVE MÓVIL (MENU OVERLAY)
+           ========================================= */
         @media (max-width: 768px) {
-            /* Navbar Móvil */
-            .navbar { flex-wrap: wrap; padding: 15px; }
-            .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block; margin-left: 15px; }
+            .navbar {
+                justify-content: space-between;
+                padding: 10px 15px !important;
+            }
             
+            .menu-toggle { display: block !important; }
+
             .nav-links {
-                display: none;
-                width: 100%;
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98);
                 flex-direction: column;
-                margin-top: 15px;
-                background: rgba(0, 0, 0, 0.95);
-                border-radius: 8px;
-                padding: 10px;
-                border: 1px solid #333;
-            }
-            .nav-links.active { display: flex; }
-            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
-
-            /* Ajustes de contenido */
-            .dashboard-container {
-                padding-top: 20px !important;
-                flex-direction: column;
+                justify-content: center;
                 align-items: center;
+                z-index: 6000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease-in-out;
             }
 
-            .rankings-wrapper {
-                flex-direction: column; /* Una tabla debajo de otra */
-                width: 100%;
-                padding: 0 15px;
-            }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
 
-            /* Tarjetas de ranking */
-            .ranking-card {
-                width: 100%;
-                margin-bottom: 25px;
-                padding: 15px !important; /* Menos padding interno */
-            }
-
-            /* Texto más pequeño en tablas móvil */
-            .ranking-table th, .ranking-table td {
-                padding: 10px 5px;
-                font-size: 0.85rem;
-            }
+            /* Ajustes Ranking Móvil */
+            .ranking-card { width: 100%; margin-bottom: 20px; min-width: auto; }
+            h1 { font-size: 1.5rem; margin-top: 10px; }
         }
     </style>
 </head>
@@ -172,58 +186,51 @@
     <div class="bg-overlay"></div>
 
     <nav class="navbar">
-         <div class="dashboard-container">
-        <h1><i class="fa-solid fa-shop"></i> Mercado</h1>
-
-        <div class="search-container">
-            <i class="fa-solid fa-search search-icon"></i>
-            <input type="text" id="buscadorAtleta" placeholder="Buscar atleta...">
+        <div class="nav-logo">
+            <a href="home.html">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
+            </a>
         </div>
-
-        <div id="mercadoGrid" class="market-grid">
-            <p style="color: white; text-align: center; margin-top: 50px;">
-                <i class="fa-solid fa-spinner fa-spin"></i> Cargando mercado...
-            </p>
-        </div>
-    </div>
 
         <button class="menu-toggle" onclick="toggleMenu()">
             <i class="fa-solid fa-bars"></i>
         </button>
 
-        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;">
-            <i class="fa-solid fa-power-off"></i>
-        </button>
-        
         <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html" class="active">Ranking</a>
             <a href="calendario.html">Calendario</a>
+
+            <button onclick="cerrarSesion()" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i> Salir
+            </button>
         </div>
     </nav>
 
-    <div class="dashboard-container" style="flex-direction: column; align-items: center; padding-top: 90px;">
+    <div class="dashboard-container">
         
-        <h1 style="color:white; text-transform: uppercase; margin-bottom: 30px; text-align: center;">
-            <i class="fa-solid fa-chart-line"></i> Clasificaciones
-        </h1>
+        <h1><i class="fa-solid fa-chart-line"></i> Clasificaciones</h1>
 
-        <div class="rankings-wrapper" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; width: 100%; max-width: 1200px;">
+        <div class="rankings-wrapper">
             
-            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 25px; border: 1px solid #333;">
-                <div class="ranking-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px;">
+            <div class="ranking-card">
+                <div class="ranking-title">
                     <i class="fa-solid fa-users"></i> Liga Managers
                 </div>
                 
                 <div class="table-responsive">
-                    <table class="ranking-table" style="width: 100%; border-collapse: collapse; color: white;">
+                    <table class="ranking-table">
                         <thead>
                             <tr style="border-bottom: 1px solid #444;">
-                                <th class="rank-col" style="padding: 10px; text-align: center; width: 50px;">#</th>
-                                <th style="padding: 10px; text-align: left;">Manager</th>
-                                <th style="padding: 10px; text-align: right; width: 70px;">Pts</th>
+                                <th class="rank-col">#</th>
+                                <th>Manager</th>
+                                <th class="pts-col">Pts</th>
                             </tr>
                         </thead>
                         <tbody id="managersBody">
@@ -232,18 +239,18 @@
                 </div>
             </div>
 
-            <div class="ranking-card" style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 25px; border: 1px solid #333;">
-                <div class="ranking-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 10px;">
+            <div class="ranking-card">
+                <div class="ranking-title">
                     <i class="fa-solid fa-medal"></i> Ranking Atletas
                 </div>
                 
                 <div class="table-responsive">
-                    <table class="ranking-table" style="width: 100%; border-collapse: collapse; color: white;">
+                    <table class="ranking-table">
                         <thead>
                             <tr style="border-bottom: 1px solid #444;">
-                                <th class="rank-col" style="padding: 10px; text-align: center; width: 50px;">#</th>
-                                <th style="padding: 10px; text-align: left;">Atleta</th>
-                                <th style="padding: 10px; text-align: right; width: 70px;">Pts</th>
+                                <th class="rank-col">#</th>
+                                <th>Atleta</th>
+                                <th class="pts-col">Pts</th>
                             </tr>
                         </thead>
                         <tbody id="atletasBody">
