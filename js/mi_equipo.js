@@ -33,7 +33,7 @@ function checkMarketStatus() {
     const hour = now.getHours();
 
     // Sábado(6), Domingo(0), Lunes(1) o Martes(2)<10:00
-    if (day === 6 || day === 0 || day === 0 || (day === 0 && hour < 10)) {
+    if (day === 4 || day === 5 || day === 6 || (day === 6 && hour < 10)) {
         isMarketClosed = true;
         document.getElementById('marketClosedMsg').style.display = 'flex';
         document.getElementById('btnSaveTeam').disabled = true;
