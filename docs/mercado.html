@@ -11,19 +11,19 @@
 
 <style>
         /* =========================================
-           1. RESET Y ESTRUCTURA (Sobrescribe style.css)
+           1. RESET Y ESTRUCTURA (ANTI-CONFLICTOS)
            ========================================= */
         html, body {
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100vh;
-            background-color: #000 !important; /* Asegura fondo negro */
+            background-color: #000 !important; 
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
         }
 
-        /* Quitamos el padding gigante del style.css global para esta página */
+        /* Quitamos el padding gigante del style.css global */
         .dashboard-container {
             padding-top: 20px !important; 
             padding-bottom: 100px !important;
@@ -31,14 +31,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-top: 0 !important;
         }
 
         /* =========================================
-           2. NAVBAR ESPECÍFICA PARA MERCADO
+           2. NAVBAR ROBUSTA (A PRUEBA DE FALLOS)
            ========================================= */
-        /* Usamos !important para ganar al style.css */
         .navbar {
-            position: relative !important; /* Para que no se quede fija tapando cosas en esta vista */
+            /* Usamos STICKY: Se queda fija arriba pero OCUPA espacio real (no tapa el contenido) */
+            position: sticky !important;
+            top: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -46,7 +48,8 @@
             padding: 15px 20px !important;
             border-bottom: 2px solid #222 !important;
             width: 100%;
-            z-index: 1000;
+            z-index: 9999; /* Muy alto para estar encima de todo */
+            height: auto !important;
         }
 
         .nav-logo a {
@@ -61,10 +64,11 @@
         
         .nav-logo span { color: #ff5e00 !important; }
 
-        /* Estilos de escritorio */
+        /* Estilos PC */
         .nav-links {
             display: flex;
             gap: 20px;
+            align-items: center;
         }
 
         .nav-links a {
@@ -73,6 +77,7 @@
             font-weight: 600;
             font-size: 0.9rem;
             transition: color 0.3s;
+            white-space: nowrap; /* Evita que el texto se parta */
         }
 
         .nav-links a:hover, .nav-links a.active {
@@ -90,18 +95,19 @@
 
         /* Botón Hamburguesa (Móvil) */
         .menu-toggle {
-            display: none; /* Oculto en PC */
+            display: none; 
             background: none;
             border: none;
             color: white !important;
             font-size: 1.5rem;
             cursor: pointer;
+            padding: 5px;
         }
 
         /* =========================================
-           3. DISEÑO DE TARJETAS (FANTASY)
+           3. ESTILOS TARJETAS (FANTASY)
            ========================================= */
-        h1 { color: white; margin-bottom: 20px; text-transform: uppercase; text-align: center; }
+        h1 { color: white; margin-bottom: 20px; text-transform: uppercase; text-align: center; font-size: 1.5rem; }
 
         .search-container {
             width: 100%;
@@ -247,57 +253,54 @@
         .grid-label { color: #666; font-size: 0.6rem; }
         .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; text-transform: uppercase;}
 
-        .btn-comprar-mini {
-            width: 100%;
-            background-color: #eee;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* =========================================
-           4. RESPONSIVE (MÓVIL) - CORRECCIÓN CLAVE
+           4. RESPONSIVE MÓVIL (CORRECCIÓN MENU ABSOLUTO)
            ========================================= */
         @media (max-width: 768px) {
             .navbar {
-                flex-wrap: wrap; /* Permite que el menú caiga abajo */
                 padding: 15px !important;
+                /* IMPORTANTE: Relative para que el menú absoluto se posicione respecto a esto */
+                position: relative !important; 
             }
             
             .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block !important; } /* Mostrar hamburguesa */
+            .menu-toggle { display: block !important; } 
             
-            /* El menú se oculta por defecto en móvil */
+            /* Menú desplegable flotante (Overlay) */
             .nav-links {
                 display: none; 
+                position: absolute; /* FLOTA SOBRE EL CONTENIDO */
+                top: 100%; /* Justo debajo de la barra negra */
+                left: 0;
                 width: 100%;
                 flex-direction: column;
-                margin-top: 15px;
-                background-color: #111;
-                padding: 10px;
-                border-radius: 8px;
-                border: 1px solid #333;
+                background-color: #050505; /* Fondo casi negro */
+                padding: 0;
+                border-bottom: 2px solid #333;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+                z-index: 10000; /* Por encima de todo */
             }
 
-            /* Se muestra cuando añadimos la clase 'active' con JS */
             .nav-links.active { display: flex; }
 
             .nav-links a {
-                padding: 12px;
-                border-bottom: 1px solid #333;
+                padding: 15px;
+                border-bottom: 1px solid #222;
                 width: 100%;
-                display: block;
                 text-align: center;
                 margin: 0 !important;
+                font-size: 1rem;
+            }
+
+            .btn-logout {
+                margin: 15px auto; /* Centrado en el menú */
+                display: block;
             }
 
             .market-grid { 
-                grid-template-columns: 1fr; /* Una columna en móvil */
+                grid-template-columns: 1fr; 
                 padding: 0 15px;
             }
         }
