@@ -16,7 +16,7 @@ async function cargarMercado() {
             todosLosAtletas.push({ id: doc.id, ...doc.data() });
         });
 
-        // --- ORDENAR POR PRECIO (DE MAYOR A MENOR) ---
+        // ORDENAR POR PRECIO (DE MAYOR A MENOR)
         todosLosAtletas.sort((a, b) => Number(b.precio) - Number(a.precio));
 
         renderizarAtletas(todosLosAtletas);
@@ -42,9 +42,7 @@ function renderizarAtletas(listaAtletas) {
         const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
         const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
         
-        // --- PRECIO DIRECTO (SIN DIVIDIR) ---
-        // Si en Firebase es 7, se muestra "7M"
-        // Si es undefined o null, mostramos "0M"
+        // PRECIO DIRECTO (Ej: "7M")
         const precioVal = atleta.precio !== undefined ? atleta.precio : 0;
         const precioDisplay = precioVal + 'M';
 
@@ -71,7 +69,6 @@ function renderizarAtletas(listaAtletas) {
         });
 
         // --- C. CONSTRUIR HTML ---
-        // Nota: He añadido estilos inline al precio para asegurarme de que se vea verde
         htmlAcumulado += `
             <div class="athlete-card">
                 <div class="athlete-header">
@@ -111,8 +108,7 @@ function renderizarAtletas(listaAtletas) {
                         <label class="section-label">Evolución Valor</label>
                         <div class="history-grid">${htmlGridValor}</div>
                     </div>
-                    <button class="btn-comprar-mini" onclick="ficharAtleta('${atleta.id}', '${atleta.nombre}')">FICHAR</button>
-                </div>
+                    </div>
             </div>
         `;
     });
@@ -134,9 +130,7 @@ window.toggleHistorial = (id) => {
     }
 };
 
-window.ficharAtleta = (id, nombre) => {
-    alert("Has pulsado fichar a " + nombre);
-};
+// La función window.ficharAtleta ya no es necesaria, pero no molesta si la dejas.
 
 inputBuscador.addEventListener('input', (e) => {
     const texto = e.target.value.toLowerCase();
@@ -154,7 +148,7 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            resultado[index + offset] = dato + 'M'; // Sin dividir
+            resultado[index + offset] = dato + 'M'; 
         } else {
             resultado[index + offset] = dato;
         }
