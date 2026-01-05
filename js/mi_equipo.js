@@ -16,58 +16,15 @@ const db = getFirestore(app);
 // --- ESTADO ---
 let currentUserData = null;
 let allAthletes = [];
-// El equipo son 3 huecos. Si hay jugador es un objeto, si no es null.
 let teamSlots = [null, null, null]; 
-let captainId = null; // ID del capitán
+let captainId = null;
 let totalPatrimony = 0;
-let currentBudget = 0;
-let isMarketClosed = false;
-
-// Variable para saber qué hueco estamos llenando (0, 1 o 2)
 let currentSlotIndex = -1;
 
-// --- 1. COMPROBAR MERCADO ---
-
-function checkMarketStatus() {
-
-    const now = new Date();
-
-    const day = now.getDay();
-
-    const hour = now.getHours();
-
-
-
-    // Sábado(6), Domingo(0), Lunes(1) o Martes(2)<10:00
-
-    if (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 8)) {
-
-        isMarketClosed = true;
-
-        document.getElementById('marketClosedMsg').style.display = 'flex';
-
-        document.getElementById('btnSaveTeam').disabled = true;
-
-        document.getElementById('btnSaveTeam').innerText = "MERCADO CERRADO";
-
-        return false;
-
-    }
-
-    return true;
-
-}
-
-// --- 2. INIT ---
+// --- INIT ---
 async function init() {
     const userNick = localStorage.getItem('fantasy_user');
-    if (!userNick) {
-        alert("Inicia sesión primero");
-        window.location.href = '../index.html';
-        return;
-    }
-
-    checkMarketStatus();
+    if (!userNick) { window.location.href = '../index.html'; return; }
 
     try {
         // Cargar Usuario
@@ -81,14 +38,15 @@ async function init() {
         athSnap.forEach(d => {
             let a = d.data();
             a.id = d.id;
+            // Aseguramos que precio es número
+            a.precio = parseInt(a.precio) || 0; 
             allAthletes.push(a);
         });
 
-        // RECONSTRUIR EQUIPO Y CAPITÁN
+        // Reconstruir equipo
         const savedIds = currentUserData.equipo || [];
-        captainId = currentUserData.capitanId || null; // Leemos el capitán guardado
+        captainId = currentUserData.capitanId || null;
 
-        // Rellenar los slots (máximo 3)
         savedIds.forEach((id, index) => {
             if (index < 3) {
                 const player = allAthletes.find(a => a.id === id);
@@ -96,209 +54,198 @@ async function init() {
             }
         });
 
-        // Si el capitán guardado ya no está en el equipo, resetearlo
-        if (captainId && !teamSlots.some(p => p && p.id === captainId)) {
-            captainId = null;
-        }
-
-        // Cálculos
-        const initialTeamValue = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-        totalPatrimony = (currentUserData.presupuesto || 0) + initialTeamValue;
+        // Calcular Patrimonio Total (Dinero en caja + Valor Equipo Actual)
+        const teamValue = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+        // El presupuesto guardado en la BD es el dinero "sobrante".
+        // Patrimonio = Presupuesto Guardado + Valor Equipo
+        totalPatrimony = (parseInt(currentUserData.presupuesto) || 0) + teamValue;
 
         updateUI();
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error(error);
     }
 }
 
-// --- 3. ACTUALIZAR UI ---
+// --- ACTUALIZAR UI ---
 function updateUI() {
+    // 1. Calcular Coste Actual del Equipo
     const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-    currentBudget = totalPatrimony - currentTeamCost;
+    
+    // 2. Presupuesto Restante = Patrimonio - Coste Equipo
+    const currentBudget = totalPatrimony - currentTeamCost;
 
-    const maxDebt = totalPatrimony * 0.07;
-    const isValidDebt = currentBudget >= -maxDebt;
-
-    // Presupuesto
+    // 3. Actualizar Barra
     const budgetEl = document.getElementById('budgetValue');
-    budgetEl.innerText = currentBudget.toFixed(1) + "M";
-    budgetEl.className = 'budget-value ' + (currentBudget < 0 ? 'negative' : 'positive');
-
-    // Warning Deuda
-    const warnEl = document.getElementById('debtWarning');
+    // Sin decimales, número entero
+    budgetEl.innerText = Math.round(currentBudget) + "M"; 
+    
     if (currentBudget < 0) {
-        warnEl.style.display = 'block';
-        warnEl.innerText = isValidDebt ? `⚠️ Deuda OK (Máx -${maxDebt.toFixed(1)}M)` : `⛔ Deuda Excesiva`;
-        warnEl.style.color = isValidDebt ? 'orange' : 'red';
+        budgetEl.classList.remove('positive');
+        budgetEl.classList.add('negative');
+        document.getElementById('debtWarning').style.display = 'block';
+        document.getElementById('btnSaveTeam').disabled = true;
+        document.getElementById('btnSaveTeam').innerText = "DEUDA EXCESIVA";
     } else {
-        warnEl.style.display = 'none';
+        budgetEl.classList.remove('negative');
+        budgetEl.classList.add('positive');
+        document.getElementById('debtWarning').style.display = 'none';
+        document.getElementById('btnSaveTeam').disabled = false;
+        document.getElementById('btnSaveTeam').innerText = "GUARDAR CAMBIOS";
     }
 
-    // PINTAR LOS 3 SLOTS
-    renderSlot(0, 'slot0'); // Arriba
-    renderSlot(1, 'slot1'); // Abajo Izq
-    renderSlot(2, 'slot2'); // Abajo Der
-
-    // Botón Guardar
-    const btnSave = document.getElementById('btnSaveTeam');
-    if (!isMarketClosed) {
-        if (!isValidDebt) {
-            btnSave.disabled = true;
-            btnSave.innerText = "DEUDA EXCESIVA";
-        } else {
-            btnSave.disabled = false;
-            btnSave.innerText = "GUARDAR CAMBIOS";
-        }
-    }
+    // 4. Renderizar Slots
+    renderSlot(0, 'slot0');
+    renderSlot(1, 'slot1');
+    renderSlot(2, 'slot2');
 }
 
 function renderSlot(index, elementId) {
     const container = document.getElementById(elementId);
     const player = teamSlots[index];
-
     container.innerHTML = "";
 
     if (player) {
-        // ESTADO: LLENO
         container.className = "player-card-slot filled";
         
-        // ¿Es capitán?
+        // Capitán
         const isCapi = (player.id === captainId);
         const capiClass = isCapi ? "active" : "";
 
+        // Foto por defecto
+        const imgUrl = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+
         container.innerHTML = `
-            <img src="${player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" class="slot-img">
+            <img src="${imgUrl}" class="slot-img">
             <div class="slot-name">${player.nombre}</div>
             <div class="slot-price">${player.precio}M</div>
             
             <div class="card-actions">
-                <button class="btn-mini btn-captain ${capiClass}" onclick="toggleCaptain('${player.id}', event)">C</button>
-                <button class="btn-mini btn-remove" onclick="clearSlot(${index}, event)">X</button>
+                <button class="btn-mini btn-captain ${capiClass}" data-id="${player.id}">C</button>
+                <button class="btn-mini btn-remove" data-index="${index}">X</button>
             </div>
         `;
-        // Quitamos el onclick del contenedor padre para que no abra el modal si pulsamos botones
-        container.onclick = null; 
+
+        // Asignar eventos a los botones DENTRO del HTML generado
+        container.querySelector('.btn-captain').onclick = (e) => {
+            e.stopPropagation();
+            toggleCaptain(player.id);
+        };
+        container.querySelector('.btn-remove').onclick = (e) => {
+            e.stopPropagation();
+            clearSlot(index);
+        };
+        // Quitar evento de abrir modal si está lleno
+        container.onclick = null;
 
     } else {
-        // ESTADO: VACÍO
         container.className = "player-card-slot";
         container.innerHTML = `
-            <i class="fa-solid fa-plus" style="font-size: 2rem; color: #444;"></i>
-            <span style="font-size: 0.8rem; color: #666; margin-top:5px;">Fichar</span>
+            <i class="fa-solid fa-plus" style="font-size: 1.5rem; color: #666;"></i>
+            <span style="font-size: 0.7rem; color: #666; margin-top:5px; font-weight:600;">FICHAR</span>
         `;
-        // Al hacer click en lo vacío, abrimos modal
         container.onclick = () => openModal(index);
     }
 }
 
-// --- 4. GESTIÓN DEL CAPITÁN ---
-window.toggleCaptain = (pid, event) => {
-    event.stopPropagation(); // Evita abrir modal si hubiera click
-    if (captainId === pid) {
-        captainId = null; // Quitar capi
-    } else {
-        captainId = pid; // Nuevo capi
-    }
-    updateUI();
-};
+// --- FUNCIONES LÓGICAS ---
 
-window.clearSlot = (index, event) => {
-    event.stopPropagation();
+function toggleCaptain(pid) {
+    if (captainId === pid) captainId = null; // Quitar
+    else captainId = pid; // Poner
+    updateUI();
+}
+
+function clearSlot(index) {
     const p = teamSlots[index];
-    if (p && p.id === captainId) captainId = null; // Si borras al capi, adiós capi
-    
+    if (p && p.id === captainId) captainId = null;
     teamSlots[index] = null;
     updateUI();
-};
+}
 
-// --- 5. MODAL DE FICHAJES ---
-window.openModal = (index) => {
-    if (isMarketClosed) return alert("Mercado Cerrado");
+// --- MODAL ---
+function openModal(index) {
     currentSlotIndex = index;
     renderMarketList();
     document.getElementById('playerModal').style.display = 'flex';
-};
+}
 
-window.closeModal = () => {
-    document.getElementById('playerModal').style.display = 'none';
-};
+// Vinculamos input search
+document.getElementById('modalSearch').addEventListener('keyup', renderMarketList);
 
 function renderMarketList() {
-    const listContainer = document.getElementById('modalPlayerList');
+    const container = document.getElementById('modalPlayerList');
     const search = document.getElementById('modalSearch').value.toLowerCase();
-    listContainer.innerHTML = "";
+    container.innerHTML = "";
 
-    // Filtro: No mostrar los que YA están en el equipo (en otros slots)
-    const currentIds = teamSlots.filter(p => p).map(p => p.id);
+    // IDs ya usados
+    const usedIds = teamSlots.filter(p => p).map(p => p.id);
 
     const available = allAthletes.filter(a => {
-        return !currentIds.includes(a.id) && 
-               (a.nombre.toLowerCase().includes(search) || a.apellidos.toLowerCase().includes(search));
+        const matchName = a.nombre.toLowerCase().includes(search);
+        return !usedIds.includes(a.id) && matchName;
     });
 
+    // Ordenar por precio desc
     available.sort((a,b) => b.precio - a.precio);
 
     available.forEach(p => {
         const div = document.createElement('div');
         div.className = 'player-list-item';
         div.innerHTML = `
-            <img src="${p.foto}">
+            <img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}">
             <div style="flex-grow:1;">
-                <div style="color:white; font-weight:bold;">${p.nombre} ${p.apellidos}</div>
-                <div style="color:#4cd137; font-size:0.8rem;">${p.precio}M - ${p.categoria}</div>
+                <div style="color:white; font-weight:bold;">${p.nombre}</div>
+                <div style="color:#ff5e00; font-size:0.8rem;">${p.precio}M | ${p.categoria || 'JUG'}</div>
             </div>
-            <i class="fa-solid fa-plus" style="color:var(--primary);"></i>
+            <i class="fa-solid fa-plus-circle" style="color:#4cd137; font-size:1.2rem;"></i>
         `;
-        div.onclick = () => {
-            selectPlayer(p);
-        };
-        listContainer.appendChild(div);
+        div.onclick = () => selectPlayer(p);
+        container.appendChild(div);
     });
 }
 
 function selectPlayer(player) {
     teamSlots[currentSlotIndex] = player;
-    closeModal();
+    document.getElementById('playerModal').style.display = 'none';
     updateUI();
 }
 
-// Búsqueda en modal
-window.filtrarModal = () => renderMarketList();
-
-
-// --- 6. GUARDAR ---
+// --- GUARDAR ---
 document.getElementById('btnSaveTeam').addEventListener('click', async () => {
     const btn = document.getElementById('btnSaveTeam');
-    btn.innerText = "Guardando...";
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GUARDANDO...';
     btn.disabled = true;
 
     try {
         const userNick = localStorage.getItem('fantasy_user');
         
-        // Guardamos IDs
-        const finalIds = teamSlots.filter(p => p).map(p => p.id);
-        
+        // Calcular presupuesto final REAL
+        const cost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+        const finalBudget = totalPatrimony - cost;
+
+        const teamIds = teamSlots.filter(p => p).map(p => p.id);
+
         await updateDoc(doc(db, "usuarios", userNick), {
-            equipo: finalIds,
-            capitanId: captainId || null, // Guardamos también el capitán
-            presupuesto: Number(currentBudget.toFixed(1))
+            equipo: teamIds,
+            capitanId: captainId || null,
+            presupuesto: Math.round(finalBudget) // Guardar sin decimales
         });
 
-        alert("✅ Equipo guardado.");
-        // NO recargamos la página para que se vea el resultado. 
-        // Solo actualizamos el botón.
-        btn.innerText = "GUARDADO CON ÉXITO";
+        btn.style.background = "#4cd137";
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> GUARDADO';
+        
         setTimeout(() => {
-            btn.innerText = "GUARDAR CAMBIOS";
+            btn.style.background = "#ff5e00";
+            btn.innerHTML = 'GUARDAR CAMBIOS';
             btn.disabled = false;
         }, 2000);
 
-    } catch (error) {
-        console.error(error);
-        alert("Error al guardar");
-        btn.disabled = false;
+    } catch (e) {
+        console.error(e);
+        btn.innerText = "ERROR";
     }
 });
 
+// Arrancar
 document.addEventListener('DOMContentLoaded', init);

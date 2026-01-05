@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <title>Mi Equipo | Fantasy Orcasitas</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
@@ -14,13 +12,9 @@
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* =========================================
-           1. ESTILOS BASE (ARQUITECTURA NUCLEAR)
-           ========================================= */
+        /* RESET NUCLEAR */
         * { box-sizing: border-box; }
-
         html { background-color: #000000 !important; }
-
         body {
             display: block !important;
             height: auto !important;
@@ -29,7 +23,6 @@
             background-color: transparent !important;
             margin: 0; padding: 0;
             font-family: 'Montserrat', sans-serif;
-            position: relative; 
         }
 
         /* FONDO */
@@ -43,193 +36,109 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7)); z-index: -1;
         }
 
-        /* =========================================
-           2. NAVBAR (ESTANDARIZADA)
-           ========================================= */
+        /* NAVBAR */
         .navbar {
-            position: sticky !important;
-            top: 0;
-            display: flex; justify-content: space-between; align-items: center;
-            background-color: #000 !important;
-            padding: 15px 20px !important;
-            border-bottom: 2px solid #222 !important;
-            width: 100%; height: 70px !important;
-            z-index: 5000;
+            position: sticky !important; top: 0; display: flex; justify-content: space-between; align-items: center;
+            background-color: #000 !important; padding: 15px 20px !important; border-bottom: 2px solid #222 !important;
+            width: 100%; height: 70px !important; z-index: 5000;
         }
-
-        .nav-logo a {
-            text-decoration: none; color: white !important; font-size: 1.2rem; font-weight: 800;
-            display: flex; align-items: center; gap: 10px;
-        }
+        .nav-logo a { text-decoration: none; color: white !important; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
         .nav-logo span { color: #ff5e00 !important; }
-
+        
         .nav-links { display: flex; gap: 20px; align-items: center; }
         .nav-links a { text-decoration: none; color: #aaa !important; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
         .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
-
+        
         .btn-logout { background: none; border: none; color: #ff5e00 !important; font-size: 1.2rem; cursor: pointer; margin-left: 15px; }
         .menu-toggle { display: none !important; background: none; border: none; color: white !important; font-size: 1.5rem; cursor: pointer; }
 
-        /* =========================================
-           3. UI DE MI EQUIPO
-           ========================================= */
-        
-        /* HEADER PRESUPUESTO (Pegajoso debajo de la navbar) */
+        /* PRESUPUESTO */
         .budget-header {
-            position: sticky;
-            top: 70px; /* Justo debajo de la navbar */
-            background: rgba(0, 0, 0, 0.95);
-            border-bottom: 1px solid #333;
-            width: 100%;
-            padding: 15px 20px;
-            display: flex; justify-content: center;
-            z-index: 4000;
+            position: sticky; top: 70px; background: rgba(0, 0, 0, 0.95); border-bottom: 1px solid #333;
+            width: 100%; padding: 10px 20px; display: flex; justify-content: center; z-index: 4000;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-
-        .budget-content {
-            width: 100%; max-width: 600px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
+        .budget-content { width: 100%; max-width: 600px; display: flex; justify-content: space-between; align-items: center; }
         .budget-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; display: block; }
         .budget-number { font-size: 1.5rem; font-weight: 700; color: white; }
         .budget-number.positive { color: #4cd137; }
         .budget-number.negative { color: #e84118; }
-
+        
         .debt-pill {
-            background: rgba(232, 65, 24, 0.2); color: #e84118;
-            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold;
-            display: none; border: 1px solid rgba(232, 65, 24, 0.5);
+            background: rgba(232, 65, 24, 0.2); color: #e84118; padding: 4px 10px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: bold; display: none; border: 1px solid rgba(232, 65, 24, 0.5);
         }
 
-        /* CONTENEDOR PRINCIPAL */
+        /* CAMPO */
         .dashboard-container {
-            padding-top: 20px !important;
-            padding-bottom: 120px !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding-left: 15px; padding-right: 15px;
-            position: relative; z-index: 1;
+            padding-top: 20px !important; padding-bottom: 120px !important;
+            display: flex; flex-direction: column; align-items: center; width: 100%;
+            padding-left: 15px; padding-right: 15px; position: relative; z-index: 1;
         }
-
-        /* CAMPO DE JUEGO */
-        .pitch-area {
-            width: 100%; max-width: 500px; margin-top: 20px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
+        .pitch-area { width: 100%; max-width: 500px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; }
         .pitch-bg {
-            width: 100%;
-            background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
-            border: 1px solid #333; border-radius: 15px;
-            padding: 30px 10px;
-            position: relative;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            width: 100%; background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
+            border: 1px solid #333; border-radius: 15px; padding: 30px 10px; position: relative;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             background-size: 20px 20px;
         }
-
         .formation-wrapper { display: flex; flex-direction: column; align-items: center; gap: 25px; width: 100%; }
         .formation-row { display: flex; justify-content: center; gap: 20px; width: 100%; }
 
-        /* CARTA DE JUGADOR (SLOT) */
+        /* CARTA JUGADOR */
         .player-card-slot {
-            width: 90px; height: 135px;
-            background: rgba(255,255,255,0.03);
-            border: 2px dashed #444; border-radius: 10px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; flex-shrink: 0;
-            transition: 0.2s;
+            width: 90px; height: 135px; background: rgba(255,255,255,0.03); border: 2px dashed #444; border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative;
         }
-        .player-card-slot:hover { background: rgba(255,255,255,0.08); border-color: #666; }
-        
         .player-card-slot.filled { border: 2px solid #ff5e00; background: #1a1a1a; cursor: default; }
         
-        .slot-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.6); }
-        .slot-name { font-size: 0.75rem; color: white; font-weight: bold; text-align: center; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 80px; }
-        .slot-price { font-size: 0.65rem; color: #4cd137; margin-bottom: 5px; font-weight: 600; }
+        .slot-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; }
+        .slot-name { font-size: 0.75rem; color: white; font-weight: bold; text-align: center; max-width: 80px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .slot-price { font-size: 0.65rem; color: #4cd137; font-weight: 600; margin-bottom: 5px; }
 
-        /* ACCIONES DENTRO DE LA CARTA */
-        .card-actions { display: flex; gap: 5px; margin-top: 5px; }
+        /* BOTONES CARTA */
+        .card-actions { display: flex; gap: 5px; margin-top: 5px; z-index: 10; }
         .btn-mini { border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; font-weight: bold; }
-        .btn-remove { background: rgba(255, 59, 48, 0.15); color: #ff453a; border: 1px solid #ff453a; }
+        .btn-remove { background: rgba(255, 59, 48, 0.2); color: #ff453a; border: 1px solid #ff453a; }
         .btn-captain { background: transparent; color: #888; border: 1px solid #666; }
         .btn-captain.active { background: #ffd700; color: black; border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
 
-        /* BOTÓN FLOTANTE */
-        .fab-save-container {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 4500; width: 90%; max-width: 400px;
-        }
+        /* BOTÓN GUARDAR */
+        .fab-save-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 4500; width: 90%; max-width: 400px; }
         .btn-save-fab {
-            width: 100%; background: #ff5e00; color: white; border: none;
-            padding: 15px; border-radius: 50px; font-size: 1rem; font-weight: 800;
-            text-transform: uppercase; box-shadow: 0 10px 30px rgba(255, 94, 0, 0.4);
-            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
-            transition: transform 0.2s;
+            width: 100%; background: #ff5e00; color: white; border: none; padding: 15px; border-radius: 50px;
+            font-size: 1rem; font-weight: 800; text-transform: uppercase; box-shadow: 0 10px 30px rgba(255, 94, 0, 0.4); cursor: pointer;
         }
-        .btn-save-fab:active { transform: scale(0.95); }
-        .btn-save-fab:disabled { background: #333; color: #777; box-shadow: none; }
+        .btn-save-fab:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
 
         /* MODAL */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 8000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 8000;
             display: none; justify-content: center; align-items: center; padding: 15px;
         }
         .modal-content {
-            background: #111; border: 1px solid #333; border-radius: 12px;
-            width: 100%; max-width: 500px; max-height: 80vh;
-            display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            background: #111; border: 1px solid #333; border-radius: 12px; width: 100%; max-width: 500px; max-height: 80vh;
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
         .modal-header { padding: 15px; background: #1a1a1a; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
         .modal-body { padding: 0; overflow-y: auto; }
         
-        .player-list-item {
-            display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #222; cursor: pointer; transition: background 0.2s;
-        }
+        .player-list-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #222; cursor: pointer; }
         .player-list-item:hover { background: #222; }
         .player-list-item img { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; border: 2px solid #333; object-fit: cover; }
 
-        /* MENSAJE MERCADO CERRADO */
-        .market-closed-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; text-align: center;
-        }
-        .btn-action {
-            display: inline-block; padding: 10px 20px; background: #333; color: white;
-            border-radius: 5px; text-decoration: none; border: 1px solid #555;
-        }
-
-        /* =========================================
-           4. RESPONSIVE MÓVIL (MENU OVERLAY)
-           ========================================= */
+        /* RESPONSIVE MÓVIL */
         @media (max-width: 768px) {
             .navbar { padding: 10px 15px !important; }
             .menu-toggle { display: block !important; }
-
             .nav-links {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-                background-color: rgba(0,0,0,0.98);
-                flex-direction: column; justify-content: center; align-items: center;
-                z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out;
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: rgba(0,0,0,0.98);
+                flex-direction: column; justify-content: center; align-items: center; z-index: 6000;
+                transform: translateX(100%); transition: transform 0.3s ease-in-out;
             }
             .nav-links.active { transform: translateX(0); }
             .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
             .btn-logout { margin-top: 30px; font-size: 1.5rem; }
-
-            /* Ajustes Móvil Pequeño */
-            @media (max-width: 380px) {
-                .player-card-slot { width: 80px; height: 120px; }
-                .formation-row { gap: 10px; }
-            }
         }
     </style>
 </head>
@@ -238,33 +147,19 @@
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
-    
-
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html">
-                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
-            </a>
+            <a href="home.html"><i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span></a>
         </div>
-
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
         <div class="nav-links" id="navLinks">
-            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
-                <i class="fa-solid fa-times"></i>
-            </button>
-
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;"><i class="fa-solid fa-times"></i></button>
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html" class="active">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
             <a href="calendario.html">Calendario</a>
-
-            <button onclick="cerrarSesion()" class="btn-logout">
-                <i class="fa-solid fa-power-off"></i> Salir
-            </button>
+            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i> Salir</button>
         </div>
     </nav>
 
@@ -274,20 +169,13 @@
                 <span class="budget-label">Presupuesto</span>
                 <span id="budgetValue" class="budget-number">---</span>
             </div>
-            
-            <div id="debtWarning" class="debt-pill">
-                ⚠️ EN DEUDA
-            </div>
+            <div id="debtWarning" class="debt-pill">⚠️ EN DEUDA</div>
         </div>
     </div>
 
     <div class="dashboard-container">
-        
         <div class="pitch-area">
-            <div style="text-align: center; margin-bottom: 15px; color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">
-                Tu Alineación (3)
-            </div>
-
+            <div style="text-align: center; margin-bottom: 15px; color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Tu Alineación (3)</div>
             <div class="pitch-bg">
                 <div class="formation-wrapper">
                     <div class="formation-row">
@@ -306,41 +194,33 @@
                 <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
             </button>
         </div>
-
     </div>
 
     <div id="playerModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 style="color:white; margin:0; font-size:1.1rem; text-transform: uppercase;">Seleccionar Jugador</h3>
-                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor: pointer;">&times;</button>
+                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
             </div>
             <div style="padding:15px; background:#1a1a1a;">
-                <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar atleta..." 
-                       style="width:100%; padding:15px; border-radius:50px; border:1px solid #333; background:#000; color:white; outline:none; font-size: 1rem;">
+                <input type="text" id="modalSearch" placeholder="Buscar atleta..." style="width:100%; padding:15px; border-radius:50px; border:1px solid #333; background:#000; color:white; outline:none; font-size: 1rem;">
             </div>
-            <div id="modalPlayerList" class="modal-body">
-                </div>
+            <div id="modalPlayerList" class="modal-body"></div>
         </div>
     </div>
 
     <script>
-        function toggleMenu() { 
-            document.getElementById('navLinks').classList.toggle('active'); 
-        }
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
         
-        function cerrarSesion() { 
-            localStorage.removeItem('fantasy_user'); 
-            window.location.href = '../index.html'; 
-        }
+        // Estas funciones globales son para que el JS pueda llamar al modal y botones
+        // Se definen vacías aquí para que no den error antes de cargar el módulo, 
+        // pero el módulo JS las sobrescribirá o usará event listeners.
+        window.closeModal = function() { document.getElementById('playerModal').style.display = 'none'; };
         
-        // Función global necesaria para que el botón "X" del HTML funcione
-        window.closeModal = function() {
-            document.getElementById('playerModal').style.display = 'none';
-        }
+        // Importante: El JS module asignará las funciones reales.
     </script>
 
     <script type="module" src="../js/mi_equipo.js"></script>
-
 </body>
 </html>
