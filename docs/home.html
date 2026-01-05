@@ -2,84 +2,176 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <title>Inicio | Fantasy Orcasitas</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- ESTILOS RESPONSIVE (MÓVIL) --- */
-        
-        /* Por defecto el botón hamburguesa está oculto */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
+        /* =========================================
+           1. ESTILOS BASE (ARQUITECTURA COMÚN)
+           ========================================= */
+        * { box-sizing: border-box; }
+
+        html { background-color: #000000 !important; }
+
+        body {
+            display: block !important;
+            height: auto !important;
+            min-height: 100vh;
+            overflow-y: auto !important;
+            background-color: transparent !important;
+            margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            position: relative; 
         }
 
-        /* AJUSTES PARA PANTALLAS PEQUEÑAS (Móviles) */
+        /* FONDO */
+        .bg-image {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: -2; opacity: 0.4;
+        }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7)); z-index: -1;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .dashboard-container {
+            padding-top: 40px !important;
+            padding-bottom: 80px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Si quieres centrar verticalmente solo en home, descomenta esto: */
+            /* justify-content: center; min-height: calc(100vh - 70px); */
+            width: 100%;
+            padding-left: 15px; padding-right: 15px;
+            position: relative; z-index: 1;
+        }
+
+        /* =========================================
+           2. NAVBAR (ESTANDARIZADA)
+           ========================================= */
+        .navbar {
+            position: sticky; /* Se pega arriba al hacer scroll */
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            border-bottom: 2px solid #222;
+            padding: 15px 20px;
+            z-index: 1000;
+            height: 70px;
+            width: 100%;
+        }
+
+        .nav-logo a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span { color: #ff5e00; } /* Naranja */
+
+        /* MENÚ DE ESCRITORIO */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ff5e00;
+        }
+        .btn-logout { background: none; border: none; color: #ff5e00 !important; font-size: 1.2rem; cursor: pointer; margin-left: 15px; }
+        .menu-toggle { display: none !important; background: none; border: none; color: white !important; font-size: 1.5rem; cursor: pointer; }
+
+        /* =========================================
+           3. ESTILOS HOME (CARD Y CONTADOR)
+           ========================================= */
+        .login-card {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            border: 1px solid #333;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 500px; /* Ancho máximo para PC */
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .date-display {
+            color: #ff5e00; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;
+        }
+
+        h2 span { color: #ff5e00; }
+
+        /* Contador */
+        .countdown-container {
+            display: flex; justify-content: center; gap: 15px; margin: 25px 0;
+        }
+        .time-box {
+            display: flex; flex-direction: column; align-items: center;
+            background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333;
+            min-width: 70px;
+        }
+        .time-number { font-size: 2rem; font-weight: 800; color: white; line-height: 1; }
+        .time-label { font-size: 0.65rem; text-transform: uppercase; color: #888; margin-top: 5px; }
+
+        /* Botón Gestionar */
+        .btn-home-action {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: #ff5e00; color: white; text-decoration: none;
+            padding: 12px 25px; border-radius: 50px; font-weight: 800; text-transform: uppercase;
+            font-size: 0.9rem; box-shadow: 0 5px 15px rgba(255, 94, 0, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-home-action:hover { transform: scale(1.05); }
+
+        /* =========================================
+           4. RESPONSIVE MÓVIL (MENU OVERLAY)
+           ========================================= */
         @media (max-width: 768px) {
-            .navbar {
-                flex-wrap: wrap; /* Permite que los elementos bajen si no caben */
-                padding: 15px;
-            }
-
-            .nav-logo {
-                flex-grow: 1; /* El logo ocupa el espacio disponible */
-            }
-
-            .menu-toggle {
-                display: block; /* Mostramos el botón hamburguesa */
-                margin-left: 15px;
-            }
+            .navbar { padding: 10px 15px !important; }
+            .menu-toggle { display: block !important; }
 
             .nav-links {
-                display: none; /* Ocultamos los enlaces por defecto */
-                width: 100%;
-                flex-direction: column;
-                margin-top: 15px;
-                background: rgba(0, 0, 0, 0.9);
-                border-radius: 8px;
-                padding: 10px;
-                border: 1px solid #333;
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98); flex-direction: column; justify-content: center; align-items: center;
+                z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out;
             }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
 
-            /* Clase que añadiremos con JS para mostrar el menú */
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links a {
-                padding: 15px;
-                border-bottom: 1px solid #222;
-                text-align: center;
-                width: 100%;
-                display: block;
-            }
-
-            /* Ajuste del contador para que no se rompa */
-            .countdown-container {
-                gap: 10px;
-            }
-
-            .time-box {
-                min-width: 60px;
-                padding: 10px;
-            }
-            
-            .time-number {
-                font-size: 1.5rem;
-            }
-
-            .login-card {
-                margin: 0 15px; /* Margen lateral para que no toque los bordes */
-                width: auto;
-            }
+            /* Ajustes Home Móvil */
+            .login-card { padding: 2rem 1.5rem; }
+            .time-number { font-size: 1.5rem; }
+            .time-box { min-width: 60px; padding: 8px; }
+            .countdown-container { gap: 10px; }
         }
     </style>
 </head>
@@ -90,7 +182,7 @@
 
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html" style="color:white; text-decoration:none;">
+            <a href="home.html">
                 <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
             </a>
         </div>
@@ -98,33 +190,39 @@
         <button class="menu-toggle" onclick="toggleMenu()">
             <i class="fa-solid fa-bars"></i>
         </button>
-        
-        <button onclick="cerrarSesion()" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;">
-            <i class="fa-solid fa-power-off"></i>
-        </button>
 
         <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
             <a href="home.html" class="active">Inicio</a>
             <a href="mi_equipo.html">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
             <a href="calendario.html">Calendario</a>
+
+            <button onclick="cerrarSesion()" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i> Salir
+            </button>
         </div>
     </nav>
 
     <div class="dashboard-container">
         
-        <div class="login-card" style="width: 100%; max-width: 600px; padding: 2rem 1rem;">
+        <div class="login-card">
             
             <div id="todayDate" class="date-display">Cargando fecha...</div>
 
-            <h3 style="color: #ff5e00; margin-top: 10px;">Hola manager</span></h3>
+            <h3 style="color: white; margin-top: 10px; font-size: 1.1rem;">
+                Hola <span id="userNick" style="color: #ff5e00;">Manager</span>
+            </h3>
 
-            <h2 style="font-size: 1.8rem; margin-top: 15px; text-transform: uppercase;">
+            <h2 style="font-size: 1.8rem; margin-top: 15px; text-transform: uppercase; color: white; font-weight: 800;">
                 Próxima <span>Jornada</span>
             </h2>
             
-            <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">
+            <p style="color: #aaa; font-size: 0.85rem; margin-top: 5px;">
                 <i class="fa-regular fa-clock"></i> Cierre: Viernes 23:59
             </p>
 
@@ -148,8 +246,8 @@
             </div>
 
             <div style="margin-top: 30px;">
-                <a href="mi_equipo.html" class="btn-login" style="text-decoration: none; display: inline-flex; width: auto; padding: 12px 30px; font-size: 0.9rem;">
-                    <i class="fa-solid fa-users-gear" style="margin-right: 8px;"></i> Gestionar Equipo
+                <a href="mi_equipo.html" class="btn-home-action">
+                    <i class="fa-solid fa-users-gear"></i> Gestionar Equipo
                 </a>
             </div>
             
@@ -158,33 +256,39 @@
     </div>
 
     <script>
-        // --- 1. LÓGICA DEL MENÚ MÓVIL ---
+        // --- 1. MENÚ MÓVIL ---
         function toggleMenu() {
-            const nav = document.getElementById('navLinks');
-            nav.classList.toggle('active');
+            document.getElementById('navLinks').classList.toggle('active');
         }
 
-        // --- 2. MOSTRAR USUARIO ---
+        // --- 2. CERRAR SESIÓN ---
+        function cerrarSesion() {
+            localStorage.removeItem('fantasy_user');
+            window.location.href = '../index.html';
+        }
+
+        // --- 3. MOSTRAR USUARIO ---
         const user = localStorage.getItem('fantasy_user');
         if(user) {
+            // Buscamos el elemento y si existe lo actualizamos
             const nickElement = document.getElementById('userNick');
             if(nickElement) nickElement.innerText = user;
         }
 
-        // --- 3. FECHA ACTUAL ---
+        // --- 4. FECHA ACTUAL ---
         const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
         const today = new Date().toLocaleDateString('es-ES', dateOptions);
         document.getElementById('todayDate').innerText = today.charAt(0).toUpperCase() + today.slice(1);
 
-        // --- 4. CONTADOR (Cuenta atrás) ---
+        // --- 5. CONTADOR (Cuenta atrás al Viernes) ---
         function updateCountdown() {
             const now = new Date();
             const target = new Date();
             
-            // 5 = Viernes. 
+            // 5 = Viernes. (0=Domingo, 1=Lunes...)
             let daysUntilFriday = 5 - now.getDay();
             
-            // Si ya pasó el viernes (ej: es sábado - 6), sumamos para el siguiente
+            // Si ya pasó el viernes o es viernes noche, apuntamos al de la semana que viene
             if (daysUntilFriday < 0 || (daysUntilFriday === 0 && now.getHours() >= 23 && now.getMinutes() >= 59)) {
                 daysUntilFriday += 7;
             }
@@ -212,12 +316,6 @@
 
         setInterval(updateCountdown, 1000);
         updateCountdown();
-
-        // --- 5. CERRAR SESIÓN ---
-        function cerrarSesion() {
-            localStorage.removeItem('fantasy_user');
-            window.location.href = '../index.html'; // O login.html según donde lo tengas
-        }
     </script>
 </body>
 </html>

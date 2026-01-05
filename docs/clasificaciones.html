@@ -24,14 +24,21 @@
 
         /* FONDO */
         .bg-image {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
-            z-index: -2; opacity: 0.4;
-        }
-        .bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7)); z-index: -1;
-        }
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* Foto de una pista de atletismo real */
+    background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+    z-index: -2;
+    transform: scale(1.05); /* Zoom sutil */
+}
+
+.bg-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+    z-index: -1;
+    backdrop-filter: blur(4px); /* Difumina la foto de fondo */
+}
 
         /* DASHBOARD - AQUÍ ESTÁ EL ARREGLO DE ALINEACIÓN */
         .dashboard-container {
@@ -49,17 +56,49 @@
 
         /* NAVBAR */
         .navbar {
-            position: sticky !important; top: 0; display: flex; justify-content: space-between; align-items: center;
-            background-color: #000 !important; padding: 15px 20px !important; border-bottom: 2px solid #222 !important;
-            width: 100%; height: 70px !important; z-index: 5000;
+            position: sticky; /* Se pega arriba al hacer scroll */
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            border-bottom: 2px solid #222;
+            padding: 15px 20px;
+            z-index: 1000;
+            height: 70px;
+            width: 100%;
         }
-        .nav-logo a { text-decoration: none; color: white !important; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-        .nav-logo span { color: #ff5e00 !important; }
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-links a { text-decoration: none; color: #aaa !important; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
-        .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
-        .btn-logout { background: none; border: none; color: #ff5e00 !important; font-size: 1.2rem; cursor: pointer; margin-left: 15px; }
-        .menu-toggle { display: none !important; background: none; border: none; color: white !important; font-size: 1.5rem; cursor: pointer; }
+
+        .nav-logo a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span { color: #ff5e00; } /* Naranja */
+
+        /* MENÚ DE ESCRITORIO */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ff5e00;
+        }
 
         /* CLASIFICACIONES */
         h1 {

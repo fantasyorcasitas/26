@@ -2,141 +2,180 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <title>Mi Equipo | Fantasy Orcasitas</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* --- ARREGLO DE EMERGENCIA PARA MÓVIL --- */
-        
-        /* 1. Reset para que nada se salga de la pantalla */
-        html, body {
-            overflow-x: hidden !important; /* Prohibido scroll horizontal */
-            width: 100%;
-            background-color: #0a0a0a;
+        /* =========================================
+           1. ESTILOS BASE (ARQUITECTURA COMÚN)
+           ========================================= */
+        * { box-sizing: border-box; }
+
+        html { background-color: #000000 !important; }
+
+        body {
+            display: block !important;
+            height: auto !important;
+            min-height: 100vh;
+            overflow-y: auto !important;
+            background-color: transparent !important;
+            margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            position: relative; 
         }
 
+        /* FONDO */
+        .bg-image {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: -2; opacity: 0.4;
+        }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7)); z-index: -1;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
         .dashboard-container {
-            width: 100%;
-            padding: 10px;
-            padding-bottom: 120px; /* Espacio para el botón flotante */
+            padding-top: 20px !important;
+            padding-bottom: 120px !important; /* Espacio para el botón flotante */
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-sizing: border-box;
-        }
-
-        /* 2. BARRA DE PRESUPUESTO */
-        /* La sacamos del sticky problemático y la ponemos fija pero limpia */
-        .budget-header {
-            background: #111;
-            border-bottom: 1px solid #333;
             width: 100%;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: center;
+            padding-left: 15px;
+            padding-right: 15px;
             position: relative;
-            z-index: 50;
+            z-index: 1;
         }
 
-        .budget-content {
-            width: 100%;
-            max-width: 600px;
+        /* =========================================
+           2. NAVBAR (ESTANDARIZADA)
+           ========================================= */
+       .navbar {
+            position: sticky; /* Se pega arriba al hacer scroll */
+            top: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background-color: #000;
+            border-bottom: 2px solid #222;
+            padding: 15px 20px;
+            z-index: 1000;
+            height: 70px;
+            width: 100%;
+        }
+
+        .nav-logo a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span { color: #ff5e00; } /* Naranja */
+
+        /* MENÚ DE ESCRITORIO */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ff5e00;
+        }
+
+        /* =========================================
+           3. ESTILOS MI EQUIPO
+           ========================================= */
+        
+        /* Barra de Presupuesto (Debajo de la Navbar) */
+        .budget-header {
+            position: sticky;
+            top: 70px; /* Altura de la navbar */
+            background: rgba(0, 0, 0, 0.95);
+            border-bottom: 1px solid #333;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex; justify-content: center;
+            z-index: 4000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .budget-content {
+            width: 100%; max-width: 600px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         .budget-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-        .budget-number { font-size: 1.5rem; font-weight: 700; color: white; font-family: 'Montserrat', sans-serif; }
+        .budget-number { font-size: 1.5rem; font-weight: 700; color: white; }
         .budget-number.positive { color: #4cd137; }
         .budget-number.negative { color: #e84118; }
 
         .debt-pill {
-            background: rgba(232, 65, 24, 0.2);
-            color: #e84118;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            display: none;
-            border: 1px solid rgba(232, 65, 24, 0.5);
+            background: rgba(232, 65, 24, 0.2); color: #e84118;
+            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold;
+            display: none; border: 1px solid rgba(232, 65, 24, 0.5);
         }
 
-        /* 3. EL CAMPO (PIZARRA) - AHORA RESPONSIVE */
+        /* CAMPO / PIZARRA */
         .pitch-area {
-            width: 100%;
-            max-width: 500px; /* No más ancho que esto */
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: 100%; max-width: 500px; margin-top: 20px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
         .pitch-bg {
             width: 100%;
             background: linear-gradient(180deg, #151515 0%, #0f0f0f 100%);
-            border: 1px solid #333;
-            border-radius: 15px;
-            padding: 25px 10px; /* Menos padding lateral */
+            border: 1px solid #333; border-radius: 15px;
+            padding: 25px 10px;
             position: relative;
-            box-sizing: border-box; /* CLAVE: Para que el padding no ensanche la caja */
-            
-            /* Dibujo sutil de líneas */
             background-image: 
                 linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
-        /* FORMACIÓN Y CARTAS */
-        .formation-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            width: 100%;
-        }
+        .formation-wrapper { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+        .formation-row { display: flex; justify-content: center; gap: 20px; width: 100%; }
 
-        .formation-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px; /* Separación más pequeña para que quepan */
-            width: 100%;
-        }
-
-        /* LAS CARTAS DE JUGADOR (SLOTS) */
+        /* CARTA DE JUGADOR (SLOT) */
         .player-card-slot {
-            width: 90px;
-            height: 130px;
+            width: 90px; height: 130px;
             background: rgba(255,255,255,0.03);
-            border: 2px dashed #444;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            /* Aseguramos que no se rompa */
-            flex-shrink: 0; 
+            border: 2px dashed #444; border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; flex-shrink: 0;
         }
 
-        /* Ajuste para móviles muy pequeños */
-        @media (max-width: 380px) {
-            .player-card-slot { width: 80px; height: 120px; }
-            .formation-row { gap: 10px; }
-        }
-
-        .player-card-slot.filled { border: 2px solid var(--primary); background: #1a1a1a; cursor: default; }
+        .player-card-slot.filled { border: 2px solid #ff5e00; background: #1a1a1a; cursor: default; }
         
-        .slot-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .slot-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-bottom: 5px; }
         .slot-name { font-size: 0.7rem; color: white; font-weight: bold; text-align: center; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 75px; }
         .slot-price { font-size: 0.65rem; color: #4cd137; margin-bottom: 5px; }
 
-        /* BOTONES DENTRO DE LA CARTA */
+        /* ACCIONES CARTA */
         .card-actions { display: flex; gap: 4px; margin-top: 4px; }
         .btn-mini { border: none; border-radius: 4px; padding: 2px 5px; font-size: 0.6rem; cursor: pointer; font-weight: bold; }
         .btn-remove { background: rgba(255, 59, 48, 0.2); color: #ff3b30; border: 1px solid #ff3b30; }
@@ -145,45 +184,60 @@
 
         /* BOTÓN FLOTANTE GUARDAR */
         .fab-save-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 400px;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 4500; width: 90%; max-width: 400px;
         }
 
         .btn-save-fab {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(255, 94, 0, 0.3);
-            transition: transform 0.2s;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            width: 100%; background: #ff5e00; color: white; border: none;
+            padding: 15px; border-radius: 50px; font-size: 1rem; font-weight: 800;
+            text-transform: uppercase; box-shadow: 0 10px 20px rgba(255, 94, 0, 0.3);
+            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
         }
         .btn-save-fab:active { transform: scale(0.98); }
-        .btn-save-fab:disabled { background: #444; color: #888; box-shadow: none; }
 
-        /* NAVBAR MÓVIL ESTILOS */
-        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 6000;
+            display: none; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: #111; border: 1px solid #333; border-radius: 12px;
+            width: 100%; max-width: 500px; max-height: 80vh;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .modal-header { padding: 15px; background: #222; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .modal-body { padding: 10px; overflow-y: auto; }
+        
+        .player-list-item {
+            display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #222; cursor: pointer;
+        }
+        .player-list-item:hover { background: #1a1a1a; }
+        .player-list-item img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; border: 1px solid #555; }
+
+        /* =========================================
+           4. RESPONSIVE MÓVIL (MENU OVERLAY)
+           ========================================= */
         @media (max-width: 768px) {
-            .navbar { flex-wrap: wrap; padding: 15px; }
-            .nav-logo { flex-grow: 1; }
-            .menu-toggle { display: block; margin-left: 15px; }
-            .nav-links { display: none; width: 100%; flex-direction: column; margin-top: 15px; background: rgba(0,0,0,0.95); border-radius: 8px; padding: 10px; border: 1px solid #333; position: relative; z-index: 9999;}
-            .nav-links.active { display: flex; }
-            .nav-links a { padding: 15px; border-bottom: 1px solid #222; text-align: center; width: 100%; display: block; }
+            .navbar { padding: 10px 15px !important; }
+            .menu-toggle { display: block !important; }
+
+            .nav-links {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98);
+                flex-direction: column; justify-content: center; align-items: center;
+                z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out;
+            }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
+
+            /* Ajuste Slots Móvil Pequeño */
+            @media (max-width: 380px) {
+                .player-card-slot { width: 80px; height: 120px; }
+                .formation-row { gap: 10px; }
+            }
         }
     </style>
 </head>
@@ -192,27 +246,31 @@
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
 
-    <div id="marketClosedMsg" class="market-closed-overlay" style="display: none;">
-        <i class="fa-solid fa-lock" style="font-size: 4rem; color: #e84118; margin-bottom: 20px;"></i>
-        <h2>MERCADO CERRADO</h2>
-        <a href="home.html" class="btn-action" style="margin-top: 20px; width: auto; text-decoration: none;">Volver</a>
-    </div>
-
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html" style="color:white; text-decoration:none;">
+            <a href="home.html">
                 <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
             </a>
         </div>
-        <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
-        <button onclick="localStorage.removeItem('fantasy_user'); window.location.href='../index.html'" class="btn-logout" style="font-size: 1.2rem; margin-left: 10px;"><i class="fa-solid fa-power-off"></i></button>
-        
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
         <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
             <a href="home.html">Inicio</a>
             <a href="mi_equipo.html" class="active">Mi Equipo</a>
             <a href="mercado.html">Mercado</a>
             <a href="clasificaciones.html">Ranking</a>
             <a href="calendario.html">Calendario</a>
+
+            <button onclick="cerrarSesion()" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i> Salir
+            </button>
         </div>
     </nav>
 
@@ -261,16 +319,26 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 style="color:white; margin:0; font-size:1.1rem;">Seleccionar Jugador</h3>
-                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
+                <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
             </div>
             <div style="padding:10px; background:#1a1a1a;">
                 <input type="text" id="modalSearch" onkeyup="filtrarModal()" placeholder="Buscar atleta..." 
                        style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#000; color:white; outline:none;">
             </div>
-            <div id="modalPlayerList" class="modal-body" style="max-height: 60vh;">
+            <div id="modalPlayerList" class="modal-body">
                 </div>
         </div>
     </div>
+
+    <script>
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
+        
+        // Funciones del Modal (Necesarias para el onclick del HTML)
+        window.closeModal = function() {
+            document.getElementById('playerModal').style.display = 'none';
+        }
+    </script>
 
     <script type="module" src="../js/mi_equipo.js"></script>
 </body>
