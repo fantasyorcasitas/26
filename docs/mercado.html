@@ -11,6 +11,76 @@
 
     <style>
         /* --- CORRECCIÓN DE SCROLL (IMPORTANTE) --- */
+        /* --- PEGA ESTO DENTRO DE TU <STYLE> EN MERCADO.HTML --- */
+
+        /* Estilo de la tarjeta completa */
+        .athlete-card {
+            background-color: #222; /* Fondo oscuro */
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .athlete-card:hover {
+            transform: translateY(-2px);
+            border-color: #555;
+        }
+
+        /* Cabecera con Foto y Nombre */
+        .athlete-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .athlete-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%; /* Foto redonda */
+            object-fit: cover;
+            border: 2px solid #d4af37; /* Borde dorado */
+            background-color: #333;
+        }
+
+        .athlete-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .athlete-pos {
+            margin: 2px 0 0 0;
+            font-size: 0.85rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        /* Botón de Fichar */
+        .btn-comprar {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #d4af37, #f2c94c); /* Dorado */
+            border: none;
+            border-radius: 8px;
+            color: black;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: filter 0.2s;
+        }
+
+        .btn-comprar:hover {
+            filter: brightness(1.1);
+        }
         html, body {
             overflow-y: auto !important; /* Obliga a permitir deslizar verticalmente */
             height: auto !important;
