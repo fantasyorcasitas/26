@@ -4,49 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mercado | Fantasy Orcasitas</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
-        /* =========================================
-           1. RESET DE CONFLICTOS (IMPORTANTE)
-           ========================================= */
+        /* ======================================================
+           1. RESET NUCLEAR (ESTO ARREGLA EL CONFLICTO DEL BODY)
+           ====================================================== */
         html, body {
-            overflow-y: auto !important; /* Permitir scroll siempre */
+            /* Forzamos que la web sea un bloque normal y no una caja flexible centrada */
+            display: block !important; 
             height: auto !important;
             min-height: 100vh;
-            background-color: #000 !important; 
-            margin: 0; padding: 0;
+            overflow-y: auto !important; /* Reactiva el scroll vertical */
+            background-color: #000 !important;
+            margin: 0; 
+            padding: 0;
         }
 
+        /* Quitamos el padding gigante que pueda venir del global */
         .dashboard-container {
-            padding-top: 20px !important; 
+            padding-top: 20px !important;
             padding-bottom: 100px !important;
-            height: auto !important;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 0 !important;
-            overflow: visible !important;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* =========================================
-           2. NAVBAR (ESTILO FINAL)
-           ========================================= */
+        /* ======================================================
+           2. BARRA DE NAVEGACIÓN (NAVBAR)
+           ====================================================== */
         .navbar {
-            position: sticky !important; /* Se pega arriba pero ocupa espacio */
+            position: sticky !important; /* Se pega al techo */
             top: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #000 !important;
+            background-color: #000 !important; /* Negro sólido */
             padding: 15px 20px !important;
             border-bottom: 2px solid #222 !important;
             width: 100%;
-            z-index: 5000;
-            height: 70px !important; /* Altura fija para evitar saltos */
+            height: auto !important;
+            z-index: 10000; /* Siempre encima */
+            box-sizing: border-box;
         }
 
         .nav-logo a {
@@ -61,7 +66,7 @@
         
         .nav-logo span { color: #ff5e00 !important; }
 
-        /* Estilos PC (Escritorio) */
+        /* Estilos del Menú (Escritorio) */
         .nav-links {
             display: flex;
             gap: 20px;
@@ -89,26 +94,27 @@
             margin-left: 15px;
         }
 
+        /* Botón Hamburguesa (Oculto en PC) */
         .menu-toggle {
-            display: none; /* Oculto en PC */
+            display: none !important; 
             background: none;
             border: none;
             color: white !important;
             font-size: 1.5rem;
             cursor: pointer;
-            z-index: 6000; /* Por encima del menú desplegable */
         }
 
-        /* =========================================
-           3. TARJETAS DEL MERCADO (DISEÑO FANTASY)
-           ========================================= */
-        h1 { color: white; margin: 20px 0; text-transform: uppercase; text-align: center; font-size: 1.5rem; }
+        /* ======================================================
+           3. ESTILOS TARJETAS (FANTASY)
+           ====================================================== */
+        h1 { color: white; margin: 20px 0; text-transform: uppercase; text-align: center; }
 
         .search-container {
             width: 100%;
             max-width: 600px;
             margin-bottom: 25px;
             padding: 0 15px;
+            box-sizing: border-box;
         }
         
         #buscadorAtleta {
@@ -120,6 +126,7 @@
             color: white;
             outline: none;
             font-size: 1rem;
+            box-sizing: border-box;
         }
 
         .market-grid {
@@ -129,6 +136,7 @@
             width: 100%;
             max-width: 1200px;
             padding: 0 20px;
+            box-sizing: border-box;
         }
 
         .athlete-card {
@@ -157,146 +165,67 @@
             background-color: #222;
         }
 
-        .athlete-info h3 {
-            margin: 0;
-            color: #ffffff;
-            font-size: 1.1rem;
-            font-weight: 800;
-        }
+        .athlete-info h3 { margin: 0; color: #ffffff; font-size: 1.1rem; font-weight: 800; }
+        .badge-cat { background: #333; color: #ff5e00; font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; margin-top: 5px; width: fit-content; }
+        .price-tag { color: #4ade80; font-size: 1.5rem; font-weight: 900; margin-top: 5px; }
 
-        .badge-cat {
-            background-color: #333;
-            color: #ff5e00;
-            font-size: 0.65rem;
-            padding: 3px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            font-weight: bold;
-            width: fit-content;
-            margin-top: 5px;
-        }
-
-        .price-tag {
-            color: #4ade80; 
-            font-size: 1.5rem;
-            font-weight: 900;
-            margin-top: 5px;
-        }
-
-        .stats-summary {
-            display: flex;
-            justify-content: space-between;
-            background-color: #1a1a1a;
-            padding: 12px 0;
-            border-top: 1px solid #333;
-            border-bottom: 1px solid #333;
-            margin-bottom: 10px;
-        }
-
-        .stat-box {
-            width: 33%;
-            text-align: center;
-            border-right: 1px solid #333;
-        }
+        .stats-summary { display: flex; justify-content: space-between; background: #1a1a1a; padding: 12px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; margin-bottom: 10px; }
+        .stat-box { width: 33%; text-align: center; border-right: 1px solid #333; }
         .stat-box:last-child { border-right: none; }
+        .stat-label { display: block; font-size: 0.65rem; color: #888; margin-bottom: 3px; }
+        .stat-num { font-size: 1.2rem; font-weight: bold; color: #fff; }
 
-        .stat-label {
-            display: block;
-            font-size: 0.65rem;
-            color: #888;
-            text-transform: uppercase;
-            margin-bottom: 3px;
-        }
-
-        .stat-num {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .toggle-btn {
-            text-align: center;
-            color: #ff5e00;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 8px;
-        }
-        .toggle-btn:hover { text-decoration: underline; }
-
-        .historial-desplegable {
-            margin-top: 10px;
-            border-top: 1px solid #333;
-            padding-top: 15px;
-            animation: fadeIn 0.3s;
-        }
-
-        .history-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            background-color: #222;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+        .toggle-btn { text-align: center; color: #ff5e00; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 8px; }
+        .historial-desplegable { margin-top: 10px; border-top: 1px solid #333; padding-top: 15px; animation: fadeIn 0.3s; }
+        
+        .history-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #222; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
         .grid-value { color: white; font-weight: bold; font-size: 0.9rem; }
         .grid-label { color: #666; font-size: 0.6rem; }
-        .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; text-transform: uppercase;}
+        .section-label { color: #aaa; font-size: 0.7rem; display: block; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* =========================================
-           4. RESPONSIVE MÓVIL (SOLUCIÓN DEFINITIVA)
-           ========================================= */
+        /* ======================================================
+           4. RESPONSIVE MÓVIL (MENU FLOTANTE)
+           ====================================================== */
         @media (max-width: 768px) {
             .navbar {
-                justify-content: space-between;
-                padding: 10px 20px !important;
+                justify-content: space-between; /* Logo a la izq, Hamburguesa a la der */
+                padding: 10px 15px !important;
             }
             
             .menu-toggle { display: block !important; }
 
-            /* MENÚ A PANTALLA COMPLETA (OVERLAY) */
+            /* Menú superpuesto a pantalla completa */
             .nav-links {
-                position: fixed; /* Fijo respecto a la ventana */
+                position: fixed;
                 top: 0; 
                 left: 0;
                 width: 100%;
-                height: 100vh;
-                background-color: rgba(0,0,0,0.98); /* Fondo negro casi opaco */
+                height: 100vh; /* Toda la altura */
+                background-color: rgba(0,0,0,0.95); /* Negro casi opaco */
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                z-index: 5500;
-                transform: translateX(100%); /* Oculto a la derecha */
+                z-index: 11000;
+                
+                /* Oculto por defecto desplazado a la derecha */
+                transform: translateX(100%); 
                 transition: transform 0.3s ease-in-out;
             }
 
-            /* Cuando está activo, desliza y se muestra */
             .nav-links.active {
-                transform: translateX(0);
+                transform: translateX(0); /* Entra en pantalla */
             }
 
             .nav-links a {
-                font-size: 1.5rem; /* Letra grande para móvil */
-                margin: 15px 0;
-                color: white !important;
-            }
-
-            .nav-links a.active { color: #ff5e00 !important; }
-
-            .btn-logout {
                 font-size: 1.5rem;
-                margin-top: 30px;
+                margin: 20px 0;
+                color: white !important;
+                display: block;
             }
 
-            /* Corrección de la rejilla */
-            .market-grid { 
-                grid-template-columns: 1fr; /* Una columna */
-                padding: 0 15px;
-            }
+            .market-grid { grid-template-columns: 1fr; } /* 1 columna */
         }
     </style>
 </head>
@@ -317,7 +246,7 @@
         </button>
 
         <div class="nav-links" id="navLinks">
-            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px;">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
                 <i class="fa-solid fa-times"></i>
             </button>
 
@@ -334,7 +263,6 @@
     </nav>
 
     <div class="dashboard-container">
-        
         <h1><i class="fa-solid fa-shop"></i> Mercado</h1>
 
         <div class="search-container">
@@ -349,17 +277,14 @@
                 <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
             </p>
         </div>
-
     </div>
 
     <script>
-        // Función del Menú
         function toggleMenu() {
             const nav = document.getElementById('navLinks');
             nav.classList.toggle('active');
         }
 
-        // Función Salir
         function cerrarSesion() {
             localStorage.removeItem('fantasy_user');
             window.location.href = '../index.html';
