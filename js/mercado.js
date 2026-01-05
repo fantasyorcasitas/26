@@ -146,6 +146,24 @@ function renderizarAtletas(lista, contenedor) {
 
         contenedor.appendChild(card);
     });
+
+    // --- FUNCIÓN AUXILIAR (Pégala al final del archivo) ---
+function prepararUltimos5(arrayDatos, esMoneda = false) {
+    const datos = arrayDatos || [];
+    const ultimos = datos.slice(-5); // Coger los últimos 5
+    const resultado = Array(5).fill('-'); // Crear array de 5 guiones
+    const offset = 5 - ultimos.length; // Calcular desplazamiento
+    
+    ultimos.forEach((dato, index) => {
+        if (esMoneda) {
+            // Convierte 56000000 -> 56.0M
+            resultado[index + offset] = (dato / 1000000).toFixed(1) + 'M';
+        } else {
+            resultado[index + offset] = dato;
+        }
+    });
+    return resultado;
+}
 }
 // --- FUNCIÓN AUXILIAR: Rellena con guiones si faltan datos ---
 function prepararUltimos5(arrayDatos, esMoneda = false) {
