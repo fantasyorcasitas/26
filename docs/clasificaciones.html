@@ -11,6 +11,84 @@
 
     <style>
         /* --- 1. SOLUCIÓN AL SCROLL BLOQUEADO --- */
+        .navbar {
+        position: sticky !important;
+        top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #000 !important;
+        padding: 15px 20px !important;
+        border-bottom: 2px solid #222 !important;
+        width: 100%;
+        height: 70px;
+        z-index: 5000; /* Asegura que esté por encima de todo */
+    }
+
+    .nav-logo a {
+        text-decoration: none;
+        color: white !important;
+        font-size: 1.2rem;
+        font-weight: 800;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo span { color: #ff5e00 !important; }
+
+    /* Enlaces (PC) */
+    .nav-links {
+        display: flex; gap: 20px; align-items: center;
+    }
+    .nav-links a {
+        text-decoration: none; color: #aaa !important; font-weight: 600; font-size: 0.9rem; transition: 0.3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
+
+    /* Botón Hamburguesa (Oculto en PC) */
+    .menu-toggle {
+        display: none; 
+        background: none; border: none; color: white !important;
+        font-size: 1.5rem; cursor: pointer;
+    }
+    
+    .btn-logout {
+        background: none; border: none; color: #ff5e00 !important;
+        font-size: 1.2rem; cursor: pointer; margin-left: 10px;
+    }
+
+    /* =========================================
+       PARTE CRÍTICA: EL MENÚ MÓVIL (OVERLAY)
+       ========================================= */
+    @media (max-width: 768px) {
+        .navbar { padding: 10px 15px !important; }
+        
+        /* Mostramos el botón hamburguesa */
+        .menu-toggle { display: block !important; }
+
+        /* Transformamos los enlaces en una PANTALLA NEGRA COMPLETA */
+        .nav-links {
+            position: fixed; /* Fijo a la pantalla */
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            background-color: rgba(0,0,0,0.98); /* Fondo negro */
+            flex-direction: column; /* Lista vertical */
+            justify-content: center;
+            align-items: center;
+            z-index: 6000; /* Muy por encima */
+            
+            /* TRUCO: Lo escondemos a la derecha */
+            transform: translateX(100%); 
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Cuando JS añade esta clase, el menú entra deslizando */
+        .nav-links.active {
+            transform: translateX(0);
+        }
+
+        .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+        .btn-logout { margin-top: 30px; font-size: 1.5rem; }
+    }
+        
         html, body {
             overflow-y: auto !important; /* Permite deslizar verticalmente siempre */
             height: auto !important;
@@ -94,11 +172,20 @@
     <div class="bg-overlay"></div>
 
     <nav class="navbar">
-        <div class="nav-logo">
-            <a href="home.html" style="color:white; text-decoration:none;">
-                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
-            </a>
+         <div class="dashboard-container">
+        <h1><i class="fa-solid fa-shop"></i> Mercado</h1>
+
+        <div class="search-container">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" id="buscadorAtleta" placeholder="Buscar atleta...">
         </div>
+
+        <div id="mercadoGrid" class="market-grid">
+            <p style="color: white; text-align: center; margin-top: 50px;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Cargando mercado...
+            </p>
+        </div>
+    </div>
 
         <button class="menu-toggle" onclick="toggleMenu()">
             <i class="fa-solid fa-bars"></i>
