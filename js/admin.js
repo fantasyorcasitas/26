@@ -176,7 +176,66 @@ window.eliminarDeLista = (index) => {
     listaParticipantes.splice(index, 1);
     actualizarListaVisual();
 };
+// === FUNCIÓN ARREGLADA: CARGAR CHECKBOXES PARA CIERRE ===
+        async function cargarCheckboxesPendientes() {
+            const container = document.getElementById('checklistCompes');
+            container.innerHTML = '<p style="color:#aaa; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Buscando competiciones...</p>';
 
+            try {
+                // CAMBIO: Quitamos el 'where' para evitar errores de índice. Filtramos en JS.
+                const q = query(collection(db, "competiciones"), orderBy("fecha", "asc"));
+                const snap = await getDocs(q);
+                
+                let html = '';
+                let contadorPendientes = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    
+                    // FILTRO MANUAL: Solo mostramos si el estado es 'pendiente'
+                    if (d.estado === 'pendiente') {
+                        contadorPendientes++;
+                        
+                        // Preparamos los participantes para guardarlos en el dataset
+                        const jsonParticipantes = JSON.stringify(d.participantes || []).replace(/"/g, '&quot;');
+                        
+                        html += `
+                            <div class="check-item">
+                                <label style="display:flex; align-items:center; width:100%; cursor:pointer;">
+                                    <div style="display:flex; align-items:center; flex-grow:1;">
+                                        <input type="checkbox" class="comp-checkbox" value="${doc.id}" data-participantes="${jsonParticipantes}" style="width:20px; height:20px; margin-right:15px; accent-color:#ff5e00;">
+                                        <span style="color:white; font-weight:600;">${d.nombre}</span>
+                                    </div>
+                                    <span class="check-date" style="color:#888; font-size:0.85rem;">${d.fecha}</span>
+                                </label>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (contadorPendientes === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding:20px; color:#666;">
+                            <i class="fa-solid fa-check-circle" style="font-size:2rem; margin-bottom:10px;"></i><br>
+                            No hay competiciones pendientes de cerrar.
+                        </div>`;
+                    const btn = document.getElementById('btnCerrarJornadaGlobal');
+                    btn.disabled = true;
+                    btn.style.opacity = "0.5";
+                    btn.style.cursor = "not-allowed";
+                } else {
+                    container.innerHTML = html;
+                    const btn = document.getElementById('btnCerrarJornadaGlobal');
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    btn.style.cursor = "pointer";
+                }
+
+            } catch (error) {
+                console.error("Error cargando checklist:", error);
+                container.innerHTML = `<p style="color:red; text-align:center;">Error de conexión: ${error.message}</p>`;
+            }
+        }
 
 // === 4. GUARDAR COMPETICIÓN FINAL ===
 const formCompe = document.getElementById('formCompe');
