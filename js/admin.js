@@ -182,7 +182,8 @@ window.eliminarDeLista = (index) => {
             container.innerHTML = '<p style="color:#aaa; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Buscando competiciones...</p>';
 
             try {
-                // CAMBIO: Quitamos el 'where' para evitar errores de índice. Filtramos en JS.
+                // 1. CAMBIO CLAVE: Pedimos TODAS ordenadas por fecha (sin 'where')
+                // Esto evita el error de "Missing Index" de Firebase
                 const q = query(collection(db, "competiciones"), orderBy("fecha", "asc"));
                 const snap = await getDocs(q);
                 
@@ -192,11 +193,11 @@ window.eliminarDeLista = (index) => {
                 snap.forEach(doc => {
                     const d = doc.data();
                     
-                    // FILTRO MANUAL: Solo mostramos si el estado es 'pendiente'
+                    // 2. FILTRO MANUAL (JavaScript): Solo procesamos si está pendiente
                     if (d.estado === 'pendiente') {
                         contadorPendientes++;
                         
-                        // Preparamos los participantes para guardarlos en el dataset
+                        // Guardamos los participantes en el dataset para usarlos al cerrar
                         const jsonParticipantes = JSON.stringify(d.participantes || []).replace(/"/g, '&quot;');
                         
                         html += `
@@ -213,22 +214,27 @@ window.eliminarDeLista = (index) => {
                     }
                 });
 
+                // 3. Feedback visual si no hay nada
                 if (contadorPendientes === 0) {
                     container.innerHTML = `
                         <div style="text-align:center; padding:20px; color:#666;">
                             <i class="fa-solid fa-check-circle" style="font-size:2rem; margin-bottom:10px;"></i><br>
-                            No hay competiciones pendientes de cerrar.
+                            No hay competiciones pendientes.
                         </div>`;
                     const btn = document.getElementById('btnCerrarJornadaGlobal');
-                    btn.disabled = true;
-                    btn.style.opacity = "0.5";
-                    btn.style.cursor = "not-allowed";
+                    if(btn) {
+                        btn.disabled = true;
+                        btn.style.opacity = "0.5";
+                        btn.style.cursor = "not-allowed";
+                    }
                 } else {
                     container.innerHTML = html;
                     const btn = document.getElementById('btnCerrarJornadaGlobal');
-                    btn.disabled = false;
-                    btn.style.opacity = "1";
-                    btn.style.cursor = "pointer";
+                    if(btn) {
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        btn.style.cursor = "pointer";
+                    }
                 }
 
             } catch (error) {
