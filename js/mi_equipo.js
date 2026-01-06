@@ -28,7 +28,7 @@ function checkMarketStatus() {
     const day = now.getDay(); // 0=Domingo, 1=Lunes, 2=Martes ... 6=Sábado
 
     // DÍAS BLOQUEADOS: Sábado (6), Domingo (0), Lunes (1), Martes (2)
-    if (day === 6 || day === 0 || day === 1 || day === 2) {
+    if (day === 6 || day === 0 || day === 1 || day === 2 && hour === 8) {
         isMarketClosed = true;
         
         // 1. Mostrar la pantalla de bloqueo (Overlay del HTML)
