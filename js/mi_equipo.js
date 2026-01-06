@@ -22,20 +22,24 @@ let totalPatrimony = 0;
 let currentSlotIndex = -1;
 let isMarketClosed = false;
 
-// --- 1. COMPROBAR MERCADO (LÓGICA DE BLOQUEO) ---
+// --- 1. COMPROBAR MERCADO (LÓGICA CORREGIDA) ---
 function checkMarketStatus() {
     const now = new Date();
-    const day = now.getDay(); // 0=Domingo, 1=Lunes, 2=Martes ... 6=Sábado
+    const day = now.getDay(); // 0=Domingo, 1=Lunes, 2=Martes... 6=Sábado
+    const hour = now.getHours();
 
-    // DÍAS BLOQUEADOS: Sábado (6), Domingo (0), Lunes (1), Martes (2)
-    if (day === 6 || day === 0 || day === 1 || day === 2 && hour === 8) {
+    // BLOQUEO:
+    // Sábado (6), Domingo (0), Lunes (1) -> CERRADO TODO EL DÍA
+    // Martes (2) -> CERRADO ANTES DE LAS 10:00 (hour < 10)
+    
+    if (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 8)) {
         isMarketClosed = true;
         
-        // 1. Mostrar la pantalla de bloqueo (Overlay del HTML)
+        // Bloqueo Visual (Overlay)
         const overlay = document.getElementById('marketClosedMsg');
         if(overlay) overlay.style.display = 'flex';
 
-        // 2. Bloquear botón guardar por seguridad
+        // Bloqueo Botón Guardar
         const btn = document.getElementById('btnSaveTeam');
         if(btn) {
             btn.disabled = true;
@@ -45,7 +49,7 @@ function checkMarketStatus() {
         return false; // Mercado Cerrado
     }
 
-    // Si es Miércoles (3), Jueves (4) o Viernes (5) -> ABIERTO
+    // SI NO ES NINGUNO DE ESOS DÍAS/HORAS -> ABIERTO
     isMarketClosed = false;
     const overlay = document.getElementById('marketClosedMsg');
     if(overlay) overlay.style.display = 'none';
@@ -55,19 +59,19 @@ function checkMarketStatus() {
 
 // --- 2. INIT ---
 async function init() {
-    // Verificar bloqueo antes de nada
+    // 1. Verificar si está cerrado
     checkMarketStatus();
 
     const userNick = localStorage.getItem('fantasy_user');
     if (!userNick) { window.location.href = '../index.html'; return; }
 
     try {
-        // Cargar Usuario
+        // 2. Cargar Usuario
         const userDoc = await getDoc(doc(db, "usuarios", userNick));
         if (!userDoc.exists()) return;
         currentUserData = userDoc.data();
 
-        // Cargar Atletas
+        // 3. Cargar Atletas
         const athSnap = await getDocs(collection(db, "atletas"));
         allAthletes = [];
         athSnap.forEach(d => {
@@ -77,7 +81,7 @@ async function init() {
             allAthletes.push(a);
         });
 
-        // Reconstruir equipo
+        // 4. Reconstruir equipo
         const savedIds = currentUserData.equipo || [];
         captainId = currentUserData.capitanId || null;
 
@@ -104,7 +108,6 @@ function updateUI() {
     const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
     const currentBudget = totalPatrimony - currentTeamCost;
 
-    // Actualizar Barra Presupuesto
     const budgetEl = document.getElementById('budgetValue');
     budgetEl.innerText = Math.round(currentBudget) + "M"; 
     
@@ -138,7 +141,7 @@ function renderSlot(index, elementId) {
     const player = teamSlots[index];
     container.innerHTML = "";
 
-    // Si el mercado está cerrado, quitamos interacción visual
+    // Clase visual para deshabilitado
     const disabledClass = isMarketClosed ? "disabled-slot" : "";
 
     if (player) {
@@ -147,11 +150,10 @@ function renderSlot(index, elementId) {
         const capiClass = isCapi ? "active" : "";
         const imgUrl = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
 
-        // Si está cerrado, ocultamos botones de acción
         const actionsHTML = isMarketClosed ? '' : `
             <div class="card-actions">
-                <button class="btn-mini btn-captain ${capiClass}" data-id="${player.id}">C</button>
-                <button class="btn-mini btn-remove" data-index="${index}">X</button>
+                <button class="btn-mini btn-captain ${capiClass}" data-cap-idx="${index}">C</button>
+                <button class="btn-mini btn-remove" data-rem-idx="${index}">X</button>
             </div>
         `;
 
@@ -162,11 +164,16 @@ function renderSlot(index, elementId) {
             ${actionsHTML}
         `;
 
+        // Asignamos eventos manualmente para asegurar que funcionan
         if (!isMarketClosed) {
-            container.querySelector('.btn-captain').onclick = (e) => { e.stopPropagation(); toggleCaptain(player.id); };
-            container.querySelector('.btn-remove').onclick = (e) => { e.stopPropagation(); clearSlot(index); };
+            const btnCap = container.querySelector(`[data-cap-idx="${index}"]`);
+            const btnRem = container.querySelector(`[data-rem-idx="${index}"]`);
+            
+            if(btnCap) btnCap.onclick = (e) => { e.stopPropagation(); toggleCaptain(player.id); };
+            if(btnRem) btnRem.onclick = (e) => { e.stopPropagation(); clearSlot(index); };
         }
-        container.onclick = null;
+        
+        container.onclick = null; // Si está lleno, el contenedor no hace nada (solo los botones)
 
     } else {
         container.className = `player-card-slot ${disabledClass}`;
@@ -174,8 +181,12 @@ function renderSlot(index, elementId) {
             <i class="fa-solid fa-plus" style="font-size: 1.5rem; color: #666;"></i>
             <span style="font-size: 0.7rem; color: #666; margin-top:5px; font-weight:600;">FICHAR</span>
         `;
+        
+        // SOLO si está abierto permitimos abrir el modal
         if(!isMarketClosed) {
             container.onclick = () => openModal(index);
+        } else {
+            container.onclick = null;
         }
     }
 }
@@ -195,12 +206,17 @@ function clearSlot(index) {
     updateUI();
 }
 
-// --- 5. MODAL ---
+// --- 5. MODAL (DEFINICIÓN LOCAL SEGURA) ---
 function openModal(index) {
-    if (isMarketClosed) return;
+    if (isMarketClosed) return; // Seguridad extra
     currentSlotIndex = index;
     renderMarketList();
     document.getElementById('playerModal').style.display = 'flex';
+}
+
+// Evento para cerrar modal (usando el botón del HTML)
+window.closeModal = function() {
+    document.getElementById('playerModal').style.display = 'none';
 }
 
 document.getElementById('modalSearch').addEventListener('keyup', renderMarketList);
@@ -229,6 +245,7 @@ function renderMarketList() {
             </div>
             <i class="fa-solid fa-plus-circle" style="color:#4cd137; font-size:1.2rem;"></i>
         `;
+        // Usamos una función flecha para pasar el objeto 'p'
         div.onclick = () => selectPlayer(p);
         container.appendChild(div);
     });
@@ -241,38 +258,40 @@ function selectPlayer(player) {
 }
 
 // --- 6. GUARDAR ---
-document.getElementById('btnSaveTeam').addEventListener('click', async () => {
-    if(isMarketClosed) return; // Doble seguridad
+const btnSave = document.getElementById('btnSaveTeam');
+if(btnSave) {
+    btnSave.addEventListener('click', async () => {
+        if(isMarketClosed) return; 
 
-    const btn = document.getElementById('btnSaveTeam');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GUARDANDO...';
-    btn.disabled = true;
+        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GUARDANDO...';
+        btnSave.disabled = true;
 
-    try {
-        const userNick = localStorage.getItem('fantasy_user');
-        const cost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-        const finalBudget = totalPatrimony - cost;
-        const teamIds = teamSlots.filter(p => p).map(p => p.id);
+        try {
+            const userNick = localStorage.getItem('fantasy_user');
+            const cost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+            const finalBudget = totalPatrimony - cost;
+            const teamIds = teamSlots.filter(p => p).map(p => p.id);
 
-        await updateDoc(doc(db, "usuarios", userNick), {
-            equipo: teamIds,
-            capitanId: captainId || null,
-            presupuesto: Math.round(finalBudget)
-        });
+            await updateDoc(doc(db, "usuarios", userNick), {
+                equipo: teamIds,
+                capitanId: captainId || null,
+                presupuesto: Math.round(finalBudget)
+            });
 
-        btn.style.background = "#4cd137";
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> GUARDADO';
-        
-        setTimeout(() => {
-            btn.style.background = "#ff5e00";
-            btn.innerHTML = 'GUARDAR CAMBIOS';
-            btn.disabled = false;
-        }, 2000);
+            btnSave.style.background = "#4cd137";
+            btnSave.innerHTML = '<i class="fa-solid fa-check"></i> GUARDADO';
+            
+            setTimeout(() => {
+                btnSave.style.background = "#ff5e00";
+                btnSave.innerHTML = 'GUARDAR CAMBIOS';
+                btnSave.disabled = false;
+            }, 2000);
 
-    } catch (e) {
-        console.error(e);
-        btn.innerText = "ERROR AL GUARDAR";
-    }
-});
+        } catch (e) {
+            console.error(e);
+            btnSave.innerText = "ERROR AL GUARDAR";
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', init);
