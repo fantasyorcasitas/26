@@ -237,9 +237,11 @@
             </div>
         </div>
 
-        <button id="btnSaveTeam" class="btn-save-fab" disabled style="opacity: 0.5; cursor: not-allowed;">
-    <i class="fa-solid fa-spinner fa-spin"></i> Cargando datos...
-</button>
+        <div class="fab-save-container">
+            <button id="btnSaveTeam" class="btn-save-fab" disabled>
+                <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+            </button>
+        </div>
     </div>
 
     <div id="playerModal" class="modal-overlay">
@@ -258,15 +260,276 @@
     <script>
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
-        
-        // Estas funciones globales son para que el JS pueda llamar al modal y botones
-        // Se definen vacías aquí para que no den error antes de cargar el módulo, 
-        // pero el módulo JS las sobrescribirá o usará event listeners.
+        // Funciones globales para modal
         window.closeModal = function() { document.getElementById('playerModal').style.display = 'none'; };
-        
-        // Importante: El JS module asignará las funciones reales.
     </script>
 
-    <script type="module" src="../js/mi_equipo.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Configuración Firebase (Directa para evitar errores de import)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
+            authDomain: "fantasy-atletismo-26.firebaseapp.com",
+            projectId: "fantasy-atletismo-26",
+            storageBucket: "fantasy-atletismo-26.firebasestorage.app",
+            messagingSenderId: "133833651406",
+            appId: "1:133833651406:web:4e2841f58fd2a288c30c9f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- ESTADO ---
+        let currentUserData = null;
+        let allAthletes = [];
+        let teamSlots = [null, null, null]; 
+        let captainId = null;
+        let totalPatrimony = 0;
+        let currentSlotIndex = -1;
+        let isMarketClosed = false;
+
+        // --- 1. COMPROBAR MERCADO ---
+        function checkMarketStatus() {
+            // Lógica simple: Siempre abierto para pruebas. 
+            // Si quieres cerrarlo, cambia isMarketClosed = true;
+            isMarketClosed = false;
+            return true;
+        }
+
+        // --- 2. INIT ---
+        async function init() {
+            checkMarketStatus();
+
+            // Verificar Auth Local
+            const userNick = localStorage.getItem('fantasy_user');
+            // IMPORTANTE: Si es null, redirigimos. Comenta esto si estás probando sin login.
+            if (!userNick) { 
+                console.warn("No usuario en localStorage. Redirigiendo...");
+                // window.location.href = '../index.html'; 
+                // return; 
+            }
+
+            // Si no hay userNick (modo prueba), usamos uno dummy o fallamos.
+            // Para que funcione, asumo que tienes un usuario en BD. Si no, comenta la redirección arriba.
+            const userIdToLoad = userNick || "usuario_prueba"; 
+
+            try {
+                // Cargar Usuario
+                const userDoc = await getDoc(doc(db, "usuarios", userIdToLoad));
+                if (userDoc.exists()) {
+                    currentUserData = userDoc.data();
+                } else {
+                    console.error("Usuario no encontrado en BD");
+                    // Mock data si no existe
+                    currentUserData = { equipo: [], presupuesto: 200, capitanId: null };
+                }
+
+                // Cargar Atletas
+                const athSnap = await getDocs(collection(db, "atletas"));
+                allAthletes = [];
+                athSnap.forEach(d => {
+                    let a = d.data();
+                    a.id = d.id;
+                    a.precio = parseInt(a.precio) || 0; 
+                    allAthletes.push(a);
+                });
+
+                // Reconstruir equipo
+                const savedIds = currentUserData.equipo || [];
+                captainId = currentUserData.capitanId || null;
+
+                savedIds.forEach((id, index) => {
+                    if (index < 3) {
+                        const player = allAthletes.find(a => a.id === id);
+                        if (player) teamSlots[index] = player;
+                    }
+                });
+
+                // Calcular Patrimonio
+                const teamValue = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+                totalPatrimony = (parseInt(currentUserData.presupuesto) || 0) + teamValue;
+
+                updateUI();
+
+            } catch (error) {
+                console.error("Error iniciando:", error);
+                document.getElementById('btnSaveTeam').innerText = "Error de conexión";
+            }
+        }
+
+        // --- 3. ACTUALIZAR UI ---
+        function updateUI() {
+            const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+            const currentBudget = totalPatrimony - currentTeamCost;
+
+            const budgetEl = document.getElementById('budgetValue');
+            if(budgetEl) {
+                budgetEl.innerText = Math.round(currentBudget) + "M"; 
+                if (currentBudget < 0) {
+                    budgetEl.classList.add('negative');
+                    document.getElementById('debtWarning').style.display = 'block';
+                } else {
+                    budgetEl.classList.remove('negative');
+                    document.getElementById('debtWarning').style.display = 'none';
+                }
+            }
+
+            renderSlot(0, 'slot0');
+            renderSlot(1, 'slot1');
+            renderSlot(2, 'slot2');
+
+            // Actualizar botón guardar
+            const btn = document.getElementById('btnSaveTeam');
+            if(btn) {
+                if (currentBudget < 0) {
+                    btn.disabled = true;
+                    btn.innerText = "DEUDA (Vende jugadores)";
+                    btn.style.backgroundColor = "#e84118";
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "GUARDAR ALINEACIÓN";
+                    btn.style.backgroundColor = "#ff5e00";
+                }
+            }
+        }
+
+        function renderSlot(index, elementId) {
+            const container = document.getElementById(elementId);
+            if(!container) return;
+            const player = teamSlots[index];
+            
+            container.innerHTML = "";
+            container.className = "player-card-slot"; 
+
+            if (player) {
+                container.classList.add('filled');
+                const isCapi = (player.id === captainId);
+                const capiClass = isCapi ? "active" : "";
+                const imgUrl = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+
+                container.innerHTML = `
+                    <img src="${imgUrl}" class="slot-img">
+                    <div class="slot-name">${player.nombre}</div>
+                    <div class="slot-price">${player.precio}M</div>
+                    <div class="card-actions">
+                        <button class="btn-mini btn-captain ${capiClass}" data-action="cap" data-idx="${index}">C</button>
+                        <button class="btn-mini btn-remove" data-action="rem" data-idx="${index}">X</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <i class="fa-solid fa-plus" style="font-size: 1.5rem; color: #555;"></i>
+                    <span style="font-size: 0.6rem; color: #666; margin-top:5px; font-weight:bold;">FICHAR</span>
+                `;
+                container.onclick = () => openModal(index);
+            }
+        }
+
+        // Delegación de eventos para los botones dentro de las cartas (Capitán / Borrar)
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('[data-action="cap"]')) {
+                e.stopPropagation();
+                const idx = e.target.getAttribute('data-idx');
+                const p = teamSlots[idx];
+                if(p) {
+                    captainId = (captainId === p.id) ? null : p.id;
+                    updateUI();
+                }
+            }
+            if (e.target.matches('[data-action="rem"]')) {
+                e.stopPropagation();
+                const idx = e.target.getAttribute('data-idx');
+                const p = teamSlots[idx];
+                if (p && p.id === captainId) captainId = null;
+                teamSlots[idx] = null;
+                updateUI();
+            }
+        });
+
+        // --- 4. MODAL ---
+        window.openModal = function(index) {
+            currentSlotIndex = index;
+            renderMarketList();
+            document.getElementById('playerModal').style.display = 'flex';
+        }
+
+        const searchInput = document.getElementById('modalSearch');
+        if(searchInput) searchInput.addEventListener('keyup', renderMarketList);
+
+        function renderMarketList() {
+            const container = document.getElementById('modalPlayerList');
+            const searchVal = document.getElementById('modalSearch').value.toLowerCase();
+            container.innerHTML = "";
+
+            const usedIds = teamSlots.filter(p => p).map(p => p.id);
+            const available = allAthletes.filter(a => {
+                const matchName = (a.nombre + ' ' + (a.apellidos || '')).toLowerCase().includes(searchVal);
+                return !usedIds.includes(a.id) && matchName;
+            });
+
+            available.sort((a,b) => b.precio - a.precio);
+
+            available.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'player-list-item';
+                div.innerHTML = `
+                    <img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}">
+                    <div style="flex-grow:1;">
+                        <div style="color:white; font-weight:bold; font-size:0.9rem;">${p.nombre} ${p.apellidos || ''}</div>
+                        <div style="color:#4cd137; font-size:0.8rem; font-weight:600;">${p.precio}M</div>
+                    </div>
+                    <i class="fa-solid fa-plus-circle" style="color:#ff5e00; font-size:1.5rem;"></i>
+                `;
+                div.onclick = () => selectPlayer(p);
+                container.appendChild(div);
+            });
+        }
+
+        function selectPlayer(player) {
+            teamSlots[currentSlotIndex] = player;
+            document.getElementById('playerModal').style.display = 'none';
+            document.getElementById('modalSearch').value = "";
+            updateUI();
+        }
+
+        // --- 5. GUARDAR ---
+        const btnSave = document.getElementById('btnSaveTeam');
+        if(btnSave) {
+            btnSave.addEventListener('click', async () => {
+                btnSave.innerText = "GUARDANDO...";
+                btnSave.disabled = true;
+
+                try {
+                    const userNick = localStorage.getItem('fantasy_user');
+                    // Recalcular presupuesto final
+                    const cost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+                    const finalBudget = totalPatrimony - cost;
+                    const teamIds = teamSlots.filter(p => p).map(p => p.id);
+
+                    await updateDoc(doc(db, "usuarios", userNick), {
+                        equipo: teamIds,
+                        capitanId: captainId || null,
+                        presupuesto: Math.round(finalBudget)
+                    });
+
+                    btnSave.style.backgroundColor = "#4cd137";
+                    btnSave.innerText = "¡GUARDADO!";
+                    setTimeout(() => {
+                        updateUI(); // Restaurar botón
+                    }, 1500);
+
+                } catch (e) {
+                    console.error(e);
+                    btnSave.innerText = "ERROR";
+                    setTimeout(() => updateUI(), 2000);
+                }
+            });
+        }
+
+        // INICIAR
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
