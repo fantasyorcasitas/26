@@ -260,7 +260,6 @@
     <script>
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
-        // Funciones globales para modal
         window.closeModal = function() { document.getElementById('playerModal').style.display = 'none'; };
     </script>
 
@@ -268,7 +267,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Configuración Firebase (Directa para evitar errores de import)
+        // Configuración Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
             authDomain: "fantasy-atletismo-26.firebaseapp.com",
@@ -290,43 +289,42 @@
         let currentSlotIndex = -1;
         let isMarketClosed = false;
 
-        // --- 1. COMPROBAR MERCADO ---
         function checkMarketStatus() {
-            // Lógica simple: Siempre abierto para pruebas. 
-            // Si quieres cerrarlo, cambia isMarketClosed = true;
-            isMarketClosed = false;
+            isMarketClosed = false; // CAMBIA AQUI PARA CERRAR
             return true;
         }
 
-        // --- 2. INIT ---
         async function init() {
             checkMarketStatus();
 
-            // Verificar Auth Local
+            // 1. OBTENER ID USUARIO
             const userNick = localStorage.getItem('fantasy_user');
-            // IMPORTANTE: Si es null, redirigimos. Comenta esto si estás probando sin login.
+            
             if (!userNick) { 
-                console.warn("No usuario en localStorage. Redirigiendo...");
-                // window.location.href = '../index.html'; 
-                // return; 
+                console.error("NO HAY USUARIO LOGUEADO. Redirigiendo...");
+                // Si no hay user en localStorage, no podemos cargar nada real.
+                // window.location.href = '../index.html'; // Descomenta en producción
+                document.getElementById('btnSaveTeam').innerText = "ERROR: NO LOGIN";
+                return; 
             }
 
-            // Si no hay userNick (modo prueba), usamos uno dummy o fallamos.
-            // Para que funcione, asumo que tienes un usuario en BD. Si no, comenta la redirección arriba.
-            const userIdToLoad = userNick || "usuario_prueba"; 
+            console.log("Cargando datos para usuario:", userNick);
 
             try {
-                // Cargar Usuario
-                const userDoc = await getDoc(doc(db, "usuarios", userIdToLoad));
+                // 2. CARGAR USUARIO REAL
+                const userDoc = await getDoc(doc(db, "usuarios", userNick));
+                
                 if (userDoc.exists()) {
                     currentUserData = userDoc.data();
+                    console.log("Datos de usuario cargados:", currentUserData);
                 } else {
-                    console.error("Usuario no encontrado en BD");
-                    // Mock data si no existe
-                    currentUserData = { equipo: [], presupuesto: 200, capitanId: null };
+                    console.error("EL USUARIO NO EXISTE EN FIREBASE:", userNick);
+                    alert("Error crítico: Tu usuario no se encuentra en la base de datos.");
+                    document.getElementById('btnSaveTeam').innerText = "USUARIO NO VALIDO";
+                    return; // Detener ejecución para no mostrar datos falsos
                 }
 
-                // Cargar Atletas
+                // 3. CARGAR ATLETAS
                 const athSnap = await getDocs(collection(db, "atletas"));
                 allAthletes = [];
                 athSnap.forEach(d => {
@@ -336,7 +334,7 @@
                     allAthletes.push(a);
                 });
 
-                // Reconstruir equipo
+                // 4. RECONSTRUIR EQUIPO
                 const savedIds = currentUserData.equipo || [];
                 captainId = currentUserData.capitanId || null;
 
@@ -347,21 +345,32 @@
                     }
                 });
 
-                // Calcular Patrimonio
+                // 5. CALCULAR PATRIMONIO REAL
+                // El presupuesto en BD es el dinero "en caja".
+                // El patrimonio total es (Dinero en caja) + (Valor jugadores)
                 const teamValue = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-                totalPatrimony = (parseInt(currentUserData.presupuesto) || 0) + teamValue;
+                // Si presupuesto viene como string, convertir a int
+                const dineroEnCaja = parseInt(currentUserData.presupuesto) || 0;
+                
+                // IMPORTANTE: Definimos el patrimonio total disponible para gastar
+                totalPatrimony = dineroEnCaja + teamValue;
+
+                console.log("Dinero en caja:", dineroEnCaja);
+                console.log("Valor equipo:", teamValue);
+                console.log("Patrimonio Total:", totalPatrimony);
 
                 updateUI();
 
             } catch (error) {
                 console.error("Error iniciando:", error);
-                document.getElementById('btnSaveTeam').innerText = "Error de conexión";
+                document.getElementById('btnSaveTeam').innerText = "ERROR DE CONEXIÓN";
             }
         }
 
-        // --- 3. ACTUALIZAR UI ---
         function updateUI() {
+            // Coste del equipo actual en pantalla
             const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+            // Presupuesto restante = Patrimonio Total - Coste Equipo Actual
             const currentBudget = totalPatrimony - currentTeamCost;
 
             const budgetEl = document.getElementById('budgetValue');
@@ -380,7 +389,6 @@
             renderSlot(1, 'slot1');
             renderSlot(2, 'slot2');
 
-            // Actualizar botón guardar
             const btn = document.getElementById('btnSaveTeam');
             if(btn) {
                 if (currentBudget < 0) {
@@ -427,7 +435,6 @@
             }
         }
 
-        // Delegación de eventos para los botones dentro de las cartas (Capitán / Borrar)
         document.addEventListener('click', (e) => {
             if (e.target.matches('[data-action="cap"]')) {
                 e.stopPropagation();
@@ -448,7 +455,6 @@
             }
         });
 
-        // --- 4. MODAL ---
         window.openModal = function(index) {
             currentSlotIndex = index;
             renderMarketList();
@@ -494,7 +500,6 @@
             updateUI();
         }
 
-        // --- 5. GUARDAR ---
         const btnSave = document.getElementById('btnSaveTeam');
         if(btnSave) {
             btnSave.addEventListener('click', async () => {
@@ -503,9 +508,11 @@
 
                 try {
                     const userNick = localStorage.getItem('fantasy_user');
-                    // Recalcular presupuesto final
-                    const cost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-                    const finalBudget = totalPatrimony - cost;
+                    // IMPORTANTE: Calculamos el nuevo presupuesto (Dinero en caja)
+                    // Nuevo Presupuesto = Patrimonio Total - Valor Jugadores Actuales
+                    const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+                    const finalBudget = totalPatrimony - currentTeamCost;
+                    
                     const teamIds = teamSlots.filter(p => p).map(p => p.id);
 
                     await updateDoc(doc(db, "usuarios", userNick), {
@@ -516,19 +523,27 @@
 
                     btnSave.style.backgroundColor = "#4cd137";
                     btnSave.innerText = "¡GUARDADO!";
+                    
+                    // Actualizar datos locales para reflejar el cambio sin recargar
+                    currentUserData.presupuesto = finalBudget;
+                    currentUserData.equipo = teamIds;
+                    
                     setTimeout(() => {
                         updateUI(); // Restaurar botón
                     }, 1500);
 
                 } catch (e) {
-                    console.error(e);
-                    btnSave.innerText = "ERROR";
-                    setTimeout(() => updateUI(), 2000);
+                    console.error("Error al guardar:", e);
+                    btnSave.innerText = "ERROR AL GUARDAR";
+                    btnSave.style.backgroundColor = "#e84118";
+                    
+                    setTimeout(() => {
+                        updateUI();
+                    }, 2000);
                 }
             });
         }
 
-        // INICIAR
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
