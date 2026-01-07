@@ -2,167 +2,83 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <title>Calendario | Fantasy Orcasitas</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
 
     <style>
-        /* =========================================
-           1. ESTILOS BASE (ARQUITECTURA COMÚN)
-           ========================================= */
+        /* ESTILOS BASE */
         * { box-sizing: border-box; }
-
         html { background-color: #000000 !important; }
-
         body {
-            display: block !important;
-            height: auto !important;
-            min-height: 100vh;
-            overflow-y: auto !important;
-            background-color: transparent !important;
-            margin: 0; padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            position: relative; 
+            display: block !important; height: auto !important; min-height: 100vh; overflow-y: auto !important;
+            background-color: transparent !important; margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif; position: relative; 
         }
 
         /* FONDO */
         .bg-image {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    /* Foto de una pista de atletismo real */
-    background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
-    z-index: -2;
-    transform: scale(1.05); /* Zoom sutil */
-}
-
-.bg-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
-    z-index: -1;
-    backdrop-filter: blur(4px); /* Difumina la foto de fondo */
-}
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: -2; transform: scale(1.05);
+        }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: -1; backdrop-filter: blur(4px);
+        }
 
         .dashboard-container {
-            padding-top: 40px !important;
-            padding-bottom: 100px !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding-left: 15px; /* Margen seguro a los lados */
-            padding-right: 15px;
-            position: relative;
-            z-index: 1;
+            padding-top: 40px !important; padding-bottom: 100px !important;
+            display: flex; flex-direction: column; align-items: center; width: 100%;
+            padding-left: 15px; padding-right: 15px; position: relative; z-index: 1;
         }
 
-        /* =========================================
-           2. NAVBAR (ESTANDARIZADA)
-           ========================================= */
+        /* NAVBAR */
         .navbar {
-            position: sticky; /* Se pega arriba al hacer scroll */
-            top: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #000;
-            border-bottom: 2px solid #222;
-            padding: 15px 20px;
-            z-index: 1000;
-            height: 70px;
-            width: 100%;
+            position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center;
+            background-color: #000; border-bottom: 2px solid #222; padding: 15px 20px; z-index: 1000; height: 70px; width: 100%;
         }
-
-        .nav-logo a {
-            text-decoration: none;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-logo span { color: #ff5e00; } /* Naranja */
-
-        /* MENÚ DE ESCRITORIO */
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #aaa;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-        color: #ff5e00 !important; /* Naranja */
-        }
-
+        .nav-logo a { text-decoration: none; color: white; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .nav-logo span { color: #ff5e00; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; color: #aaa; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
         .btn-logout { background: none; border: none; color: #ff5e00 !important; font-size: 1.2rem; cursor: pointer; margin-left: 15px; }
         .menu-toggle { display: none !important; background: none; border: none; color: white !important; font-size: 1.5rem; cursor: pointer; }
 
-        /* =========================================
-           3. ESTILOS CALENDARIO
-           ========================================= */
-        h1 {
-            color: white; text-transform: uppercase; margin-bottom: 25px; text-align: center;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5); font-size: 2rem; font-weight: 800;
-        }
-
-        /* Tarjeta de Competición */
+        /* ESTILOS CALENDARIO */
+        h1 { color: white; text-transform: uppercase; margin-bottom: 25px; text-align: center; text-shadow: 0 2px 5px rgba(0,0,0,0.5); font-size: 2rem; font-weight: 800; }
+        
         .compe-card {
-            background: rgba(20, 20, 20, 0.95);
-            border: 1px solid #333;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            position: relative;
+            background: rgba(20, 20, 20, 0.95); border: 1px solid #333; border-radius: 12px;
+            width: 100%; max-width: 600px; margin-bottom: 20px; overflow: hidden; position: relative;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-
         .compe-header { padding: 20px; border-bottom: 1px solid #333; }
         .compe-date { color: #ff5e00; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
         .compe-name { color: white; font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
         .compe-location { color: #aaa; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
 
-        /* Etiquetas de Estado */
-        .status-badge {
-            position: absolute; top: 20px; right: 20px;
-            padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;
-        }
+        .status-badge { position: absolute; top: 20px; right: 20px; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
         .status-pending { background: rgba(255, 174, 0, 0.15); color: #ffae00; border: 1px solid #ffae00; }
         .status-finished { background: rgba(76, 209, 55, 0.15); color: #4cd137; border: 1px solid #4cd137; }
 
-        /* Detalles / Acordeón */
         .history-section { width: 100%; max-width: 600px; margin-top: 30px; }
-        
         details { width: 100%; margin-bottom: 10px; }
         summary {
             background: rgba(30, 30, 30, 0.9); color: white; padding: 15px; border-radius: 8px;
-            cursor: pointer; font-weight: bold; border: 1px solid #444;
-            list-style: none; display: flex; justify-content: space-between; align-items: center;
-            text-transform: uppercase; font-size: 0.9rem;
+            cursor: pointer; font-weight: bold; border: 1px solid #444; list-style: none;
+            display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-size: 0.9rem;
         }
         summary::-webkit-details-marker { display: none; }
         summary::after { content: '▼'; color: #ff5e00; }
         details[open] summary::after { content: '▲'; }
 
-        /* Tabla de Resultados */
         .results-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #ddd; }
         .results-table th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid #333; font-size: 0.7rem; text-transform: uppercase; }
         .results-table td { padding: 12px 10px; border-bottom: 1px solid #222; }
@@ -170,24 +86,17 @@
         .res-mark { color: white; font-weight: bold; }
         .res-pts { color: #ff5e00; font-weight: 800; text-align: right; }
 
-        /* =========================================
-           4. RESPONSIVE MÓVIL (MENU OVERLAY)
-           ========================================= */
         @media (max-width: 768px) {
             .navbar { padding: 10px 15px !important; }
             .menu-toggle { display: block !important; }
-
             .nav-links {
-                position: fixed; top: 0; left: 0;
-                width: 100%; height: 100vh;
-                background-color: rgba(0,0,0,0.98);
-                flex-direction: column; justify-content: center; align-items: center;
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98); flex-direction: column; justify-content: center; align-items: center;
                 z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out;
             }
             .nav-links.active { transform: translateX(0); }
             .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
             .btn-logout { margin-top: 30px; font-size: 1.5rem; }
-
             h1 { font-size: 1.8rem; margin-top: 10px; margin-bottom: 20px; }
         }
     </style>
@@ -199,29 +108,17 @@
 
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html">
-                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
-            </a>
+            <a href="home.html"><i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span></a>
         </div>
-
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
         <div class="nav-links" id="navLinks">
-            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
-                <i class="fa-solid fa-times"></i>
-            </button>
-
-             <a href="home.html">INICIO</a>
-            <a href="mi_equipo.html" >MI EQUIPO</a>
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;"><i class="fa-solid fa-times"></i></button>
+            <a href="home.html">INICIO</a>
+            <a href="mi_equipo.html">MI EQUIPO</a>
             <a href="mercado.html">MERCADO</a>
             <a href="clasificaciones.html">RANKING</a>
             <a href="calendario.html" class="active">CALENDARIO</a>
-
-            <button onclick="cerrarSesion()" class="btn-logout">
-                <i class="fa-solid fa-power-off"></i> Salir
-            </button>
+            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i> Salir</button>
         </div>
     </nav>
 
@@ -235,8 +132,7 @@
         <div class="history-section">
             <details>
                 <summary>VER RESULTADOS ANTERIORES</summary>
-                <div id="finishedList" style="margin-top: 20px;">
-                    </div>
+                <div id="finishedList" style="margin-top: 20px;"></div>
             </details>
         </div>
     </div>
@@ -281,10 +177,14 @@
                     const fechaObj = new Date(data.fecha);
                     const fechaStr = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 
-                    if (data.estado === 'finalizada') {
-                        let rows = '';
-                        if(data.participantes && data.participantes.length > 0) {
+                    // LOGICA COMUN PARA LISTAR ATLETAS (PENDIENTES Y FINALIZADAS)
+                    let listaAtletasHTML = '';
+                    if (data.participantes && data.participantes.length > 0) {
+                        listaAtletasHTML = '<div style="padding: 15px; border-top: 1px solid #333; background: rgba(0,0,0,0.2);">';
+                        // Si está finalizada usamos la tabla de resultados (más compleja)
+                        if (data.estado === 'finalizada') {
                             const sorted = data.participantes.sort((a,b) => b.puntos - a.puntos);
+                            let rows = '';
                             sorted.forEach(p => {
                                 rows += `
                                     <tr>
@@ -296,37 +196,45 @@
                                         <td class="res-pts">+${p.puntos}</td>
                                     </tr>`;
                             });
-                        } else {
-                            rows = '<tr><td colspan="3" style="text-align:center; color:#666;">Sin datos detallados</td></tr>';
+                            listaAtletasHTML += `
+                                <table class="results-table">
+                                    <thead><tr><th>Marca/Pos</th><th>Atleta</th><th style="text-align:right;">Pts</th></tr></thead>
+                                    <tbody>${rows}</tbody>
+                                </table>`;
+                        } 
+                        // Si está pendiente usamos una lista simple más limpia
+                        else {
+                            listaAtletasHTML += `<div style="font-size: 0.8rem; color: #aaa; margin-bottom: 8px; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">Atletas Inscritos:</div>`;
+                            data.participantes.forEach(p => {
+                                listaAtletasHTML += `
+                                    <div style="display:flex; justify-content:space-between; padding: 5px 0; border-bottom: 1px solid #333; font-size: 0.9rem;">
+                                        <span style="color:white; font-weight:600;">${p.nombre_completo}</span>
+                                        <span style="color:#ff5e00;">${p.prueba}</span>
+                                    </div>`;
+                            });
                         }
+                        listaAtletasHTML += '</div>';
+                    }
 
-                        finishedHTML += `
-                            <div class="compe-card">
-                                <div class="compe-header">
-                                    <div class="status-badge status-finished">FINALIZADA</div>
-                                    <div class="compe-date">${fechaStr}</div>
-                                    <div class="compe-name">${data.nombre}</div>
-                                    <div class="compe-location"><i class="fa-solid fa-location-dot"></i> ${data.lugar}</div>
+                    // GENERAR TARJETAS
+                    const cardHTML = `
+                        <div class="compe-card">
+                            <div class="compe-header" ${data.estado === 'pendiente' && !listaAtletasHTML ? 'style="border-bottom:none;"' : ''}>
+                                <div class="status-badge ${data.estado === 'finalizada' ? 'status-finished' : 'status-pending'}">
+                                    ${data.estado === 'finalizada' ? 'FINALIZADA' : 'PENDIENTE'}
                                 </div>
-                                <div style="padding: 15px; background: rgba(0,0,0,0.3);">
-                                    <table class="results-table">
-                                        <thead><tr><th>Marca/Pos</th><th>Atleta</th><th style="text-align:right;">Pts</th></tr></thead>
-                                        <tbody>${rows}</tbody>
-                                    </table>
-                                </div>
-                            </div>`;
+                                <div class="compe-date">${fechaStr}</div>
+                                <div class="compe-name">${data.nombre}</div>
+                                <div class="compe-location"><i class="fa-solid fa-location-dot"></i> ${data.lugar}</div>
+                                ${data.pruebas_resumen ? `<div style="margin-top:10px; font-size:0.8rem; color:#aaa;"><i class="fa-solid fa-list"></i> ${data.pruebas_resumen}</div>` : ''}
+                            </div>
+                            ${listaAtletasHTML}
+                        </div>`;
+
+                    if (data.estado === 'finalizada') {
+                        finishedHTML += cardHTML;
                     } else {
-                        const pruebas = data.pruebas_resumen ? `<div style="margin-top:10px; font-size:0.8rem; color:#aaa;"><i class="fa-solid fa-list"></i> ${data.pruebas_resumen}</div>` : '';
-                        pendingHTML += `
-                            <div class="compe-card">
-                                <div class="compe-header" style="border-bottom:none;">
-                                    <div class="status-badge status-pending">PENDIENTE</div>
-                                    <div class="compe-date">${fechaStr}</div>
-                                    <div class="compe-name">${data.nombre}</div>
-                                    <div class="compe-location"><i class="fa-solid fa-location-dot"></i> ${data.lugar}</div>
-                                    ${pruebas}
-                                </div>
-                            </div>`;
+                        pendingHTML += cardHTML;
                     }
                 });
 
