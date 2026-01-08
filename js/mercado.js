@@ -4,6 +4,8 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/f
 const mercadoGrid = document.getElementById('mercadoGrid');
 const inputBuscador = document.getElementById('buscadorAtleta');
 let todosLosAtletas = [];
+window.atletasMap = {};
+window.atletasCharts = {};
 
 // === 1. CARGAR MERCADO Y ORDENAR ===
 async function cargarMercado() {
@@ -15,6 +17,10 @@ async function cargarMercado() {
         querySnapshot.forEach((doc) => {
             todosLosAtletas.push({ id: doc.id, ...doc.data() });
         });
+
+        // Mapa rápido por id para acceder desde toggleHistorial
+        window.atletasMap = {};
+        todosLosAtletas.forEach(a => window.atletasMap[a.id] = a);
 
         // ORDENAR POR PRECIO (DE MAYOR A MENOR)
         todosLosAtletas.sort((a, b) => Number(b.precio) - Number(a.precio));
@@ -108,6 +114,7 @@ function renderizarAtletas(listaAtletas) {
                         <label class="section-label">Evolución Valor</label>
                         <div class="history-grid">${htmlGridValor}</div>
                     </div>
+                    <canvas id="chart-${atleta.id}" class="market-canvas" style="width:100%; height:160px; margin-top:10px;"></canvas>
                     </div>
             </div>
         `;
@@ -124,9 +131,63 @@ window.toggleHistorial = (id) => {
     if (el.style.display === "none") {
         el.style.display = "block";
         btn.innerHTML = 'Ocultar <i class="fa-solid fa-chevron-up"></i>';
+
+        // Crear/actualizar la gráfica cuando se muestre el historial
+        try {
+            const atleta = window.atletasMap[id];
+            const canvas = document.getElementById(`chart-${id}`);
+            if (canvas && typeof Chart !== 'undefined') {
+                // Preparar etiquetas y datos (hasta 5 registros)
+                const raw = (atleta.historial_valor && atleta.historial_valor.length > 0) ? atleta.historial_valor.slice(-5) : [atleta.precio || 0];
+                const padded = Array(5 - raw.length).fill(null).concat(raw);
+                const labels = ['Reg-4','Reg-3','Reg-2','Reg-1','Última'];
+                const dataNums = padded.map(v => v === null ? null : Number(v));
+
+                // Destruir gráfica previa si existe
+                if (window.atletasCharts[id]) {
+                    window.atletasCharts[id].destroy();
+                    delete window.atletasCharts[id];
+                }
+
+                const ctx = canvas.getContext('2d');
+                window.atletasCharts[id] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Valor (M)',
+                            data: dataNums,
+                            borderColor: '#ff5e00',
+                            backgroundColor: 'rgba(255,94,0,0.15)',
+                            fill: true,
+                            spanGaps: true,
+                            tension: 0.25,
+                            pointRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: false, ticks: { color: '#ddd' } },
+                            x: { ticks: { color: '#bbb' } }
+                        },
+                        plugins: { legend: { labels: { color: '#fff' } } }
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Error creando la gráfica:', err);
+        }
+
     } else {
         el.style.display = "none";
         btn.innerHTML = 'Ver historial <i class="fa-solid fa-list-ul"></i>';
+        // Destruir gráfica al ocultar para liberar memoria
+        if (window.atletasCharts[id]) {
+            try { window.atletasCharts[id].destroy(); } catch (e) {}
+            delete window.atletasCharts[id];
+        }
     }
 };
 
