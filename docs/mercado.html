@@ -315,6 +315,10 @@
             border-radius: 6px;
         }
 
+        /* Gráfica compacta dentro del desplegable */
+        .chart-wrapper { height: 140px; max-height: 140px; position: relative; margin-top: 10px; }
+        .chart-wrapper canvas { width: 100% !important; height: 100% !important; display: block; }
+
         .grid-value { font-weight: bold; font-size: 0.9rem; color: white; }
         .grid-label { font-size: 0.6rem; color: #777; margin-top: 2px; }
 
@@ -432,7 +436,7 @@
         }
     </script>
 
-    <!-- Chart.js CDN (para generar gráficas de evolución de valor) -->
+    <!-- Chart.js (compact, curvas suaves) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="module" src="../js/mercado.js"></script>

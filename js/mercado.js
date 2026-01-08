@@ -18,12 +18,12 @@ async function cargarMercado() {
             todosLosAtletas.push({ id: doc.id, ...doc.data() });
         });
 
-        // Mapa rápido por id para acceder desde toggleHistorial
-        window.atletasMap = {};
-        todosLosAtletas.forEach(a => window.atletasMap[a.id] = a);
-
         // ORDENAR POR PRECIO (DE MAYOR A MENOR)
         todosLosAtletas.sort((a, b) => Number(b.precio) - Number(a.precio));
+
+        // Rellenar mapa rápido por id
+        window.atletasMap = {};
+        todosLosAtletas.forEach(a => window.atletasMap[a.id] = a);
 
         renderizarAtletas(todosLosAtletas);
     } catch (error) {
@@ -110,12 +110,14 @@ function renderizarAtletas(listaAtletas) {
                         <label class="section-label">Puntos (Últimas 5)</label>
                         <div class="history-grid">${htmlGridPuntos}</div>
                     </div>
-                    <div class="stats-section">
-                        <label class="section-label">Evolución Valor</label>
-                        <div class="history-grid">${htmlGridValor}</div>
-                    </div>
-                    <canvas id="chart-${atleta.id}" class="market-canvas" style="width:100%; height:160px; margin-top:10px;"></canvas>
-                    </div>
+                        <div class="stats-section">
+                            <label class="section-label">Evolución Valor</label>
+                            <div class="history-grid">${htmlGridValor}</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-${atleta.id}" class="market-canvas"></canvas>
+                        </div>
+                        </div>
             </div>
         `;
     });
@@ -131,23 +133,18 @@ window.toggleHistorial = (id) => {
     if (el.style.display === "none") {
         el.style.display = "block";
         btn.innerHTML = 'Ocultar <i class="fa-solid fa-chevron-up"></i>';
-
-        // Crear/actualizar la gráfica cuando se muestre el historial
+        // Crear/actualizar la gráfica de valor (compacta, curvas suaves)
         try {
             const atleta = window.atletasMap[id];
             const canvas = document.getElementById(`chart-${id}`);
             if (canvas && typeof Chart !== 'undefined') {
-                // Preparar etiquetas y datos (hasta 5 registros)
+                // Datos: hasta 5 últimos registros
                 const raw = (atleta.historial_valor && atleta.historial_valor.length > 0) ? atleta.historial_valor.slice(-5) : [atleta.precio || 0];
-                const padded = Array(5 - raw.length).fill(null).concat(raw);
+                const padded = Array(5 - raw.length).fill(null).concat(raw.map(v => Number(v)));
                 const labels = ['Reg-4','Reg-3','Reg-2','Reg-1','Última'];
-                const dataNums = padded.map(v => v === null ? null : Number(v));
 
-                // Destruir gráfica previa si existe
-                if (window.atletasCharts[id]) {
-                    window.atletasCharts[id].destroy();
-                    delete window.atletasCharts[id];
-                }
+                // Destruir si existe
+                if (window.atletasCharts[id]) { try { window.atletasCharts[id].destroy(); } catch(e){} delete window.atletasCharts[id]; }
 
                 const ctx = canvas.getContext('2d');
                 window.atletasCharts[id] = new Chart(ctx, {
@@ -156,12 +153,13 @@ window.toggleHistorial = (id) => {
                         labels: labels,
                         datasets: [{
                             label: 'Valor (M)',
-                            data: dataNums,
+                            data: padded,
                             borderColor: '#ff5e00',
-                            backgroundColor: 'rgba(255,94,0,0.15)',
+                            backgroundColor: 'rgba(255,94,0,0.12)',
                             fill: true,
                             spanGaps: true,
-                            tension: 0.25,
+                            tension: 0.4,
+                            cubicInterpolationMode: 'monotone',
                             pointRadius: 3
                         }]
                     },
@@ -169,25 +167,21 @@ window.toggleHistorial = (id) => {
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            y: { beginAtZero: false, ticks: { color: '#ddd' } },
+                            y: { beginAtZero: false, ticks: { color: '#ddd', maxTicksLimit: 4 } },
                             x: { ticks: { color: '#bbb' } }
                         },
-                        plugins: { legend: { labels: { color: '#fff' } } }
+                        plugins: { legend: { display: false } },
+                        elements: { line: { borderWidth: 2 } }
                     }
                 });
             }
-        } catch (err) {
-            console.error('Error creando la gráfica:', err);
-        }
+        } catch (err) { console.error('Error creando la gráfica:', err); }
 
     } else {
         el.style.display = "none";
         btn.innerHTML = 'Ver historial <i class="fa-solid fa-list-ul"></i>';
-        // Destruir gráfica al ocultar para liberar memoria
-        if (window.atletasCharts[id]) {
-            try { window.atletasCharts[id].destroy(); } catch (e) {}
-            delete window.atletasCharts[id];
-        }
+        // Destruir gráfica para liberar memoria
+        if (window.atletasCharts[id]) { try { window.atletasCharts[id].destroy(); } catch(e){} delete window.atletasCharts[id]; }
     }
 };
 
