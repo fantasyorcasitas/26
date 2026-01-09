@@ -188,6 +188,22 @@
             .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
             .btn-logout { margin-top: 30px; font-size: 1.5rem; }
         }
+
+        /* ESTADO MERCADO CERRADO */
+        .disabled-slot { opacity: 0.45; cursor: not-allowed; }
+        #marketClosedMsg {
+            position: fixed; inset: 0; display: none; justify-content: center; align-items: center;
+            z-index: 9000; pointer-events: none;
+        }
+        #marketClosedMsg .card {
+            pointer-events: auto;
+            background: linear-gradient(180deg, rgba(17,17,17,0.96), rgba(22,22,22,0.96));
+            border: 1px solid #333; padding: 20px 28px; border-radius: 12px; text-align: center; color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        #marketClosedMsg .card i { font-size: 2rem; color: #ff5e00; margin-bottom: 8px; }
+        #marketClosedMsg .card h2 { margin: 6px 0 0; font-size: 1.3rem; text-transform: uppercase; }
+        #marketClosedMsg .card p { margin: 6px 0 0; color:#ccc; font-size:0.95rem; }
     </style>
 </head>
 <body>
@@ -257,6 +273,14 @@
         </div>
     </div>
 
+        <div id="marketClosedMsg" aria-hidden="true">
+            <div class="card">
+                <i class="fa-solid fa-lock"></i>
+                <h2>Mercado cerrado</h2>
+                <p><strong>Este es tu equipo</strong><br>Puedes verlo, pero no podrás modificarlo hasta que el mercado abra.</p>
+            </div>
+        </div>
+
     <script>
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
@@ -309,7 +333,7 @@
         const btn = document.getElementById('btnSaveTeam');
         if(btn) {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-lock"></i> CERRADO';
+            btn.innerHTML = '<i class="fa-solid fa-lock"></i> MERCADO CERRADO';
             btn.style.backgroundColor = "#333";
         }
         return false; // Mercado Cerrado
@@ -322,6 +346,10 @@
     
     return true; // Mercado Abierto
 }
+
+// Ejecutar al cargar y vigilar cambios periódicamente
+checkMarketStatus();
+setInterval(checkMarketStatus, 30000);
 
             // 1. OBTENER ID USUARIO
             const userNick = localStorage.getItem('fantasy_user');
@@ -435,34 +463,50 @@
             const player = teamSlots[index];
             
             container.innerHTML = "";
+            const disabledClass = isMarketClosed ? "disabled-slot" : "";
             container.className = "player-card-slot"; 
 
             if (player) {
-                container.classList.add('filled');
+                container.classList.add('filled'); if (isMarketClosed) container.classList.add('disabled-slot');
                 const isCapi = (player.id === captainId);
                 const capiClass = isCapi ? "active" : "";
                 const imgUrl = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
 
-                container.innerHTML = `
-                    <img src="${imgUrl}" class="slot-img">
-                    <div class="slot-name">${player.nombre}</div>
-                    <div class="slot-price">${player.precio}M</div>
+                const actionsHTML = isMarketClosed ? '' : `
                     <div class="card-actions">
                         <button class="btn-mini btn-captain ${capiClass}" data-action="cap" data-idx="${index}">C</button>
                         <button class="btn-mini btn-remove" data-action="rem" data-idx="${index}">X</button>
                     </div>
                 `;
-            } else {
+
                 container.innerHTML = `
-                    <i class="fa-solid fa-plus" style="font-size: 1.5rem; color: #555;"></i>
-                    <span style="font-size: 0.6rem; color: #666; margin-top:5px; font-weight:bold;">FICHAR</span>
+                    <img src="${imgUrl}" class="slot-img">
+                    <div class="slot-name">${player.nombre}</div>
+                    <div class="slot-price">${player.precio}M</div>
+                    ${actionsHTML}
                 `;
-                container.onclick = () => openModal(index);
+            } else {
+                container.className = `player-card-slot ${disabledClass}`;
+                if(!isMarketClosed) {
+                    container.innerHTML = `
+                        <i class="fa-solid fa-plus" style="font-size: 1.5rem; color: #555;"></i>
+                        <span style="font-size: 0.6rem; color: #666; margin-top:5px; font-weight:bold;">FICHAR</span>
+                    `;
+                    container.onclick = () => openModal(index);
+                } else {
+                    container.innerHTML = `
+                        <i class="fa-solid fa-lock" style="font-size: 1.3rem; color: #ff5e00;"></i>
+                        <div style="font-size:0.7rem; color:#ccc; margin-top:6px; font-weight:700; text-transform:uppercase;">Mercado cerrado</div>
+                        <div style="font-size:0.6rem; color:#999; margin-top:4px;">Este es tu equipo</div>
+                    `;
+                    container.onclick = null;
+                }
             }
         }
 
         document.addEventListener('click', (e) => {
             if (e.target.matches('[data-action="cap"]')) {
+                if(isMarketClosed) return; // No permitir cambios si está cerrado
                 e.stopPropagation();
                 const idx = e.target.getAttribute('data-idx');
                 const p = teamSlots[idx];
@@ -472,6 +516,7 @@
                 }
             }
             if (e.target.matches('[data-action="rem"]')) {
+                if(isMarketClosed) return; // No permitir cambios si está cerrado
                 e.stopPropagation();
                 const idx = e.target.getAttribute('data-idx');
                 const p = teamSlots[idx];
