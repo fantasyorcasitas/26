@@ -359,13 +359,13 @@ setInterval(checkMarketStatus, 30000);
                 // Si no hay user en localStorage, no podemos cargar nada real.
                 // window.location.href = '../index.html'; // Descomenta en producción
                 document.getElementById('btnSaveTeam').innerText = "ERROR: NO LOGIN";
-                return; 
             }
 
             console.log("Cargando datos para usuario:", userNick);
 
-            try {
-                // 2. CARGAR USUARIO REAL
+            if (userNick) {
+                try {
+                    // 2. CARGAR USUARIO REAL
                 const userDoc = await getDoc(doc(db, "usuarios", userNick));
                 
                 if (userDoc.exists()) {
@@ -375,7 +375,7 @@ setInterval(checkMarketStatus, 30000);
                     console.error("EL USUARIO NO EXISTE EN FIREBASE:", userNick);
                     alert("Error crítico: Tu usuario no se encuentra en la base de datos.");
                     document.getElementById('btnSaveTeam').innerText = "USUARIO NO VALIDO";
-                    return; // Detener ejecución para no mostrar datos falsos
+                    throw new Error("USUARIO NO VALIDO");
                 }
 
                 // 3. CARGAR ATLETAS
@@ -417,9 +417,9 @@ setInterval(checkMarketStatus, 30000);
 
             } catch (error) {
                 console.error("Error iniciando:", error);
-                document.getElementById('btnSaveTeam').innerText = "ERROR DE CONEXIÓN";
+                document.getElementById('btnSaveTeam').innerText = "ERROR: " + (error.message || "DE CONEXIÓN");
             }
-        
+        }
 
         function updateUI() {
             // Coste del equipo actual en pantalla
