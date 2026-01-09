@@ -224,13 +224,15 @@
                 Hola <span id="nombre_usuario" style="color: #ff5e00;">manager</span>
             </h3>
 
-            <h2 style="font-size: 1.8rem; margin-top: 15px; text-transform: uppercase; color: white; font-weight: 800;">
+            <h2 id="mainTitle" style="font-size: 1.8rem; margin-top: 15px; text-transform: uppercase; color: white; font-weight: 800;">
                 Próxima <span>Jornada</span>
             </h2>
             
-            <p style="color: #aaa; font-size: 0.85rem; margin-top: 5px;">
+            <p id="subInfo" style="color: #aaa; font-size: 0.85rem; margin-top: 5px;">
                 <i class="fa-regular fa-clock"></i> Cierre: Viernes 23:59
             </p>
+
+            <p id="countLabel" style="color:#ff5e00; font-weight:700; text-transform:uppercase; margin-top:8px; height:18px;"></p>
 
             <div class="countdown-container">
                 <div class="time-box">
@@ -286,21 +288,42 @@
         const today = new Date().toLocaleDateString('es-ES', dateOptions);
         document.getElementById('todayDate').innerText = today.charAt(0).toUpperCase() + today.slice(1);
 
-        // --- 5. CONTADOR (Cuenta atrás al Viernes) ---
+        // --- 5. CONTADOR (Cuenta atrás con modo fin de semana) ---
         function updateCountdown() {
             const now = new Date();
-            const target = new Date();
-            
-            // 5 = Viernes. (0=Domingo, 1=Lunes...)
-            let daysUntilFriday = 5 - now.getDay();
-            
-            // Si ya pasó el viernes o es viernes noche, apuntamos al de la semana que viene
-            if (daysUntilFriday < 0 || (daysUntilFriday === 0 && now.getHours() >= 23 && now.getMinutes() >= 59)) {
-                daysUntilFriday += 7;
+            const day = now.getDay(); // 0=Domingo, 1=Lunes... 6=Sábado
+            let target = new Date();
+
+            // Sábado (6) o Domingo (0) => Jornada en vivo, mostrará tiempo hasta el martes 08:00
+            if (day === 6 || day === 0) {
+                // Mostrar títulos / labels para fin de semana
+                const main = document.getElementById('mainTitle');
+                if (main) main.innerHTML = 'Jornada <span>en vivo</span>';
+                const sub = document.getElementById('subInfo');
+                if (sub) sub.innerHTML = '<i class="fa-regular fa-clock"></i> Fichajes reabren: Martes 08:00';
+                const label = document.getElementById('countLabel');
+                if (label) label.innerText = 'Nueva jornada dentro de...';
+
+                // Calcular próximo martes 08:00
+                const daysUntilTue = (2 - day + 7) % 7 || 7; // 2 = Martes
+                target.setDate(now.getDate() + daysUntilTue);
+                target.setHours(8, 0, 0, 0);
+            } else {
+                // Comportamiento por defecto: cuenta atrás hasta Viernes 23:59
+                const main = document.getElementById('mainTitle');
+                if (main) main.innerHTML = 'Próxima <span>Jornada</span>';
+                const sub = document.getElementById('subInfo');
+                if (sub) sub.innerHTML = '<i class="fa-regular fa-clock"></i> Cierre: Viernes 23:59';
+                const label = document.getElementById('countLabel');
+                if (label) label.innerText = '';
+
+                let daysUntilFriday = 5 - day; // 5 = Viernes
+                if (daysUntilFriday < 0 || (daysUntilFriday === 0 && now.getHours() >= 23 && now.getMinutes() >= 59)) {
+                    daysUntilFriday += 7;
+                }
+                target.setDate(now.getDate() + daysUntilFriday);
+                target.setHours(23, 59, 59, 0);
             }
-            
-            target.setDate(now.getDate() + daysUntilFriday);
-            target.setHours(23, 59, 59, 0);
 
             const diff = target - now;
 
