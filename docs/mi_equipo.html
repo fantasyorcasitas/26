@@ -204,6 +204,12 @@
         #marketClosedMsg .card i { font-size: 2rem; color: #ff5e00; margin-bottom: 8px; }
         #marketClosedMsg .card h2 { margin: 6px 0 0; font-size: 1.3rem; text-transform: uppercase; }
         #marketClosedMsg .card p { margin: 6px 0 0; color:#ccc; font-size:0.95rem; }
+        #marketClosedMsg .card .market-close {
+            position: absolute; top: 8px; right: 10px; background: transparent; border: none; color: #888; font-size: 1.4rem; cursor: pointer;
+        }
+        #marketClosedMsg .card .btn-small {
+            margin-top: 12px; background: #ff5e00; color: white; border: none; padding: 8px 16px; border-radius: 999px; font-weight:700; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -275,9 +281,11 @@
 
         <div id="marketClosedMsg" aria-hidden="true">
             <div class="card">
+                <button id="marketClosedClose" class="market-close" aria-label="Cerrar">&times;</button>
                 <i class="fa-solid fa-lock"></i>
                 <h2>Mercado cerrado</h2>
                 <p><strong>Este es tu equipo</strong><br>Puedes verlo, pero no podrás modificarlo hasta que el mercado abra.</p>
+                <button id="marketClosedDismiss" class="btn-small">Entendido</button>
             </div>
         </div>
 
@@ -312,6 +320,7 @@
         let totalPatrimony = 0;
         let currentSlotIndex = -1;
         let isMarketClosed = false;
+        let overlayManuallyHidden = false;
 
         function checkMarketStatus() {
     const now = new Date();
@@ -327,7 +336,15 @@
         
         // Bloqueo Visual (Overlay)
         const overlay = document.getElementById('marketClosedMsg');
-        if(overlay) overlay.style.display = 'flex';
+        if(overlay) {
+            if (!overlayManuallyHidden) {
+                overlay.style.display = 'flex';
+                overlay.setAttribute('aria-hidden', 'false');
+            } else {
+                overlay.style.display = 'none';
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+        }
 
         // Bloqueo Botón Guardar
         const btn = document.getElementById('btnSaveTeam');
@@ -341,16 +358,33 @@
 
     // SI NO ES NINGUNO DE ESOS DÍAS/HORAS -> ABIERTO
     isMarketClosed = false;
+    overlayManuallyHidden = false; // reset manual hide when market reabre
     const overlay = document.getElementById('marketClosedMsg');
-    if(overlay) overlay.style.display = 'none';
+    if(overlay) {
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+    }
     
     return true; // Mercado Abierto
-}
+} 
 
 // Ejecutar al cargar y vigilar cambios periódicamente
 checkMarketStatus();
 setInterval(checkMarketStatus, 30000);
 
+// Permitir cerrar el overlay manualmente (no reabrir hasta que el mercado cambie)
+const dismissBtn = document.getElementById('marketClosedDismiss');
+if (dismissBtn) dismissBtn.addEventListener('click', () => {
+    const o = document.getElementById('marketClosedMsg');
+    if (o) { o.style.display = 'none'; o.setAttribute('aria-hidden', 'true'); }
+    overlayManuallyHidden = true;
+});
+const closeBtn = document.getElementById('marketClosedClose');
+if (closeBtn) closeBtn.addEventListener('click', () => {
+    const o = document.getElementById('marketClosedMsg');
+    if (o) { o.style.display = 'none'; o.setAttribute('aria-hidden', 'true'); }
+    overlayManuallyHidden = true;
+});
             // 1. OBTENER ID USUARIO
             const userNick = localStorage.getItem('fantasy_user');
             
@@ -445,7 +479,11 @@ setInterval(checkMarketStatus, 30000);
 
             const btn = document.getElementById('btnSaveTeam');
             if(btn) {
-                if (currentBudget < 0) {
+                if (isMarketClosed) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-lock"></i> MERCADO CERRADO';
+                    btn.style.backgroundColor = "#333";
+                } else if (currentBudget < 0) {
                     btn.disabled = true;
                     btn.innerText = "DEUDA (Vende jugadores)";
                     btn.style.backgroundColor = "#e84118";
@@ -574,6 +612,12 @@ setInterval(checkMarketStatus, 30000);
         const btnSave = document.getElementById('btnSaveTeam');
         if(btnSave) {
             btnSave.addEventListener('click', async () => {
+                if (isMarketClosed) {
+                    btnSave.innerHTML = '<i class="fa-solid fa-lock"></i> MERCADO CERRADO';
+                    btnSave.disabled = true;
+                    return;
+                }
+
                 btnSave.innerText = "GUARDANDO...";
                 btnSave.disabled = true;
 
