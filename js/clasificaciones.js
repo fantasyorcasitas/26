@@ -36,12 +36,12 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Tomamos puntos reales (num) y truncamos más abajo si corresponde
                 const puntosReales = Number(data.puntos_total) || 0; 
 
-                // Reglas nuevas: los puntos solo se aplican si tiene 3 atletas y presupuesto positivo
+                // Reglas nuevas: los puntos solo se aplican si tiene al menos 3 atletas y presupuesto >= 0 (0M es legal)
                 const equipoLen = (data.equipo || []).length;
                 const presupuesto = Number(data.presupuesto) || 0;
 
                 // Aplicamos truncado (sin redondear) y condición de equipo/presupuesto
-                const finalPuntos = (equipoLen === 3 && presupuesto > 0) ? Math.trunc(puntosReales) : 0;
+                const finalPuntos = (equipoLen >= 3 && presupuesto >= 0) ? Math.trunc(puntosReales) : 0;
 
                 if (nombreReal) {
                     objetoLimpio.nombre = nombreReal;
