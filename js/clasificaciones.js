@@ -39,6 +39,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 if (nombreReal) {
                     objetoLimpio.nombre = nombreReal;
                     objetoLimpio.puntos = puntosReales;
+                    objetoLimpio.id = doc.id; // guardamos el id del documento para poder abrir su equipo al clicar
                     incluirEnTabla = true;
                 }
             } else {
