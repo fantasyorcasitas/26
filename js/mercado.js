@@ -44,9 +44,12 @@ function renderizarAtletas(listaAtletas) {
     listaAtletas.forEach(atleta => {
         // --- A. CÁLCULOS DE ESTADÍSTICAS ---
         const historial = atleta.historial_puntos || [];
-        const totalPuntos = historial.reduce((a, b) => a + b, 0);
-        const ultimaJornada = historial.length > 0 ? historial[historial.length - 1] : 0;
-        const media = historial.length > 0 ? (totalPuntos / historial.length).toFixed(1) : "0.0";
+        const totalPuntosRaw = historial.reduce((a, b) => a + b, 0);
+        const ultimaJornadaRaw = historial.length > 0 ? historial[historial.length - 1] : 0;
+        const formatInt = v => Math.round(Number(v) || 0);
+        const totalPuntos = formatInt(totalPuntosRaw);
+        const ultimaJornada = formatInt(ultimaJornadaRaw);
+        const media = historial.length > 0 ? formatInt(totalPuntosRaw / historial.length) : 0;
         
         // PRECIO DIRECTO (Ej: "7M")
         const precioVal = atleta.precio !== undefined ? atleta.precio : 0;
@@ -203,9 +206,9 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            resultado[index + offset] = dato + 'M'; 
+            resultado[index + offset] = (Math.trunc(Number(dato) || 0)) + 'M'; 
         } else {
-            resultado[index + offset] = dato;
+            resultado[index + offset] = (typeof dato === 'number') ? Math.round(Number(dato)) : dato;
         }
     });
     return resultado;
