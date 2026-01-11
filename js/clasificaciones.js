@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 // Mantenemos getDocsFromServer para evitar problemas de caché viejos
-import { getFirestore, collection, getDocsFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocsFromServer, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
@@ -82,13 +82,26 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
                 tr.innerHTML = `
                     <td class="rank-col" style="text-align:center;">${rankDisplay}</td>
-                    <td style="font-weight:600; font-size: 0.9rem;">${item.nombre}</td>
+                    <td style="font-weight:600; font-size: 0.9rem;">${item.id ? `<span class="manager-name" data-id="${item.id}" style="cursor:pointer; color:inherit; text-decoration:underline;">${item.nombre}</span>` : item.nombre}</td>
                     <td class="points-col" style="text-align:right; font-weight:800;">${item.puntos}</td>
                 `;
                 
                 tr.style.opacity = "0";
                 tr.style.animation = `slideIn 0.3s ease-out forwards ${index * 0.1}s`;
                 tbody.appendChild(tr);
+
+                // Hacer clicable el nombre para ver equipo (solo lectura) cuando el mercado esté cerrado
+                const nameEl = tr.querySelector('.manager-name');
+                if (nameEl) {
+                    nameEl.onclick = (e) => {
+                        e.stopPropagation();
+                        if (!isMarketClosed()) {
+                            alert('Solo disponible mientras tu equipo esté cerrado');
+                            return;
+                        }
+                        showTeamModal(nameEl.dataset.id, nameEl.innerText);
+                    }
+                }
             });
         }
 
@@ -101,7 +114,64 @@ async function cargarRanking(coleccionNombre, bodyId) {
 document.addEventListener('DOMContentLoaded', () => {
     cargarRanking('usuarios', 'managersBody');
     cargarRanking('atletas', 'atletasBody');
+
+    const closeBtn = document.getElementById('closeTeamModal');
+    if (closeBtn) closeBtn.onclick = () => { const m = document.getElementById('viewTeamModal'); if (m) m.style.display = 'none'; };
 });
+
+// Comprueba si el mercado (mi equipo) está cerrado — misma regla que en mi_equipo.js
+function isMarketClosed() {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+
+    return (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 8));
+}
+
+// Muestra modal con el equipo del manager (solo lectura)
+async function showTeamModal(managerId, managerName) {
+    const modal = document.getElementById('viewTeamModal');
+    const content = document.getElementById('modalTeamContent');
+    if (!modal || !content) return;
+
+    modal.querySelector('.modal-manager-name').innerText = managerName;
+    content.innerHTML = '<p style="color:#aaa;">Cargando...</p>';
+    modal.style.display = 'flex';
+
+    try {
+        const userRef = doc(db, 'usuarios', managerId);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) { content.innerHTML = '<p style="color:#ccc;">Usuario no encontrado</p>'; return; }
+
+        const u = userSnap.data();
+        const equipo = u.equipo || [];
+        if (equipo.length === 0) { content.innerHTML = '<p style="color:#ccc;">Equipo vacío</p>'; return; }
+
+        // Cargar atletas (si existen)
+        const athletePromises = equipo.map(id => getDoc(doc(db, 'atletas', id)).then(s => s.exists() ? s.data() : null));
+        const athletes = await Promise.all(athletePromises);
+
+        let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+        athletes.forEach(a => {
+            if (!a) return;
+            const foto = a.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+            html += `<div style="display:flex; gap:10px; align-items:center;">
+                <img src="${foto}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
+                <div style="flex:1;">
+                    <div style="font-weight:700;">${a.nombre} ${a.apellidos || ''}</div>
+                    <div style="color:#ff5e00; font-size:0.85rem;">${a.precio || 0}M | ${a.categoria || ''}</div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+
+        content.innerHTML = html;
+
+    } catch (error) {
+        console.error(error);
+        content.innerHTML = '<p style="color:red;">Error cargando equipo.</p>';
+    }
+}
 
 const styleSheet = document.createElement("style");
 styleSheet.innerText = `@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`;

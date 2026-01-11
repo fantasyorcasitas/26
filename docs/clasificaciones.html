@@ -256,6 +256,20 @@
         </div>
     </div>
 
+    <!-- Modal solo lectura: mostrar equipo de un manager (disponible solo con mercado cerrado) -->
+    <div id="viewTeamModal" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; z-index:10000;">
+        <div style="background:rgba(0,0,0,0.6); position:absolute; inset:0;"></div>
+        <div style="position:relative; width:360px; max-width:95%; background:#111; border:1px solid #333; padding:16px; border-radius:10px; z-index:10001; color:white;">
+            <h3 style="margin-top:0; color:#ff5e00;">Equipo de <span class="modal-manager-name"></span></h3>
+            <div id="modalTeamContent" style="max-height:340px; overflow:auto; margin-top:10px;">
+                <p style="color:#aaa;">Cargando...</p>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+                <button id="closeTeamModal" style="background:#333; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
         function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
