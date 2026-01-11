@@ -33,13 +33,22 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Buscamos 'nick', 'nombre_usuario' o 'nombre'
                 const nombreReal = data.nick || data.nombre_usuario || data.nombre || "Manager";
                 
-                // *** CORRECCIÓN AQUÍ: puntos_total (singular) ***
-                const puntosReales = data.puntos_total || 0; 
+                // Tomamos puntos reales (num) y truncamos más abajo si corresponde
+                const puntosReales = Number(data.puntos_total) || 0; 
+
+                // Reglas nuevas: los puntos solo se aplican si tiene 3 atletas y presupuesto positivo
+                const equipoLen = (data.equipo || []).length;
+                const presupuesto = Number(data.presupuesto) || 0;
+
+                // Aplicamos truncado (sin redondear) y condición de equipo/presupuesto
+                const finalPuntos = (equipoLen === 3 && presupuesto > 0) ? Math.trunc(puntosReales) : 0;
 
                 if (nombreReal) {
                     objetoLimpio.nombre = nombreReal;
-                    objetoLimpio.puntos = puntosReales;
+                    objetoLimpio.puntos = finalPuntos;
                     objetoLimpio.id = doc.id; // guardamos el id del documento para poder abrir su equipo al clicar
+                    objetoLimpio._equipoLen = equipoLen; // meta para debugging/uso futuro
+                    objetoLimpio._presupuesto = presupuesto;
                     incluirEnTabla = true;
                 }
             } else {
@@ -49,7 +58,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 
                 // Juntamos Nombre + Apellido
                 objetoLimpio.nombre = `${nombre} ${apellidos}`.trim(); 
-                objetoLimpio.puntos = data.puntos || 0;
+                objetoLimpio.puntos = Math.trunc(Number(data.puntos) || 0); // truncar puntos de atleta (enteros)
                 
                 // Incluimos en la tabla si tiene nombre válido
                 if (objetoLimpio.nombre !== "Atleta" && objetoLimpio.nombre !== "") {
