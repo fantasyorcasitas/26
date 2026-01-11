@@ -305,7 +305,7 @@
                 if (label) label.innerText = 'Jornada termina dentro de...';
 
                 // Calcular próximo martes 08:00
-                const daysUntilTue = (2 - day + 7) % 7 || 7; // 2 = Martes
+                const daysUntilTue = (1 - day + 7) % 7 || 7; // 2 = Martes
                 target.setDate(now.getDate() + daysUntilTue);
                 target.setHours(8, 0, 0, 0);
             } else {

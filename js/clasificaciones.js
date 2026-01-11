@@ -135,7 +135,7 @@ function isMarketClosed() {
     const day = now.getDay();
     const hour = now.getHours();
 
-    return (day === 6 || day === 0 || day === 1 || (day === 2 && hour < 8));
+    return (day === 6 || day === 0 || (day === 1 && hour < 8));
 }
 
 // Muestra modal con el equipo del manager (solo lectura)
