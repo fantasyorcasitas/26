@@ -83,7 +83,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
 
                 tr.innerHTML = `
                     <td class="rank-col" style="text-align:center;">${rankDisplay}</td>
-                    <td style="font-weight:600; font-size: 0.9rem;">${item.id ? `<span class="manager-name" data-id="${item.id}" style="cursor:pointer; color:inherit; text-decoration:underline;">${item.nombre}</span>` : item.nombre}</td>
+                    <td style="font-weight:600; font-size: 0.9rem;">${item.id ? `<span class="manager-name" data-id="${item.id}" style="cursor:pointer; color:inherit;">${item.nombre}</span>` : item.nombre}</td>
                     <td class="points-col" style="text-align:right; font-weight:800;">${item.puntos}</td>
                 `;
                 
