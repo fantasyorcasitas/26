@@ -172,7 +172,7 @@ async function showTeamModal(managerId, managerName) {
                 <img src="${foto}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
                 <div style="flex:1;">
                     <div style="font-weight:700;">${a.nombre} ${a.apellidos || ''}</div>
-                    <div style="color:#ff5e00; font-size:0.85rem;">${Math.trunc(Number(a.precio) || 0)}M | ${a.categoria || ''}</div>
+                    <div style="color:#ff5e00; font-size:0.85rem;">${a.precio || 0}M | ${a.categoria || ''}</div>
                 </div>
             </div>`;
         });
