@@ -160,7 +160,7 @@ function renderSlot(index, elementId) {
         container.innerHTML = `
             <img src="${imgUrl}" class="slot-img">
             <div class="slot-name">${player.nombre}</div>
-            <div class="slot-price">${player.precio}M</div>
+            <div class="slot-price">${Math.trunc(Number(player.precio) || 0)}M</div>
             ${actionsHTML}
         `;
 
@@ -241,7 +241,7 @@ function renderMarketList() {
             <img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}">
             <div style="flex-grow:1;">
                 <div style="color:white; font-weight:bold;">${p.nombre}</div>
-                <div style="color:#ff5e00; font-size:0.8rem;">${p.precio}M | ${p.categoria || 'JUG'}</div>
+                <div style="color:#ff5e00; font-size:0.8rem;">${Math.trunc(Number(p.precio) || 0)}M | ${p.categoria || 'JUG'}</div>
             </div>
             <i class="fa-solid fa-plus-circle" style="color:#4cd137; font-size:1.2rem;"></i>
         `;

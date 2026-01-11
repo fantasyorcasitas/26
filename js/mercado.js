@@ -50,7 +50,7 @@ function renderizarAtletas(listaAtletas) {
         
         // PRECIO DIRECTO (Ej: "7M")
         const precioVal = atleta.precio !== undefined ? atleta.precio : 0;
-        const precioDisplay = precioVal + 'M';
+        const precioDisplay = Math.trunc(Number(precioVal) || 0) + 'M';
 
         // --- B. PREPARAR GRÁFICAS (OCULTAS) ---
         const puntosVisuales = prepararUltimos5(historial, false);
@@ -203,7 +203,7 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            resultado[index + offset] = dato + 'M'; 
+            resultado[index + offset] = (Math.trunc(Number(dato) || 0)) + 'M'; 
         } else {
             resultado[index + offset] = dato;
         }
