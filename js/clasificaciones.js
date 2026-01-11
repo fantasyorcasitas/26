@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 // Mantenemos getDocsFromServer para evitar problemas de caché viejos
-import { getFirestore, collection, getDocsFromServer, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocsFromServer, doc, getDoc, getDocFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
 
 const firebaseConfig = {
   apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
@@ -157,8 +157,16 @@ async function showTeamModal(managerId, managerName) {
         const equipo = u.equipo || [];
         if (equipo.length === 0) { content.innerHTML = '<p style="color:#ccc;">Equipo vacío</p>'; return; }
 
-        // Cargar atletas (si existen)
-        const athletePromises = equipo.map(id => getDoc(doc(db, 'atletas', id)).then(s => s.exists() ? s.data() : null));
+        // Cargar atletas (si existen) — forzamos fetch desde servidor para evitar cache fuera de fecha
+        const athletePromises = equipo.map(id => {
+            const ref = doc(db, 'atletas', String(id).trim());
+            // Intentamos servidor primero, en caso de fallo usamos getDoc (cache) como fallback
+            return getDocFromServer(ref).then(s => s.exists() ? s.data() : null)
+                .catch(e => {
+                    console.warn('getDocFromServer fallo para', id, e);
+                    return getDoc(ref).then(s => s.exists() ? s.data() : null);
+                });
+        });
 
         // Truncar precio al mostrar
         const truncatePrice = (v) => Math.trunc(Number(v) || 0);
@@ -172,7 +180,7 @@ async function showTeamModal(managerId, managerName) {
                 <img src="${foto}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
                 <div style="flex:1;">
                     <div style="font-weight:700;">${a.nombre} ${a.apellidos || ''}</div>
-                    <div style="color:#ff5e00; font-size:0.85rem;">${a.precio || 0}M | ${a.categoria || ''}</div>
+                    <div style="color:#ff5e00; font-size:0.85rem;">${truncatePrice(a.precio)}M | ${a.categoria || ''}</div>
                 </div>
             </div>`;
         });
