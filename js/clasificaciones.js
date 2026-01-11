@@ -36,12 +36,12 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Tomamos puntos reales (num) y truncamos más abajo si corresponde
                 const puntosReales = Number(data.puntos_total) || 0; 
 
-                // Reglas nuevas: los puntos solo se aplican si tiene 3 atletas y presupuesto positivo
-                const equipoLen = (data.equipo || []).length;
-                const presupuesto = Number(data.presupuesto) || 0;
+                // Reglas nuevas: los puntos solo se aplican si tiene 3 atletas o más y presupuesto >= 0
+                const equipoLen = (data.equipo || []).filter(x => x !== null && x !== undefined && String(x).trim() !== '').length;
+                const presupuesto = Number(data.presupuesto);
 
                 // Aplicamos truncado (sin redondear) y condición de equipo/presupuesto
-                const finalPuntos = (equipoLen === 3 && presupuesto > 0) ? Math.trunc(puntosReales) : 0;
+                const finalPuntos = (equipoLen >= 3 && !isNaN(presupuesto) && presupuesto >= 0) ? Math.trunc(puntosReales) : 0;
 
                 if (nombreReal) {
                     objetoLimpio.nombre = nombreReal;
@@ -172,7 +172,7 @@ async function showTeamModal(managerId, managerName) {
                 <img src="${foto}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
                 <div style="flex:1;">
                     <div style="font-weight:700;">${a.nombre} ${a.apellidos || ''}</div>
-                    <div style="color:#ff5e00; font-size:0.85rem;">${a.precio || 0}M | ${a.categoria || ''}</div>
+                    <div style="color:#ff5e00; font-size:0.85rem;">${Math.trunc(Number(a.precio) || 0)}M | ${a.categoria || ''}</div>
                 </div>
             </div>`;
         });
