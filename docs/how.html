@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Cómo se puntúa? | Fantasy Orcasitas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background: #000; color: #ddd; margin:0; padding:20px; }
+        .container { max-width: 900px; margin: 0 auto; background: rgba(18,18,18,0.95); border: 1px solid #222; padding: 24px; border-radius: 10px; }
+        h1 { color: #ff5e00; text-transform: uppercase; font-size: 1.7rem; margin-bottom: 8px; }
+        h2 { color: #fff; margin-top: 18px; }
+        p { color: #ddd; line-height: 1.4; }
+        ul { color: #ddd; margin-left: 1rem; }
+        .back { display:inline-block; margin-top: 18px; background:#ff5e00; color:#111; padding:10px 14px; border-radius:8px; text-decoration:none; font-weight:700; }
+        .section { margin-bottom: 14px; }
+        .muted { color:#aaa; font-size:0.92rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>¿Cómo se puntúa y funciona todo este juego?</h1>
+
+        <div class="section">
+            <h2>1. FUNCIONAMIENTO</h2>
+            <p>Cada atleta del grupo será asignado un <strong>precio</strong>. Este precio está basado en la MMP, forma física, próximas competiciones y últimos resultados. El precio varía dos veces a la semana: <strong>miércoles y domingos</strong> (post-inscripción y post-competición).</p>
+            <p>Cada jugador del fantasy selecciona <strong>3 atletas</strong> con la suma de sus precios igual o inferior a las monedas iniciales. Uno de ellos deberá ser el <strong>capitán</strong>, cuyos puntos se multiplican por <strong>1.5</strong>. La selección debe hacerse <strong>24h antes</strong> de cualquier competición.</p>
+            <p>Dependiendo del rendimiento de cada atleta variarán dos factores: <strong>Puntos conseguidos</strong> y <strong>Valor del mercado</strong>.</p>
+        </div>
+
+        <div class="section">
+            <h2>PUNTUACIÓN</h2>
+
+            <h3>A) PUNTOS POR COMPETICIÓN</h3>
+            <ul>
+                <li><strong>DQ:</strong> -3 pts</li>
+                <li><strong>DNS:</strong> -1 pt</li>
+                <li><strong>DNF:</strong> -2 pts</li>
+                <li><strong>Salida nula sin DQ:</strong> -2 pts</li>
+                <li><span class="muted">Nota:</span> Si el atleta vuelve a hacer otra salida no válida se sumarán DQ y Salida nula sin DQ = <strong>-5 pts</strong>.</li>
+            </ul>
+
+            <h3>B) PUNTOS POR PUESTOS</h3>
+            <p><strong>b.1</strong> - Competiciones <em>con menos de 12 participantes inscritos</em>:</p>
+            <ul>
+                <li><strong>Puestos:</strong> 1ª (+2 pts), 2º-3º (+1 pt), Última (-2 pts).</li>
+                <li><strong>Posiciones (variación entre esperado y obtenido):</strong>
+                    <ul>
+                        <li>±0,1 puestos: +1</li>
+                        <li>±2 puestos: +2 / -1</li>
+                        <li>±5 puestos: +3 / -3</li>
+                        <li>±7 puestos: +5 / -5</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <p><strong>b.2</strong> - Competiciones <em>con más de 12 participantes inscritos</em>:</p>
+            <ul>
+                <li><strong>Puestos:</strong> 1ª (+5 pts), 2ª (+3 pts), 3ª (+2 pts), 4º-5º (+1 pt), Última (-3 pts), Penúltima (-2 pts), Antepenúltima (-1 pt).</li>
+                <li><strong>Posiciones (variación):</strong>
+                    <ul>
+                        <li>±0 puestos: +1</li>
+                        <li>±3 puestos: +1 / -1</li>
+                        <li>±6 puestos: +2 / -2</li>
+                        <li>±9 puestos: +3 / -3</li>
+                        <li>±12 puestos: +5 / -5</li>
+                        <li>±15 puestos: +7 / -7</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>C) PUNTOS POR MARCA</h3>
+            <ul>
+                <li><strong>PB:</strong> +4 pts</li>
+                <li><strong>SB:</strong> +2 pts</li>
+                <li><strong>Récord del grupo:</strong> +3 pts</li>
+                <li><strong>Récord de Madrid:</strong> +8 pts</li>
+                <li><strong>Récord de España:</strong> +15 pts</li>
+            </ul>
+
+            <p>Bonus por quedar cerca de la TH de SB:</p>
+            <ul>
+                <li>±7 pts: +2 pts</li>
+                <li>±15 pts: +2 pts / 0 pts</li>
+                <li>±25 pts: +3 pts / -2 pts</li>
+                <li>±45 pts: +5 pts / -3 pts</li>
+                <li>±80 pts: +7 pts / -5 pts</li>
+                <li>±150 pts: +9 pts / -7 pts</li>
+            </ul>
+
+            <h3>D) PUNTOS POR BONUS</h3>
+            <ul>
+                <li>Completar la competición: +1 pt</li>
+                <li>Pases de ronda: Mejora +2 pt, Clasif -> Semis +2 pt, Semis -> Final +3 pt</li>
+                <li>Tipos de competición (bonus): Control FAM: 0 pts; Cto de Madrid: +3 pts; Cto de España: +5 pts; Cto Internacional: +7 pts; Encuentro internacional: +4 pts; Ctos con el club: 2 pts regional, 3 pts nacional, 4 pts internacional.</li>
+                <li>Mínimas: Repesca (+2), Española categoría (+5), Española absoluta sin ser absoluto (+6), Mínima internacional (+9).</li>
+                <li>Sticky Bonus: rango -3 pts a +7 pts (aplicable según criterio del organizador).</li>
+            </ul>
+
+            <h3>Mínimas específicas</h3>
+            <ul>
+                <li>Repesca: +3 pts</li>
+                <li>Categoría: +5 pts</li>
+                <li>Española absoluta sin ser absoluto: +6 pts</li>
+                <li>Repesca absoluta sin ser absoluto: +4 pts</li>
+            </ul>
+
+            <h3>Medallas</h3>
+            <ul>
+                <li>Cto España Categoría: Oro +10 / Plata +8 / Bronce +6 / 4-5 puesto +4</li>
+                <li>Cto España Absoluto: Oro +20 / Plata +15 / Bronce +12 / 4-5 puesto +10</li>
+                <li>Cto Madrid Categoría: Oro +5 / Plata +4 / Bronce +3 / 4-5 puesto +2</li>
+                <li>Cto Madrid Absoluto: Oro +7 / Plata +6 / Bronce +5 / 4-5 puesto +3</li>
+            </ul>
+
+        </div>
+
+        <a href="clasificaciones.html" class="back">Volver a Clasificaciones</a>
+    </div>
+</body>
+</html>
