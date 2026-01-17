@@ -110,7 +110,7 @@ function updateUI() {
     const currentBudget = totalPatrimony - currentTeamCost;
 
     const budgetEl = document.getElementById('budgetValue');
-    budgetEl.innerText = Math.round(currentBudget) + "M"; 
+    budgetEl.innerText = currentBudget.toFixed(1) + "M"; 
     
     if (currentBudget < 0) {
         budgetEl.classList.remove('positive');
@@ -161,7 +161,7 @@ function renderSlot(index, elementId) {
         container.innerHTML = `
             <img src="${imgUrl}" class="slot-img">
             <div class="slot-name">${player.nombre}</div>
-            <div class="slot-price">${Math.round(player.precio)}M</div>
+            <div class="slot-price">${player.precio.toFixed(1)}M</div>
             ${actionsHTML}
         `;
 
@@ -242,7 +242,7 @@ function renderMarketList() {
             <img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}">
             <div style="flex-grow:1;">
                 <div style="color:white; font-weight:bold;">${p.nombre}</div>
-                <div style="color:#ff5e00; font-size:0.8rem;">${Math.round(p.precio)}M | ${p.categoria || 'JUG'}</div>
+                <div style="color:#ff5e00; font-size:0.8rem;">${p.precio.toFixed(1)}M | ${p.categoria || 'JUG'}</div>
             </div>
             <i class="fa-solid fa-plus-circle" style="color:#4cd137; font-size:1.2rem;"></i>
         `;

@@ -51,9 +51,9 @@ function renderizarAtletas(listaAtletas) {
         const ultimaJornada = formatInt(ultimaJornadaRaw);
         const media = historial.length > 0 ? formatInt(totalPuntosRaw / historial.length) : 0;
         
-        // PRECIO DIRECTO (Ej: "7M") — mostrar redondeado sin decimales, la base de datos sigue guardando float
+        // PRECIO DIRECTO (Ej: "7.5M") — mostrar con 1 decimal, la base de datos sigue guardando float
         const precioVal = atleta.precio !== undefined ? atleta.precio : 0;
-        const precioDisplay = Math.round(Number(precioVal) || 0) + 'M';
+        const precioDisplay = (Number(precioVal) || 0).toFixed(1) + 'M';
 
         // --- B. PREPARAR GRÁFICAS (OCULTAS) ---
         const puntosVisuales = prepararUltimos5(historial, false);
