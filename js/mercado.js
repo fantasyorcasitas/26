@@ -206,8 +206,8 @@ function prepararUltimos5(arrayDatos, esMoneda = false) {
     
     ultimos.forEach((dato, index) => {
         if (esMoneda) {
-            // Mostrar monedas redondeadas al entero más cercano
-            resultado[index + offset] = Math.round(Number(dato) || 0) + 'M';
+            // Mostrar monedas con 1 decimal
+            resultado[index + offset] = (Number(dato) || 0).toFixed(1) + 'M';
         } else {
             resultado[index + offset] = (typeof dato === 'number') ? Math.round(Number(dato)) : dato;
         }
