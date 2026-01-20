@@ -38,12 +38,13 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Tomamos puntos reales (num) y truncamos más abajo si correspondes
                 const puntosReales = Number(data.puntos_total) || 0; 
 
-                // Reglas: se muestra siempre en ranking, pero solo recibe puntos si tiene 3+ jugadores y presupuesto >= 0
+                // Mostrar siempre los puntos que tiene (aunque no tenga 3 jugadores actualmente)
+                // En el futuro, solo recibirá nuevos puntos si tiene 3+ jugadores y presupuesto >= 0
                 const equipoLen = (data.equipo || []).length;
                 const presupuesto = Number(data.presupuesto) || 0;
 
-                // Los puntos solo se asignan si cumple el requisito de 3 jugadores y presupuesto válido
-                const finalPuntos = (equipoLen >= 3 && presupuesto >= 0) ? Math.trunc(puntosReales) : 0;
+                // Mostrar puntos tal cual están en la BD
+                const finalPuntos = Math.trunc(puntosReales);
 
                 // Siempre incluir en la tabla
                 objetoLimpio.nombre = nombreReal;
