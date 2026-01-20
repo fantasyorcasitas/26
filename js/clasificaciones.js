@@ -43,14 +43,13 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Los puntos solo se asignan si cumple el requisito de 3 jugadores y presupuesto válido
                 const finalPuntos = (equipoLen >= 3 && presupuesto >= 0) ? Math.trunc(puntosReales) : 0;
 
-                if (nombreReal) {
-                    objetoLimpio.nombre = nombreReal;
-                    objetoLimpio.puntos = Math.round(finalPuntos); // mostrar siempre enteros (redondeo)
-                    objetoLimpio.id = doc.id; // guardamos el id del documento para poder abrir su equipo al clicar
-                    objetoLimpio._equipoLen = equipoLen; // meta para debugging/uso futuro
-                    objetoLimpio._presupuesto = presupuesto;
-                    incluirEnTabla = true; // Siempre incluir en la tabla, aunque no tenga 3 jugadores
-                }
+                // Siempre incluir en la tabla
+                objetoLimpio.nombre = nombreReal;
+                objetoLimpio.puntos = Math.round(finalPuntos); // mostrar siempre enteros (redondeo)
+                objetoLimpio.id = doc.id; // guardamos el id del documento para poder abrir su equipo al clicar
+                objetoLimpio._equipoLen = equipoLen; // meta para debugging/uso futuro
+                objetoLimpio._presupuesto = presupuesto;
+                incluirEnTabla = true; // Siempre incluir en la tabla, aunque no tenga 3 jugadores
             } else {
                 // --- LÓGICA ATLETAS (CON APELLIDOS) ---
                 const nombre = data.nombre || data.nombre_atleta || "Atleta";
