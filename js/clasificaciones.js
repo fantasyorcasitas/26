@@ -36,11 +36,11 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Tomamos puntos reales (num) y truncamos más abajo si corresponde
                 const puntosReales = Number(data.puntos_total) || 0; 
 
-                // Reglas nuevas: los puntos solo se aplican si tiene al menos 3 atletas y presupuesto >= 0 (0M es legal)
+                // Reglas: se muestra siempre en ranking, pero solo recibe puntos si tiene 3+ jugadores y presupuesto >= 0
                 const equipoLen = (data.equipo || []).length;
                 const presupuesto = Number(data.presupuesto) || 0;
 
-                // Aplicamos truncado (sin redondear) y condición de equipo/presupuesto
+                // Los puntos solo se asignan si cumple el requisito de 3 jugadores y presupuesto válido
                 const finalPuntos = (equipoLen >= 3 && presupuesto >= 0) ? Math.trunc(puntosReales) : 0;
 
                 if (nombreReal) {
@@ -49,7 +49,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
                     objetoLimpio.id = doc.id; // guardamos el id del documento para poder abrir su equipo al clicar
                     objetoLimpio._equipoLen = equipoLen; // meta para debugging/uso futuro
                     objetoLimpio._presupuesto = presupuesto;
-                    incluirEnTabla = true;
+                    incluirEnTabla = true; // Siempre incluir en la tabla, aunque no tenga 3 jugadores
                 }
             } else {
                 // --- LÓGICA ATLETAS (CON APELLIDOS) ---
