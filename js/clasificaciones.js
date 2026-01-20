@@ -33,7 +33,7 @@ async function cargarRanking(coleccionNombre, bodyId) {
                 // Buscamos 'nick', 'nombre_usuario' o 'nombre'
                 const nombreReal = data.nick || data.nombre_usuario || data.nombre || "Manager";
                 
-                // Tomamos puntos reales (num) y truncamos más abajo si corresponde
+                // Tomamos puntos reales (num) y truncamos más abajo si correspondes
                 const puntosReales = Number(data.puntos_total) || 0; 
 
                 // Reglas: se muestra siempre en ranking, pero solo recibe puntos si tiene 3+ jugadores y presupuesto >= 0
