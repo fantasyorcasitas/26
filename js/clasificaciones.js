@@ -28,6 +28,8 @@ async function cargarRanking(coleccionNombre, bodyId) {
             let objetoLimpio = { nombre: "---", puntos: 0 };
             let incluirEnTabla = false;
 
+            console.log('Procesando:', data.nick || data.nombre, 'Equipo:', (data.equipo || []).length);
+
             if (coleccionNombre === 'usuarios') {
                 // --- LÓGICA MANAGERS (USUARIOS) ---
                 // Buscamos 'nick', 'nombre_usuario' o 'nombre'
