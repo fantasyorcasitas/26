@@ -120,7 +120,40 @@
             .stat-card { transition: transform 0.12s ease, box-shadow 0.12s ease; }
             .stat-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
             @media (min-width: 880px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
-        </style>
+
+            /* Player card */
+            .player-grid { display:flex; flex-wrap:wrap; gap:12px; }
+            .player-card { background:#111; border:1px solid #222; padding:10px; border-radius:12px; width: calc(33.333% - 8px); display:flex; gap:10px; align-items:center; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+            .player-card img { width:56px; height:56px; border-radius:10px; object-fit:cover; flex-shrink:0; }
+            .player-meta { flex:1; }
+            .player-name { font-weight:700; color:white; }
+            .player-sub { color:#999; font-size:0.9rem; margin-top:4px; }
+            .player-badges { display:flex; gap:8px; align-items:center; }
+            .badge { background:#ff5e00; color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:0.85rem; }
+            .pts-badge { background:#222; color:#ff5e00; border:1px solid #333; padding:6px 8px; border-radius:10px; font-weight:800; }
+
+            /* Mini cards for team preview */
+            .mini-team { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+            .mini-card { width:80px; background:#0f0f0f; border:1px solid #222; border-radius:8px; padding:6px; text-align:center; font-size:0.85rem; }
+            .mini-card img { width:40px; height:40px; border-radius:6px; object-fit:cover; }
+
+            /* Formación (alineación) */
+            .formation { display:flex; gap:12px; align-items:center; justify-content:center; margin-top:8px; }
+            .formation .slot { background:#0f0f0f; border:1px solid #222; border-radius:10px; padding:8px; width:30%; text-align:center; }
+            .formation .slot .name { font-weight:700; }
+            .formation .slot .pts { color:#ff5e00; font-weight:800; margin-top:6px; }
+
+            /* Responsive adjustments */
+            @media (max-width: 880px) {
+                .player-card { width: calc(50% - 8px); }
+                .mini-card { width: 70px; }
+            }
+            @media (max-width: 520px) {
+                .player-card { width: 100%; }
+                .formation { flex-direction:column; }
+                .formation .slot { width:100%; }
+            }
+        </style> 
 
         <div class="stats-grid">
             <div class="stat-card" id="card-most-owned">
@@ -149,7 +182,8 @@
             </div>
         </div>
 
-        <div class="note">Nota: los cálculos se basan en <code>puntos_ultima_jornada</code> de los atletas y las alineaciones guardadas en los documentos de <code>usuarios</code>. Si necesitas datos históricos por jornada, podemos añadir snapshots.</div>
+        <div class="note">Nota: los cálculos se basan en <code>puntos_ultima_jornada</code> de los atletas y las alineaciones guardadas en los documentos de <code>usuarios</code>. El capitán suma puntos extra iguales a sus puntos (x2) en el cómputo de managers.</div>
+    
     </div>
 </div>
 
@@ -180,7 +214,7 @@
                 ]);
 
                 const atletas = {};
-                athSnap.forEach(d => { const data = d.data(); atletas[d.id] = { id: d.id, nombre: data.nombre || data.nombre_completo || d.id, precio: Number(data.precio) || 0, puntosUlt: Number(data.puntos_ultima_jornada) || 0 }; });
+                athSnap.forEach(d => { const data = d.data(); atletas[d.id] = { id: d.id, nombre: data.nombre || data.nombre_completo || d.id, precio: Number(data.precio) || 0, puntosUlt: Number(data.puntos_ultima_jornada) || 0, foto: data.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png' }; });
 
                 const users = [];
                 usersSnap.forEach(d => { const u = d.data(); users.push({ id: d.id, nombre: u.nick || u.nombre_usuario || u.nombre || d.id, equipo: u.equipo || [], capitanId: u.capitanId || null }); });
@@ -191,15 +225,15 @@
                 // 1. Atletas más seleccionados (solo entre participantes)
                 const ownershipCounts = {};
                 users.forEach(u => { (u.equipo || []).forEach(id => { if (atletas[id] && atletas[id].puntosUlt) ownershipCounts[id] = (ownershipCounts[id] || 0) + 1; }); });
-                const mostOwned = Object.keys(ownershipCounts).map(id => ({ id, nombre: atletas[id].nombre, count: ownershipCounts[id], puntos: atletas[id].puntosUlt })).sort((a,b)=> b.count - a.count).slice(0,10);
+                const mostOwned = Object.keys(ownershipCounts).map(id => ({ id, nombre: atletas[id].nombre, count: ownershipCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count).slice(0,10);
 
                 // 2. Atleta más capitaneado (contar capitanes entre participantes)
                 const capiCounts = {};
                 users.forEach(u => { const c = u.capitanId; if(c && atletas[c] && atletas[c].puntosUlt) capiCounts[c] = (capiCounts[c]||0) + 1; });
-                const capiList = Object.keys(capiCounts).map(id => ({ id, nombre: atletas[id].nombre, count: capiCounts[id], puntos: atletas[id].puntosUlt })).sort((a,b)=> b.count - a.count);
+                const capiList = Object.keys(capiCounts).map(id => ({ id, nombre: atletas[id].nombre, count: capiCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count);
 
-                // 3. Mejor puntos por millón (puntos/prcio)
-                const valueList = participantes.map(a => ({ id: a.id, nombre: a.nombre, puntos: a.puntosUlt, precio: a.precio, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : (a.puntosUlt > 0 ? Infinity : 0) }));
+                // 3. Mejor puntos por millón (puntos/precio)
+                const valueList = participantes.map(a => ({ id: a.id, nombre: a.nombre, puntos: a.puntosUlt, precio: a.precio, foto: a.foto, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : (a.puntosUlt > 0 ? Infinity : 0) }));
                 const bestValue = valueList.sort((a,b)=> b.ratio - a.ratio)[0] || null;
 
                 // 4. Mejor alineación posible (top 3 por puntos)
@@ -208,9 +242,12 @@
 
                 // Para cada manager, calcular su alineación puntuación y distancia
                 const managersPerformance = users.map(u => {
-                    const teamPts = (u.equipo || []).reduce((s,id)=> s + ((atletas[id] && atletas[id].puntosUlt) ? atletas[id].puntosUlt : 0), 0);
+                    const team = (u.equipo || []).map(id => atletas[id]).filter(Boolean);
+                    const teamPtsBase = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
+                    const capBonus = (u.capitanId && atletas[u.capitanId] && atletas[u.capitanId].puntosUlt) ? atletas[u.capitanId].puntosUlt : 0; // capitán suma puntos extra iguales a sus puntos
+                    const totalPts = teamPtsBase + capBonus;
                     const overlap = (u.equipo || []).filter(id => bestThree.find(bt => bt.id === id)).length;
-                    return { id: u.id, nombre: u.nombre, pts: teamPts, overlap };
+                    return { id: u.id, nombre: u.nombre, pts: totalPts, overlap, team, capitanId: u.capitanId };
                 }).sort((a,b)=> b.pts - a.pts);
 
                 const closestManagers = managersPerformance.length ? managersPerformance.filter(m => m.pts === managersPerformance[0].pts) : [];
@@ -221,7 +258,7 @@
                     const price = team.reduce((s,a)=> s + (a.precio || 0), 0);
                     const pts = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
                     const eff = price > 0 ? (pts / price) : (pts > 0 ? Infinity : 0);
-                    return { id: u.id, nombre: u.nombre, price, pts, eff };
+                    return { id: u.id, nombre: u.nombre, price, pts, eff, team };
                 }).sort((a,b)=> b.eff - a.eff);
                 const bestEfficiency = managerEfficiency[0] || null;
 
@@ -231,11 +268,16 @@
                 renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers);
                 renderBestEfficiency(bestEfficiency);
 
+                const btn = document.getElementById('btnRefresh');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Actualizar'; }
+
                 document.getElementById('lastUpdated').innerText = new Date().toLocaleString();
 
             } catch (err) {
                 console.error('Error cargando estadísticas:', err);
                 document.getElementById('mostOwnedContent').innerText = 'Error al cargar datos.';
+                const btn = document.getElementById('btnRefresh');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Actualizar'; }
             }
         }
 
@@ -246,56 +288,118 @@
             document.getElementById('bestValueContent').innerHTML = loadText;
             document.getElementById('bestLineupContent').innerHTML = loadText;
             document.getElementById('bestEfficiencyContent').innerHTML = loadText;
+            const btn = document.getElementById('btnRefresh');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...'; }
         }
 
         function renderMostOwned(list) {
             if (!list || list.length === 0) { document.getElementById('mostOwnedContent').innerHTML = '<div class="small">No hay datos de selección en la última jornada.</div>'; return; }
-            let html = '<table><thead><tr><th>#</th><th>Atleta</th><th>Veces seleccionado</th><th>Puntos (última jornada)</th></tr></thead><tbody>';
-            list.forEach((it, i) => { html += `<tr><td>${i+1}</td><td>${it.nombre}</td><td>${it.count}</td><td>${it.puntos}</td></tr>`; });
-            html += '</tbody></table>';
+            let html = '<div class="player-grid">';
+            list.forEach((it, i) => {
+                const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+                const precio = (typeof it.precio !== 'undefined') ? it.precio : '-';
+                html += `
+                    <div class="player-card">
+                        <img src="${foto}" alt="${it.nombre}">
+                        <div class="player-meta">
+                            <div class="player-name">${it.nombre}</div>
+                            <div class="player-sub">Precio: ${precio}M — Selecciones: ${it.count}</div>
+                            <div class="player-badges" style="margin-top:8px;"><div class="pts-badge">${it.puntos} pts</div></div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
             document.getElementById('mostOwnedContent').innerHTML = html;
         }
 
         function renderMostCaptained(list) {
             if (!list || list.length === 0) { document.getElementById('mostCaptainedContent').innerHTML = '<div class="small">No hay capitanes en la última jornada.</div>'; return; }
-            let top = list[0];
-            let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong style="font-size:1.05rem">${top.nombre}</strong><div class="muted">${top.count} managers lo capitanean</div></div><div class="top-badge">${top.count}</div></div>`;
+            const top = list[0];
+            const fotoTop = top.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+            let html = `
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <img src="${fotoTop}" style="width:80px;height:80px;border-radius:12px;object-fit:cover;margin-right:8px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:800; font-size:1.05rem;">${top.nombre}</div>
+                        <div class="muted">${top.count} managers lo capitanean</div>
+                        <div class="player-badges" style="margin-top:8px;"><div class="pts-badge">${top.puntos} pts</div></div>
+                    </div>
+                    <div class="top-badge" style="font-size:1rem;">${top.count}</div>
+                </div>
+            `;
             html += '<hr style="border:none;border-top:1px solid #222;margin:10px 0">';
-            html += '<table><thead><tr><th>#</th><th>Atleta</th><th>Veces capitan</th><th>Puntos</th></tr></thead><tbody>';
-            list.slice(0,8).forEach((it,i)=> html += `<tr><td>${i+1}</td><td>${it.nombre}</td><td>${it.count}</td><td>${it.puntos}</td></tr>`);
-            html += '</tbody></table>';
+            html += '<div class="player-grid">';
+            list.slice(1,8).forEach((it,i)=> {
+                const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+                html += `
+                    <div class="player-card">
+                        <img src="${foto}" alt="${it.nombre}">
+                        <div class="player-meta">
+                            <div class="player-name">${it.nombre}</div>
+                            <div class="player-sub">${it.count} capitanes</div>
+                            <div class="player-badges" style="margin-top:8px;"><div class="pts-badge">${it.puntos} pts</div></div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
             document.getElementById('mostCaptainedContent').innerHTML = html;
         }
 
         function renderBestValue(it) {
             if (!it) { document.getElementById('bestValueContent').innerHTML = '<div class="small">No hay datos para calcular valor.</div>'; return; }
             const ratio = (it.ratio === Infinity) ? '∞' : (it.ratio.toFixed(3));
-            let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${it.nombre}</strong><div class="muted">${it.puntos} pts / ${it.precio}M</div></div><div class="top-badge">${ratio}</div></div>`;
-            html += '<div style="margin-top:8px;" class="small">(Puntos / Precio)</div>';
+            const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+            let html = `
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <img src="${foto}" style="width:72px;height:72px;border-radius:10px;object-fit:cover;">
+                    <div style="flex:1;">
+                        <div style="font-weight:800;">${it.nombre}</div>
+                        <div class="muted">${it.puntos} pts — ${it.precio}M</div>
+                        <div class="small" style="margin-top:6px;">Puntos por millón</div>
+                    </div>
+                    <div class="top-badge">${ratio}</div>
+                </div>
+            `;
             document.getElementById('bestValueContent').innerHTML = html;
         }
 
         function renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers) {
             if (!bestThree || bestThree.length === 0) { document.getElementById('bestLineupContent').innerHTML = '<div class="small">No hay datos de alineación.</div>'; return; }
             let html = '<div class="muted">Mejor alineación (3 mejores por puntos):</div>';
-            html += '<table style="margin-top:8px;"><thead><tr><th>#</th><th>Atleta</th><th>Puntos</th></tr></thead><tbody>';
-            bestThree.forEach((a,i)=> html += `<tr><td>${i+1}</td><td>${a.nombre}</td><td>${a.puntosUlt}</td></tr>`);
-            html += `<tr style="font-weight:800"><td></td><td>Total</td><td>${bestThreePoints}</td></tr>`;
-            html += '</tbody></table>';
+            html += '<div class="formation">';
+            bestThree.forEach((a,i)=> {
+                const foto = a.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+                html += `<div class="slot"><img src="${foto}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;margin-bottom:6px;"><div class="name">${a.nombre}</div><div class="pts">${a.puntosUlt} pts</div></div>`;
+            });
+            html += `<div style="width:100%; text-align:center; margin-top:8px; font-weight:800;">Total: ${bestThreePoints} pts</div>`;
+            html += '</div>';
 
-            // Mostrar managers más cercanos (por puntos)
+            // Mostrar mejor manager(es) (por pts incluidos bonus capitán)
             if (managersPerformance && managersPerformance.length > 0) {
-                const bestPts = managersPerformance[0].pts;
-                const diff = bestThreePoints - bestPts;
+                const bestManager = managersPerformance[0];
+                const diff = bestThreePoints - bestManager.pts;
                 html += '<hr style="border:none;border-top:1px solid #222;margin:10px 0">';
-                html += `<div class="muted">Mejor manager (por pts en esa jornada): <strong>${managersPerformance[0].nombre}</strong> — ${managersPerformance[0].pts} pts</div>`;
-                html += `<div class="small">Diferencia al óptimo: <strong>${diff}</strong> pts - Superposición con óptimo: <strong>${managersPerformance[0].overlap}</strong> jugadores</div>`;
+                html += `<div class="muted">Mejor manager: <strong>${bestManager.nombre}</strong> — ${bestManager.pts} pts (incluye bonus capitán)</div>`;
+                html += `<div class="small">Diferencia al óptimo: <strong>${diff}</strong> pts — Superposición con óptimo: <strong>${bestManager.overlap}</strong> jugadores</div>`;
 
-                // Si hay varios managers con mismo pts, mostrarlos
-                const ties = managersPerformance.filter(m => m.pts === bestPts);
-                if (ties.length > 1) {
-                    html += '<div style="margin-top:8px;" class="small">Empate entre managers:</div>';
-                    html += '<ul>' + ties.map(t => `<li>${t.nombre} — ${t.pts} pts (overlap ${t.overlap})</li>`).join('') + '</ul>';
+                // Mostrar mini-team del mejor manager (máx 3) con formato estilo "mi equipo"
+                if (bestManager.team && bestManager.team.length) {
+                    const teamSlots = [bestManager.team[0] || null, bestManager.team[1] || null, bestManager.team[2] || null];
+                    html += '<div style="margin-top:10px;">';
+                    html += '<div class="formation" style="justify-content:space-between;">';
+                    teamSlots.forEach(p => {
+                        if (!p) {
+                            html += '<div class="slot"><div class="name muted">Vacante</div></div>';
+                            return;
+                        }
+                        const isCapi = (bestManager.capitanId && bestManager.capitanId === p.id);
+                        const bonus = isCapi ? p.puntosUlt : 0;
+                        const totalP = (p.puntosUlt || 0) + bonus;
+                        html += `<div class="slot"><img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;margin-bottom:6px;"><div class="name">${p.nombre}${isCapi? ' <span class="small" style="color:#ffb86b;">(C)</span>': ''}</div><div class="pts">${p.puntosUlt} pts${isCapi? ' + ' + bonus + ' (cap)' : ''}</div></div>`;
+                    });
+                    html += '</div></div>';
                 }
             }
 
@@ -305,8 +409,16 @@
         function renderBestEfficiency(it) {
             if (!it) { document.getElementById('bestEfficiencyContent').innerHTML = '<div class="small">No hay managers con equipo válido.</div>'; return; }
             const eff = (it.eff === Infinity) ? '∞' : it.eff.toFixed(4);
-            let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${it.nombre}</strong><div class="muted">Puntos: ${it.pts} — Precio total: ${it.price}M</div></div><div class="top-badge">${eff}</div></div>`;
-            html += '<div class="small" style="margin-top:8px;">(Puntos / Precio total) — cuanto mayor mejor</div>';
+            let html = `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;"><div><strong>${it.nombre}</strong><div class="muted">Puntos: ${it.pts} — Precio total: ${it.price}M</div></div><div class="top-badge">${eff}</div></div>`;
+            // Mostrar equipo del manager (si existe en 'team')
+            if (it.team && it.team.length) {
+                html += '<div style="margin-top:10px;">';
+                html += '<div class="small">Equipo:</div>';
+                html += '<div class="mini-team">' + it.team.map(t => `<div class="mini-card"><img src="${t.foto}" alt=""><div style="font-weight:700;">${t.nombre}</div><div style="color:#999;">${t.puntosUlt} pts</div></div>`).join('') + '</div>';
+                html += '</div>';
+            } else {
+                html += `<div class="small" style="margin-top:10px;">(Pulse actualizar para ver detalle del equipo)</div>`;
+            }
             document.getElementById('bestEfficiencyContent').innerHTML = html;
         }
 
