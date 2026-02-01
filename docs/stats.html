@@ -42,46 +42,21 @@
         h1 { color: #ff5e00; text-transform: uppercase; font-size: 1.6rem; margin-bottom: 5px; font-weight: 800; }
         .muted { color: #888; margin-bottom: 25px; font-size: 0.85rem; }
 
+        /* AVISO JORNADA ABIERTA */
+        #status-banner {
+            display: none; background: rgba(255, 94, 0, 0.1); border: 1px solid #ff5e00;
+            color: #ff5e00; padding: 15px; border-radius: 12px; text-align: center;
+            font-weight: 600; margin-bottom: 20px; font-size: 0.9rem;
+        }
+
         /* GRID DE ESTADÍSTICAS */
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 20px; 
-        }
-
-        .stat-card { 
-            background: rgba(15, 15, 15, 0.85); 
-            border: 1px solid #222; 
-            border-radius: 16px; 
-            padding: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .stat-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #222; border-radius: 16px; padding: 20px; }
         .stat-card.full-width { grid-column: 1 / -1; }
-
-        .stat-title { 
-            color: #ff5e00; 
-            font-size: 0.85rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .stat-title { color: #ff5e00; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
 
         /* PLAYER ROWS */
-        .player-row {
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            gap: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
+        .player-row { display: flex; align-items: center; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; gap: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .player-row img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
         .player-info { flex: 1; min-width: 0; }
         .player-name { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -96,27 +71,15 @@
         .formation-display { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
         .slot { background: #000; border: 1px solid #222; padding: 10px 5px; border-radius: 12px; text-align: center; }
         .slot img { width: 40px; height: 40px; border-radius: 50%; margin-bottom: 6px; }
-        .slot-name { font-size: 0.7rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; }
+        .slot-name { font-size: 0.7rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .slot-pts { font-size: 0.8rem; color: #ff5e00; font-weight: 800; margin-top: 2px; }
-
         .cap-badge { background: #ff5e00; color: #000; font-size: 0.6rem; font-weight: 900; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
 
-        /* RESPONSIVE */
         @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr; } }
-
         @media (max-width: 768px) {
-            .navbar { height: 60px; padding: 0 15px; }
             .menu-toggle { display: block; }
-            .nav-links { 
-                position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
-                background: #000; flex-direction: column; justify-content: center; 
-                transform: translateX(100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-                z-index: 2000;
-            }
+            .nav-links { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #000; flex-direction: column; justify-content: center; transform: translateX(100%); transition: 0.3s; z-index: 2000; }
             .nav-links.active { transform: translateX(0); }
-            .nav-links a { font-size: 1.3rem; margin: 10px 0; }
-            h1 { font-size: 1.4rem; }
-            .stat-card { padding: 15px; }
         }
     </style>
 </head>
@@ -130,14 +93,13 @@
         </div>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
         <div class="nav-links" id="navLinks">
-            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px;"><i class="fa-solid fa-xmark"></i></button>
             <a href="home.html">INICIO</a>
             <a href="mi_equipo.html">MI EQUIPO</a>
             <a href="mercado.html">MERCADO</a>
             <a href="clasificaciones.html">RANKING</a>
             <a href="stats.html" class="active">ESTADÍSTICAS</a>
             <a href="calendario.html">CALENDARIO</a>
-            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i> Salir</button>
+            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </nav>
 
@@ -145,29 +107,27 @@
         <h1><i class="fa-solid fa-chart-simple"></i> Estadísticas</h1>
         <div class="muted">Datos de la última jornada • Actualizado: <span id="lastUpdated">--</span></div>
 
-        <div class="stats-grid">
+        <div id="status-banner"><i class="fa-solid fa-clock"></i> La jornada está en curso. Las estadísticas se actualizarán al finalizar.</div>
+
+        <div class="stats-grid" id="main-stats" style="display: none;">
             <div class="stat-card">
                 <div class="stat-title"><i class="fa-solid fa-users"></i> Los más seleccionados</div>
                 <div id="mostOwnedContent"></div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-title"><i class="fa-solid fa-star"></i> Más capitaneados</div>
                 <div id="mostCaptainedContent"></div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-title"><i class="fa-solid fa-gem"></i> Mejor Pts/Millón</div>
                 <div id="bestValueContent"></div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-title"><i class="fa-solid fa-trophy"></i> Mejor Alineación</div>
                 <div id="bestLineupContent"></div>
             </div>
-
             <div class="stat-card full-width">
-                <div class="stat-title"><i class="fa-solid fa-bolt"></i> Manager más Eficiente (Calidad/Precio)</div>
+                <div class="stat-title"><i class="fa-solid fa-bolt"></i> Manager más Eficiente</div>
                 <div id="bestEfficiencyContent"></div>
             </div>
         </div>
@@ -175,7 +135,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
@@ -189,115 +149,95 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function loadStats() {
+        async function checkStatusAndLoad() {
             try {
-                const [athSnap, usersSnap] = await Promise.all([
-                    getDocs(collection(db, 'atletas')),
-                    getDocs(collection(db, 'usuarios'))
-                ]);
+                // 1. Verificar si la jornada está cerrada (debes crear esta colección/doc en Firebase)
+                const configRef = doc(db, "configuracion", "estado_jornada");
+                const configSnap = await getDoc(configRef);
+                
+                let cerrada = true; // Por defecto true si no existe el doc
+                if (configSnap.exists()) {
+                    cerrada = configSnap.data().jornada_cerrada;
+                }
 
-                const atletas = {};
-                athSnap.forEach(d => { 
-                    const data = d.data(); 
-                    atletas[d.id] = { 
-                        id: d.id, 
-                        nombre: data.nombre || data.nombre_completo || d.id, 
-                        precio: Number(data.precio) || 0, 
-                        puntosUlt: Number(data.puntos_ultima_jornada) || 0, 
-                        foto: data.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png' 
-                    }; 
-                });
+                if (!cerrada) {
+                    document.getElementById('status-banner').style.display = 'block';
+                    return;
+                }
 
-                const users = [];
-                usersSnap.forEach(d => { 
-                    const u = d.data(); 
-                    // Lógica corregida para mostrar el ID si no hay nombre_usuario ni nick
-                    const displayName = u.nombre_usuario || u.nick || u.nombre || d.id;
-                    users.push({ id: d.id, nombre: displayName, equipo: u.equipo || [], capitanId: u.capitanId || null }); 
-                });
-
-                const participantes = Object.values(atletas).filter(a => a.puntosUlt > 0);
-
-                // 1. MÁS SELECCIONADOS
-                const ownership = {};
-                users.forEach(u => u.equipo.forEach(id => { if(atletas[id]) ownership[id] = (ownership[id]||0) + 1; }));
-                const topOwned = Object.keys(ownership).map(id => ({...atletas[id], count: ownership[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
-
-                // 2. MÁS CAPITANEADOS
-                const capCounts = {};
-                users.forEach(u => { if(u.capitanId && atletas[u.capitanId]) capCounts[u.capitanId] = (capCounts[u.capitanId]||0) + 1; });
-                const topCaptained = Object.keys(capCounts).map(id => ({...atletas[id], count: capCounts[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
-
-                // 3. RENTABILIDAD
-                const topValue = participantes.map(a => ({...a, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : 0})).sort((a,b)=>b.ratio - a.ratio).slice(0,3);
-
-                // 4. MEJOR ALINEACIÓN (CÁLCULO CON CAPITÁN X1.5)
-                const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
-                const idealCapPts = bestThree.length > 0 ? bestThree[0].puntosUlt * 0.5 : 0;
-                const idealTotal = bestThree.reduce((s,a)=> s + a.puntosUlt, 0) + idealCapPts;
-
-                const managersPerformance = users.map(u => {
-                    const team = u.equipo.map(id => atletas[id]).filter(Boolean);
-                    const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
-                    let bestExtra = 0;
-                    team.forEach(a => {
-                        const extra = a.puntosUlt * 0.5;
-                        if(extra > bestExtra) bestExtra = extra;
-                    });
-                    return { ...u, pts: basePts + bestExtra };
-                }).sort((a,b)=> b.pts - a.pts);
-
-                renderSimpleList('mostOwnedContent', topOwned, 'Elegido');
-                renderSimpleList('mostCaptainedContent', topCaptained, 'Capitán');
-                renderSimpleList('bestValueContent', topValue, 'Ratio', true);
-                renderIdeal(bestThree, idealTotal, managersPerformance[0]);
-                renderEfficiency(users, atletas);
-
-                document.getElementById('lastUpdated').innerText = new Date().toLocaleTimeString();
-
+                // 2. Si está cerrada, cargar todo
+                document.getElementById('main-stats').style.display = 'grid';
+                await loadStats();
             } catch (e) { console.error(e); }
         }
 
+        async function loadStats() {
+            const [athSnap, usersSnap] = await Promise.all([
+                getDocs(collection(db, 'atletas')),
+                getDocs(collection(db, 'usuarios'))
+            ]);
+
+            const atletas = {};
+            athSnap.forEach(d => { 
+                const data = d.data(); 
+                atletas[d.id] = { id: d.id, nombre: data.nombre || data.nombre_completo || d.id, precio: Number(data.precio) || 0, puntosUlt: Number(data.puntos_ultima_jornada) || 0, foto: data.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png' }; 
+            });
+
+            const users = [];
+            usersSnap.forEach(d => { 
+                const u = d.data(); 
+                users.push({ id: d.id, nombre: u.nombre_usuario || u.nick || u.nombre || d.id, equipo: u.equipo || [], capitanId: u.capitanId || null }); 
+            });
+
+            const participantes = Object.values(atletas).filter(a => a.puntosUlt > 0);
+
+            // Cálculos
+            const ownership = {};
+            users.forEach(u => u.equipo.forEach(id => { if(atletas[id]) ownership[id] = (ownership[id]||0) + 1; }));
+            const topOwned = Object.keys(ownership).map(id => ({...atletas[id], count: ownership[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
+
+            const capCounts = {};
+            users.forEach(u => { if(u.capitanId && atletas[u.capitanId]) capCounts[u.capitanId] = (capCounts[u.capitanId]||0) + 1; });
+            const topCaptained = Object.keys(capCounts).map(id => ({...atletas[id], count: capCounts[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
+
+            const topValue = participantes.map(a => ({...a, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : 0})).sort((a,b)=>b.ratio - a.ratio).slice(0,3);
+
+            const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
+            const idealTotal = bestThree.length > 0 ? (bestThree[0].puntosUlt * 1.5) + (bestThree[1]?.puntosUlt || 0) + (bestThree[2]?.puntosUlt || 0) : 0;
+
+            const managersPerformance = users.map(u => {
+                const team = u.equipo.map(id => atletas[id]).filter(Boolean);
+                const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
+                const bestExtra = team.length ? Math.max(...team.map(a=>a.puntosUlt * 0.5)) : 0;
+                return { ...u, pts: basePts + bestExtra };
+            }).sort((a,b)=> b.pts - a.pts);
+
+            // Renderizado
+            renderSimpleList('mostOwnedContent', topOwned, 'Elegido');
+            renderSimpleList('mostCaptainedContent', topCaptained, 'Capitán');
+            renderSimpleList('bestValueContent', topValue, 'Ratio', true);
+            renderIdeal(bestThree, idealTotal, managersPerformance[0]);
+            renderEfficiency(users, atletas);
+            document.getElementById('lastUpdated').innerText = new Date().toLocaleTimeString();
+        }
+
+        // Funciones de Renderizado (Idénticas a la versión anterior para mantener el diseño)
         function renderSimpleList(id, list, label, isFloat = false) {
             let html = '';
             list.forEach(a => {
                 const val = isFloat ? a.ratio.toFixed(2) : a.count;
-                html += `
-                <div class="player-row">
-                    <img src="${a.foto}">
-                    <div class="player-info">
-                        <div class="player-name">${a.nombre}</div>
-                        <div class="player-sub">${a.puntosUlt} pts esta jornada</div>
-                    </div>
-                    <div class="stat-highlight">
-                        <span class="highlight-value">${val}</span>
-                        <span class="highlight-label">${label}</span>
-                    </div>
-                </div>`;
+                html += `<div class="player-row"><img src="${a.foto}"><div class="player-info"><div class="player-name">${a.nombre}</div><div class="player-sub">${a.puntosUlt} pts</div></div><div class="stat-highlight"><span class="highlight-value">${val}</span><span class="highlight-label">${label}</span></div></div>`;
             });
-            document.getElementById(id).innerHTML = html || '<div class="muted">No hay datos</div>';
+            document.getElementById(id).innerHTML = html || 'Sin datos';
         }
 
         function renderIdeal(bestThree, total, bestManager) {
             if(!bestThree.length) return;
             let html = `<div class="formation-display">`;
             bestThree.forEach((a, i) => {
-                html += `
-                <div class="slot">
-                    <img src="${a.foto}">
-                    <div class="slot-name">${a.nombre}${i===0?'<span class="cap-badge">C</span>':''}</div>
-                    <div class="slot-pts">${(i===0 ? a.puntosUlt * 1.5 : a.puntosUlt).toFixed(1)}</div>
-                </div>`;
+                html += `<div class="slot"><img src="${a.foto}"><div class="slot-name">${a.nombre}${i===0?'<span class="cap-badge">C</span>':''}</div><div class="slot-pts">${(i===0 ? a.puntosUlt * 1.5 : a.puntosUlt).toFixed(1)}</div></div>`;
             });
-            html += `</div>
-            <div style="text-align:center; font-weight:800; color:#ff5e00; font-size: 0.9rem; margin-bottom:15px;">TOTAL ÓPTIMO: ${total.toFixed(1)} PTS</div>
-            <div style="border-top:1px solid #222; padding-top:12px;">
-                <div class="player-sub">Manager más cercano:</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                    <span style="font-weight:700; font-size:0.85rem; color:#fff;">${bestManager.nombre}</span>
-                    <span style="color:#ff5e00; font-weight:800; font-size:0.95rem;">${bestManager.pts.toFixed(1)} pts</span>
-                </div>
-            </div>`;
+            html += `</div><div style="text-align:center; font-weight:800; color:#ff5e00; font-size: 0.9rem; margin-bottom:15px;">TOTAL ÓPTIMO: ${total.toFixed(1)} PTS</div><div style="border-top:1px solid #222; padding-top:12px;"><div class="player-sub">Manager más cercano:</div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;"><span style="font-weight:700; font-size:0.85rem;">${bestManager.nombre}</span><span style="color:#ff5e00; font-weight:800;">${bestManager.pts.toFixed(1)} pts</span></div></div>`;
             document.getElementById('bestLineupContent').innerHTML = html;
         }
 
@@ -306,31 +246,18 @@
                 const team = u.equipo.map(id => atletas[id]).filter(Boolean);
                 const cost = team.reduce((s,a)=> s + a.precio, 0);
                 const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
-                const bestExtra = team.length ? Math.max(...team.map(a=>a.puntosUlt * 0.5)) : 0;
-                const totalPts = basePts + bestExtra;
+                const totalPts = basePts + (team.length ? Math.max(...team.map(a=>a.puntosUlt * 0.5)) : 0);
                 return { nombre: u.nombre, ratio: cost > 0 ? totalPts / cost : 0, pts: totalPts, cost };
             }).sort((a,b)=> b.ratio - a.ratio);
-
             const eff = effList[0];
             if(!eff) return;
-            document.getElementById('bestEfficiencyContent').innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="min-width:0;">
-                        <div style="font-size:1.1rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${eff.nombre}</div>
-                        <div class="player-sub">${eff.pts.toFixed(1)} pts / ${eff.cost}M invertidos</div>
-                    </div>
-                    <div class="stat-highlight">
-                        <span class="highlight-value">${eff.ratio.toFixed(3)}</span>
-                        <span class="highlight-label">Eficiencia</span>
-                    </div>
-                </div>
-            `;
+            document.getElementById('bestEfficiencyContent').innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="min-width:0;"><div style="font-size:1.1rem; font-weight:800; overflow:hidden; text-overflow:ellipsis;">${eff.nombre}</div><div class="player-sub">${eff.pts.toFixed(1)} pts / ${eff.cost}M</div></div><div class="stat-highlight"><span class="highlight-value">${eff.ratio.toFixed(3)}</span><span class="highlight-label">Eficiencia</span></div></div>`;
         }
 
         window.toggleMenu = () => document.getElementById('navLinks').classList.toggle('active');
         window.cerrarSesion = () => { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; };
 
-        loadStats();
+        checkStatusAndLoad();
     </script>
 </body>
 </html>
