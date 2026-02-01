@@ -27,20 +27,73 @@
             z-index: -1; backdrop-filter: blur(8px);
         }
 
-        /* NAVBAR */
-        .navbar { position: sticky; top: 0; display:flex; justify-content:space-between; align-items:center; background-color:#000; border-bottom:2px solid #222; padding:0 20px; z-index:1000; height:70px; width:100%; }
-        .nav-logo a { text-decoration:none; color:white; font-size:1.1rem; font-weight:800; display:flex; align-items:center; gap:8px; }
-        .nav-logo span { color:#ff5e00; }
-        .nav-links { display:flex; gap:15px; align-items:center; }
-        .nav-links a { text-decoration:none; color:#aaa; font-weight:600; font-size:0.8rem; transition:0.3s; }
-        .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
-        .btn-logout { background:none; border:none; color:#ff5e00; font-size:1.1rem; cursor:pointer; }
-        .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.4rem; cursor:pointer; }
+        /* NAVBAR (UNIFICADA CON RANKING) */
+        .navbar {
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            border-bottom: 2px solid #222;
+            padding: 15px 20px;
+            z-index: 1000;
+            height: 70px;
+            width: 100%;
+        }
+
+        .nav-logo a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span { color: #ff5e00; }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #aaa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ff5e00 !important;
+        }
+
+        .btn-logout {
+            background: none;
+            border: none;
+            color: #ff5e00;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
 
         /* CONTENEDOR */
-        .container { max-width: 1100px; margin: 0 auto; padding: 30px 15px; }
-        h1 { color: #ff5e00; text-transform: uppercase; font-size: 1.6rem; margin-bottom: 5px; font-weight: 800; }
-        .muted { color: #888; margin-bottom: 25px; font-size: 0.85rem; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 15px; }
+        h1 { color: white; text-transform: uppercase; font-size: 2.2rem; margin-bottom: 5px; font-weight: 800; text-align: center; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .muted { color: #888; margin-bottom: 25px; font-size: 0.85rem; text-align: center; }
 
         /* AVISO JORNADA ABIERTA */
         #status-banner {
@@ -51,9 +104,9 @@
 
         /* GRID DE ESTADÍSTICAS */
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .stat-card { background: rgba(15, 15, 15, 0.85); border: 1px solid #222; border-radius: 16px; padding: 20px; }
+        .stat-card { background: rgba(20, 20, 20, 0.95); border: 1px solid #333; border-radius: 16px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .stat-card.full-width { grid-column: 1 / -1; }
-        .stat-title { color: #ff5e00; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .stat-title { color: #ff5e00; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
 
         /* PLAYER ROWS */
         .player-row { display: flex; align-items: center; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; gap: 12px; border: 1px solid rgba(255,255,255,0.05); }
@@ -75,11 +128,22 @@
         .slot-pts { font-size: 0.8rem; color: #ff5e00; font-weight: 800; margin-top: 2px; }
         .cap-badge { background: #ff5e00; color: #000; font-size: 0.6rem; font-weight: 900; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
 
-        @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr; } }
+        /* RESPONSIVE MÓVIL (Sincronizado con Ranking) */
         @media (max-width: 768px) {
-            .menu-toggle { display: block; }
-            .nav-links { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #000; flex-direction: column; justify-content: center; transform: translateX(100%); transition: 0.3s; z-index: 2000; }
+            .navbar { padding: 10px 15px !important; }
+            .menu-toggle { display: block !important; }
+
+            .nav-links {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+                background-color: rgba(0,0,0,0.98); flex-direction: column; justify-content: center; align-items: center;
+                z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out;
+            }
             .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
+
+            .stats-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -89,17 +153,30 @@
 
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html"><i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span></a>
+            <a href="home.html">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
+            </a>
         </div>
-        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
         <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
             <a href="home.html">INICIO</a>
             <a href="mi_equipo.html">MI EQUIPO</a>
             <a href="mercado.html">MERCADO</a>
             <a href="clasificaciones.html">RANKING</a>
             <a href="stats.html" class="active">ESTADÍSTICAS</a>
             <a href="calendario.html">CALENDARIO</a>
-            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i></button>
+
+            <button onclick="cerrarSesion()" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i> Salir
+            </button>
         </div>
     </nav>
 
@@ -133,10 +210,16 @@
         </div>
     </div>
 
+    <script>
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // Mismo config que ya tenías
         const firebaseConfig = {
             apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
             authDomain: "fantasy-atletismo-26.firebaseapp.com",
@@ -151,11 +234,10 @@
 
         async function checkStatusAndLoad() {
             try {
-                // 1. Verificar si la jornada está cerrada (debes crear esta colección/doc en Firebase)
                 const configRef = doc(db, "configuracion", "estado_jornada");
                 const configSnap = await getDoc(configRef);
                 
-                let cerrada = true; // Por defecto true si no existe el doc
+                let cerrada = true;
                 if (configSnap.exists()) {
                     cerrada = configSnap.data().jornada_cerrada;
                 }
@@ -165,7 +247,6 @@
                     return;
                 }
 
-                // 2. Si está cerrada, cargar todo
                 document.getElementById('main-stats').style.display = 'grid';
                 await loadStats();
             } catch (e) { console.error(e); }
@@ -191,7 +272,6 @@
 
             const participantes = Object.values(atletas).filter(a => a.puntosUlt > 0);
 
-            // Cálculos
             const ownership = {};
             users.forEach(u => u.equipo.forEach(id => { if(atletas[id]) ownership[id] = (ownership[id]||0) + 1; }));
             const topOwned = Object.keys(ownership).map(id => ({...atletas[id], count: ownership[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
@@ -212,7 +292,6 @@
                 return { ...u, pts: basePts + bestExtra };
             }).sort((a,b)=> b.pts - a.pts);
 
-            // Renderizado
             renderSimpleList('mostOwnedContent', topOwned, 'Elegido');
             renderSimpleList('mostCaptainedContent', topCaptained, 'Capitán');
             renderSimpleList('bestValueContent', topValue, 'Ratio', true);
@@ -221,7 +300,6 @@
             document.getElementById('lastUpdated').innerText = new Date().toLocaleTimeString();
         }
 
-        // Funciones de Renderizado (Idénticas a la versión anterior para mantener el diseño)
         function renderSimpleList(id, list, label, isFloat = false) {
             let html = '';
             list.forEach(a => {
@@ -253,9 +331,6 @@
             if(!eff) return;
             document.getElementById('bestEfficiencyContent').innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="min-width:0;"><div style="font-size:1.1rem; font-weight:800; overflow:hidden; text-overflow:ellipsis;">${eff.nombre}</div><div class="player-sub">${eff.pts.toFixed(1)} pts / ${eff.cost}M</div></div><div class="stat-highlight"><span class="highlight-value">${eff.ratio.toFixed(3)}</span><span class="highlight-label">Eficiencia</span></div></div>`;
         }
-
-        window.toggleMenu = () => document.getElementById('navLinks').classList.toggle('active');
-        window.cerrarSesion = () => { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; };
 
         checkStatusAndLoad();
     </script>
