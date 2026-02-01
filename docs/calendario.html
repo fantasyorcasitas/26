@@ -171,7 +171,7 @@
                 const snapshot = await getDocs(q);
                 
                 let pendingHTML = '';
-                let finishedHTML = '';
+                const finishedComps = [];
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
@@ -233,11 +233,15 @@
                         </div>`;
 
                     if (data.estado === 'finalizada') {
-                        finishedHTML += cardHTML;
+                        finishedComps.push({ fecha: fechaObj, html: cardHTML });
                     } else {
                         pendingHTML += cardHTML;
                     }
                 });
+
+                // Ordenar finalizadas por fecha descendente (más reciente primero)
+                finishedComps.sort((a,b) => b.fecha - a.fecha);
+                const finishedHTML = finishedComps.map(c => c.html).join('');
 
                 pendingContainer.innerHTML = pendingHTML || '<p style="text-align:center; color:#888; padding:20px;">No hay competiciones pendientes.</p>';
                 finishedContainer.innerHTML = finishedHTML || '<p style="text-align:center; color:#888; padding:20px;">Aún no hay resultados.</p>';

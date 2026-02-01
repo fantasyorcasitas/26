@@ -109,10 +109,7 @@
     <div class="dashboard-container">
         <div class="container">
         <h1><i class="fa-solid fa-chart-simple"></i> Estadísticas - Anterior Jornada</h1>
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
-            <button id="btnRefresh" class="refresh"><i class="fa-solid fa-arrows-rotate"></i> Actualizar</button>
-            <div class="muted">Última actualización: <span id="lastUpdated">--</span></div>
-        </div> 
+        <div class="muted" style="margin-bottom:12px;">Última actualización: <span id="lastUpdated">--</span></div> 
 
         <style>
             /* Grid para tarjetas */
@@ -142,6 +139,7 @@
             .formation .slot { background:#0f0f0f; border:1px solid #222; border-radius:10px; padding:8px; width:30%; text-align:center; }
             .formation .slot .name { font-weight:700; }
             .formation .slot .pts { color:#ff5e00; font-weight:800; margin-top:6px; }
+            .cap-label { display:inline-block; background: linear-gradient(90deg,#ffb86b,#ff5e00); color:#111; padding:3px 8px; border-radius:999px; font-weight:800; margin-left:6px; font-size:0.75rem; }
 
             /* Responsive adjustments */
             @media (max-width: 880px) {
@@ -182,7 +180,7 @@
             </div>
         </div>
 
-        <div class="note">Nota: los cálculos se basan en <code>puntos_ultima_jornada</code> de los atletas y las alineaciones guardadas en los documentos de <code>usuarios</code>. El capitán suma puntos extra iguales a sus puntos (x2) en el cómputo de managers.</div>
+
     
     </div>
 </div>
@@ -203,7 +201,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        document.getElementById('btnRefresh').addEventListener('click', () => loadStats());
+
 
         async function loadStats() {
             setLoading();
@@ -225,16 +223,16 @@
                 // 1. Atletas más seleccionados (solo entre participantes)
                 const ownershipCounts = {};
                 users.forEach(u => { (u.equipo || []).forEach(id => { if (atletas[id] && atletas[id].puntosUlt) ownershipCounts[id] = (ownershipCounts[id] || 0) + 1; }); });
-                const mostOwned = Object.keys(ownershipCounts).map(id => ({ id, nombre: atletas[id].nombre, count: ownershipCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count).slice(0,10);
+                const mostOwned = Object.keys(ownershipCounts).map(id => ({ id, nombre: atletas[id].nombre, count: ownershipCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count).slice(0,3);
 
                 // 2. Atleta más capitaneado (contar capitanes entre participantes)
                 const capiCounts = {};
                 users.forEach(u => { const c = u.capitanId; if(c && atletas[c] && atletas[c].puntosUlt) capiCounts[c] = (capiCounts[c]||0) + 1; });
-                const capiList = Object.keys(capiCounts).map(id => ({ id, nombre: atletas[id].nombre, count: capiCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count);
+                const capiList = Object.keys(capiCounts).map(id => ({ id, nombre: atletas[id].nombre, count: capiCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count).slice(0,3);
 
                 // 3. Mejor puntos por millón (puntos/precio)
                 const valueList = participantes.map(a => ({ id: a.id, nombre: a.nombre, puntos: a.puntosUlt, precio: a.precio, foto: a.foto, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : (a.puntosUlt > 0 ? Infinity : 0) }));
-                const bestValue = valueList.sort((a,b)=> b.ratio - a.ratio)[0] || null;
+                const bestValueList = valueList.sort((a,b)=> b.ratio - a.ratio).slice(0,3);
 
                 // 4. Mejor alineación posible (top 3 por puntos)
                 const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
@@ -264,20 +262,15 @@
 
                 renderMostOwned(mostOwned);
                 renderMostCaptained(capiList);
-                renderBestValue(bestValue);
+                renderBestValue(bestValueList);
                 renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers);
                 renderBestEfficiency(bestEfficiency);
-
-                const btn = document.getElementById('btnRefresh');
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Actualizar'; }
 
                 document.getElementById('lastUpdated').innerText = new Date().toLocaleString();
 
             } catch (err) {
                 console.error('Error cargando estadísticas:', err);
                 document.getElementById('mostOwnedContent').innerText = 'Error al cargar datos.';
-                const btn = document.getElementById('btnRefresh');
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Actualizar'; }
             }
         }
 
@@ -288,8 +281,6 @@
             document.getElementById('bestValueContent').innerHTML = loadText;
             document.getElementById('bestLineupContent').innerHTML = loadText;
             document.getElementById('bestEfficiencyContent').innerHTML = loadText;
-            const btn = document.getElementById('btnRefresh');
-            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...'; }
         }
 
         function renderMostOwned(list) {
@@ -347,21 +338,24 @@
             document.getElementById('mostCaptainedContent').innerHTML = html;
         }
 
-        function renderBestValue(it) {
-            if (!it) { document.getElementById('bestValueContent').innerHTML = '<div class="small">No hay datos para calcular valor.</div>'; return; }
-            const ratio = (it.ratio === Infinity) ? '∞' : (it.ratio.toFixed(3));
-            const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
-            let html = `
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <img src="${foto}" style="width:72px;height:72px;border-radius:10px;object-fit:cover;">
-                    <div style="flex:1;">
-                        <div style="font-weight:800;">${it.nombre}</div>
-                        <div class="muted">${it.puntos} pts — ${it.precio}M</div>
-                        <div class="small" style="margin-top:6px;">Puntos por millón</div>
+        function renderBestValue(list) {
+            if (!list || list.length === 0) { document.getElementById('bestValueContent').innerHTML = '<div class="small">No hay datos para calcular valor.</div>'; return; }
+            let html = '<div class="player-grid">';
+            list.forEach((it, idx) => {
+                const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+                const ratio = (it.ratio === Infinity) ? '∞' : (it.ratio.toFixed(3));
+                html += `
+                    <div class="player-card">
+                        <img src="${foto}" alt="${it.nombre}">
+                        <div class="player-meta">
+                            <div class="player-name">${it.nombre}</div>
+                            <div class="player-sub">${it.puntos} pts — ${it.precio}M</div>
+                            <div class="player-badges" style="margin-top:8px;"><div class="badge">${ratio}</div></div>
+                        </div>
                     </div>
-                    <div class="top-badge">${ratio}</div>
-                </div>
-            `;
+                `;
+            });
+            html += '</div>';
             document.getElementById('bestValueContent').innerHTML = html;
         }
 
@@ -397,7 +391,7 @@
                         const isCapi = (bestManager.capitanId && bestManager.capitanId === p.id);
                         const bonus = isCapi ? p.puntosUlt : 0;
                         const totalP = (p.puntosUlt || 0) + bonus;
-                        html += `<div class="slot"><img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;margin-bottom:6px;"><div class="name">${p.nombre}${isCapi? ' <span class="small" style="color:#ffb86b;">(C)</span>': ''}</div><div class="pts">${p.puntosUlt} pts${isCapi? ' + ' + bonus + ' (cap)' : ''}</div></div>`;
+                        html += `<div class="slot"><img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;margin-bottom:6px;"><div class="name">${p.nombre}${isCapi? ' <span class="cap-label">C</span>': ''}</div><div class="pts">${p.puntosUlt} pts${isCapi? ' + ' + bonus + ' (cap)' : ''}</div></div>`;
                     });
                     html += '</div></div>';
                 }
