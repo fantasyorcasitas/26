@@ -118,22 +118,27 @@
             .stat-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
             @media (min-width: 880px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
 
-            /* Player card */
-            .player-grid { display:flex; flex-wrap:wrap; gap:12px; }
-            .player-card { background:#111; border:1px solid #222; padding:10px; border-radius:12px; width: calc(33.333% - 8px); display:flex; gap:10px; align-items:center; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
-            .player-card img { width:56px; height:56px; border-radius:10px; object-fit:cover; flex-shrink:0; }
+            /* Player card - GRID layout for better desktop */
+            .player-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; align-items:stretch; }
+            .player-card { background:#111; border:1px solid #222; padding:14px; border-radius:12px; display:flex; gap:12px; align-items:center; box-shadow: 0 6px 28px rgba(0,0,0,0.55); min-height:88px; }
+            .player-card img { width:72px; height:72px; border-radius:12px; object-fit:cover; flex-shrink:0; }
             .player-meta { flex:1; }
-            .player-name { font-weight:700; color:white; }
-            .player-sub { color:#999; font-size:0.9rem; margin-top:4px; }
+            .player-name { font-weight:800; color:white; font-size:1rem; }
+            .player-sub { color:#9aa0a6; font-size:0.88rem; margin-top:6px; }
             .player-badges { display:flex; gap:8px; align-items:center; }
-            .badge { background:#ff5e00; color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:0.85rem; }
-            .pts-badge { background:#222; color:#ff5e00; border:1px solid #333; padding:6px 8px; border-radius:10px; font-weight:800; }
+            .badge { background:#ff5e00; color:#111; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.9rem; }
+            .pts-badge { background:#0b0b0b; color:#ff5e00; border:1px solid #333; padding:8px 10px; border-radius:12px; font-weight:900; font-size:0.95rem; }
 
             /* Mini cards for team preview */
             .mini-team { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-            .mini-card { width:80px; background:#0f0f0f; border:1px solid #222; border-radius:8px; padding:6px; text-align:center; font-size:0.85rem; }
-            .mini-card img { width:40px; height:40px; border-radius:6px; object-fit:cover; }
+            .mini-card { width:96px; background:#0f0f0f; border:1px solid #222; border-radius:10px; padding:8px; text-align:center; font-size:0.85rem; }
+            .mini-card img { width:48px; height:48px; border-radius:8px; object-fit:cover; }
 
+            /* Larger image on wide screens */
+            @media (min-width: 1200px) {
+                .player-card img { width:84px; height:84px; }
+                .player-name { font-size:1.05rem; }
+            }
             /* Formación (alineación) */
             .formation { display:flex; gap:12px; align-items:center; justify-content:center; margin-top:8px; }
             .formation .slot { background:#0f0f0f; border:1px solid #222; border-radius:10px; padding:8px; width:30%; text-align:center; }
@@ -232,7 +237,7 @@
 
                 // 3. Mejor puntos por millón (puntos/precio)
                 const valueList = participantes.map(a => ({ id: a.id, nombre: a.nombre, puntos: a.puntosUlt, precio: a.precio, foto: a.foto, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : (a.puntosUlt > 0 ? Infinity : 0) }));
-                const bestValueList = valueList.sort((a,b)=> b.ratio - a.ratio).slice(0,3);
+                const bestValueList = valueList.sort((a,b)=> b.ratio - a.ratio).slice(0,3); // top3 already set
 
                 // 4. Mejor alineación posible (top 3 por puntos)
                 const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
@@ -242,10 +247,16 @@
                 const managersPerformance = users.map(u => {
                     const team = (u.equipo || []).map(id => atletas[id]).filter(Boolean);
                     const teamPtsBase = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
-                    const capBonus = (u.capitanId && atletas[u.capitanId] && atletas[u.capitanId].puntosUlt) ? atletas[u.capitanId].puntosUlt : 0; // capitán suma puntos extra iguales a sus puntos
-                    const totalPts = teamPtsBase + capBonus;
+                    // Compute ideal captain: choose team member that maximizes (teamPtsBase + a.puntosUlt * 0.5)
+                    let bestCapId = null;
+                    let bestCapExtra = 0; // additional pts from captain = 0.5 * cap points
+                    team.forEach(a => {
+                        const extra = (a.puntosUlt || 0) * 0.5;
+                        if (extra > bestCapExtra) { bestCapExtra = extra; bestCapId = a.id; }
+                    });
+                    const bestTotalPts = teamPtsBase + bestCapExtra;
                     const overlap = (u.equipo || []).filter(id => bestThree.find(bt => bt.id === id)).length;
-                    return { id: u.id, nombre: u.nombre, pts: totalPts, overlap, team, capitanId: u.capitanId };
+                    return { id: u.id, nombre: u.nombre, pts: bestTotalPts, overlap, team, capitanId: u.capitanId, bestCaptainId: bestCapId, bestCaptainExtra: bestCapExtra };
                 }).sort((a,b)=> b.pts - a.pts);
 
                 const closestManagers = managersPerformance.length ? managersPerformance.filter(m => m.pts === managersPerformance[0].pts) : [];
@@ -254,9 +265,11 @@
                 const managerEfficiency = users.map(u => {
                     const team = (u.equipo || []).map(id => atletas[id]).filter(Boolean);
                     const price = team.reduce((s,a)=> s + (a.precio || 0), 0);
-                    const pts = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
-                    const eff = price > 0 ? (pts / price) : (pts > 0 ? Infinity : 0);
-                    return { id: u.id, nombre: u.nombre, price, pts, eff, team };
+                    const teamPtsBase = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
+                    const bestCapExtra = team.reduce((mx,a) => Math.max(mx, (a.puntosUlt || 0) * 0.5), 0);
+                    const totalPtsWithBestCap = teamPtsBase + bestCapExtra;
+                    const eff = price > 0 ? (totalPtsWithBestCap / price) : (totalPtsWithBestCap > 0 ? Infinity : 0);
+                    return { id: u.id, nombre: u.nombre, price, pts: totalPtsWithBestCap, eff, team };
                 }).sort((a,b)=> b.eff - a.eff);
                 const bestEfficiency = managerEfficiency[0] || null;
 
@@ -306,22 +319,10 @@
 
         function renderMostCaptained(list) {
             if (!list || list.length === 0) { document.getElementById('mostCaptainedContent').innerHTML = '<div class="small">No hay capitanes en la última jornada.</div>'; return; }
-            const top = list[0];
-            const fotoTop = top.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
-            let html = `
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <img src="${fotoTop}" style="width:80px;height:80px;border-radius:12px;object-fit:cover;margin-right:8px;">
-                    <div style="flex:1;">
-                        <div style="font-weight:800; font-size:1.05rem;">${top.nombre}</div>
-                        <div class="muted">${top.count} managers lo capitanean</div>
-                        <div class="player-badges" style="margin-top:8px;"><div class="pts-badge">${top.puntos} pts</div></div>
-                    </div>
-                    <div class="top-badge" style="font-size:1rem;">${top.count}</div>
-                </div>
-            `;
-            html += '<hr style="border:none;border-top:1px solid #222;margin:10px 0">';
-            html += '<div class="player-grid">';
-            list.slice(1,8).forEach((it,i)=> {
+            // Uniform top3 display as player-cards, emphasize #veces capitan
+            const top3 = list.slice(0,3);
+            let html = '<div class="player-grid">';
+            top3.forEach((it, i) => {
                 const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
                 html += `
                     <div class="player-card">
@@ -329,8 +330,8 @@
                         <div class="player-meta">
                             <div class="player-name">${it.nombre}</div>
                             <div class="player-sub">${it.count} capitanes</div>
-                            <div class="player-badges" style="margin-top:8px;"><div class="pts-badge">${it.puntos} pts</div></div>
                         </div>
+                        <div style="text-align:right;"><div class="badge">${it.count}</div><div class="small" style="margin-top:6px;color:#9aa0a6">${it.puntos} pts</div></div>
                     </div>
                 `;
             });
