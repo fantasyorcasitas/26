@@ -7,16 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ESTILOS BASE - Consistente con el resto de páginas */
+        /* ESTILOS BASE */
         * { box-sizing: border-box; }
         html { background-color: #000 !important; }
         body {
             display: block !important; height: auto !important; min-height: 100vh; overflow-y: auto !important;
             background-color: transparent !important; margin: 0; padding: 0;
-            font-family: 'Montserrat', sans-serif; position: relative; 
+            font-family: 'Montserrat', sans-serif; position: relative; color: white;
         }
 
-        /* FONDO (imagen + overlay) */
         .bg-image {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
@@ -24,49 +23,126 @@
         }
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
-            z-index: -1; backdrop-filter: blur(4px);
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.8) 100%);
+            z-index: -1; backdrop-filter: blur(8px);
         }
 
-        /* CONTENEDOR PRINCIPAL */
-        .dashboard-container { padding-top: 40px !important; padding-bottom: 80px !important; display:flex; flex-direction:column; align-items:center; width:100%; padding-left:15px; padding-right:15px; position:relative; z-index:1; }
-
         /* NAVBAR */
-        .navbar { position: sticky; top: 0; display:flex; justify-content:space-between; align-items:center; background-color:#000; border-bottom:2px solid #222; padding:15px 20px; z-index:1000; height:70px; width:100%; }
+        .navbar { position: sticky; top: 0; display:flex; justify-content:space-between; align-items:center; background-color:#000; border-bottom:2px solid #222; padding:0 20px; z-index:1000; height:70px; width:100%; }
         .nav-logo a { text-decoration:none; color:white; font-size:1.2rem; font-weight:800; display:flex; align-items:center; gap:10px; }
         .nav-logo span { color:#ff5e00; }
         .nav-links { display:flex; gap:20px; align-items:center; }
-        .nav-links a { text-decoration:none; color:#aaa; font-weight:600; font-size:0.9rem; transition:0.3s; }
+        .nav-links a { text-decoration:none; color:#aaa; font-weight:600; font-size:0.85rem; transition:0.3s; }
         .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
         .btn-logout { background:none; border:none; color:#ff5e00; font-size:1.2rem; cursor:pointer; margin-left:10px; }
         .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; }
 
-        /* Estadísticas - Tarjetas */
-        .container { max-width:1100px; margin: 40px auto; padding: 20px; }
-        h1 { color: #ff5e00; text-transform: uppercase; font-size: 1.8rem; margin-bottom: 12px; }
-        .stat-card { background: rgba(20,20,20,0.95); border:1px solid #222; padding:18px; border-radius:12px; margin-bottom:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
-        .stat-title { color:#ff5e00; font-weight:800; text-transform:uppercase; margin-bottom:8px; }
-        table { width:100%; border-collapse:collapse; color:#fff; }
-        th, td { padding:10px 8px; border-bottom:1px solid #222; text-align:left; }
-        th { color:#aaa; font-size:0.85rem; text-transform:uppercase; }
-        .muted { color:#999; font-size:0.9rem; }
-        .top-badge { background:#ff5e00; color:#111; padding:6px 10px; border-radius:999px; font-weight:800; }
-        .small { font-size:0.95rem; color:#ccc; }
-        .refresh { background:#222; color:#ff5e00; border:1px solid #333; padding:10px 14px; border-radius:8px; cursor:pointer; }
-        .note { color:#ccc; font-size:0.9rem; margin-top:8px; }
+        /* CONTENEDOR */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { color: #ff5e00; text-transform: uppercase; font-size: 2rem; margin-bottom: 5px; font-weight: 800; }
+        .muted { color: #888; margin-bottom: 30px; font-size: 0.9rem; }
 
-        /* RESPONSIVE MÓVIL */
-        @media (max-width: 768px) {
-            .navbar { padding: 10px 15px !important; }
-            .menu-toggle { display: block !important; }
-
-            .nav-links { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: rgba(0,0,0,0.98); flex-direction: column; justify-content: center; align-items: center; z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out; }
-            .nav-links.active { transform: translateX(0); }
-            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
-            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
-            .dashboard-container { padding-left: 15px; padding-right: 15px; }
+        /* GRID DE ESTADÍSTICAS */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 25px; 
         }
-    </style> 
+
+        .stat-card { 
+            background: rgba(15, 15, 15, 0.8); 
+            border: 1px solid #222; 
+            border-radius: 16px; 
+            padding: 24px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); border-color: #444; }
+        .stat-card.full-width { grid-column: 1 / -1; }
+
+        .stat-title { 
+            color: #ff5e00; 
+            font-size: 0.9rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* PLAYER CARDS - UNIFICADAS */
+        .player-row {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            gap: 15px;
+            border: 1px solid transparent;
+        }
+
+        .player-row img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 1px solid #333; }
+        .player-info { flex: 1; }
+        .player-name { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+        .player-sub { font-size: 0.8rem; color: #777; }
+
+        /* EL DATO IMPORTANTE (HIGHLIGHT) */
+        .stat-highlight {
+            text-align: right;
+            min-width: 80px;
+        }
+        .highlight-value { color: #ff5e00; font-weight: 800; font-size: 1.2rem; display: block; }
+        .highlight-label { font-size: 0.7rem; color: #555; text-transform: uppercase; font-weight: 600; }
+
+        /* FORMACIÓN / MEJOR EQUIPO */
+        .formation-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .slot {
+            background: #000;
+            border: 1px solid #222;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .slot img { width: 45px; height: 45px; border-radius: 50%; margin-bottom: 8px; }
+        .slot-name { font-size: 0.8rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .slot-pts { font-size: 0.85rem; color: #ff5e00; font-weight: 800; margin-top: 4px; }
+
+        .cap-badge {
+            background: #ff5e00;
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 15px; }
+            .menu-toggle { display: block; }
+            .nav-links { 
+                position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
+                background: #000; flex-direction: column; justify-content: center; 
+                transform: translateX(100%); transition: 0.3s; 
+            }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.2rem; }
+        }
+    </style>
 </head>
 <body>
     <div class="bg-image"></div>
@@ -74,123 +150,53 @@
 
     <nav class="navbar">
         <div class="nav-logo">
-            <a href="home.html">
-                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
-            </a>
+            <a href="home.html"><i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span></a>
         </div>
-
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
+        <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
         <div class="nav-links" id="navLinks">
-            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
-                <i class="fa-solid fa-times"></i>
-            </button>
-
-             <a href="home.html">INICIO</a>
+            <a href="home.html">INICIO</a>
             <a href="mi_equipo.html">MI EQUIPO</a>
             <a href="mercado.html">MERCADO</a>
             <a href="clasificaciones.html">RANKING</a>
             <a href="stats.html" class="active">ESTADÍSTICAS</a>
             <a href="calendario.html">CALENDARIO</a>
-
-            <button onclick="cerrarSesion()" class="btn-logout">
-                <i class="fa-solid fa-power-off"></i> Salir
-            </button>
+            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </nav>
 
-    <script>
-        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
-        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
-    </script>
-
-    <div class="dashboard-container">
-        <div class="container">
-        <h1><i class="fa-solid fa-chart-simple"></i> Estadísticas - Anterior Jornada</h1>
-        <div class="muted" style="margin-bottom:12px;">Última actualización: <span id="lastUpdated">--</span></div> 
-
-        <style>
-            /* Grid para tarjetas */
-            .stats-grid { display:grid; grid-template-columns: 1fr; gap: 16px; width:100%; }
-            .stat-card { transition: transform 0.12s ease, box-shadow 0.12s ease; }
-            .stat-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
-            @media (min-width: 880px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
-
-            /* Player card - GRID layout for better desktop */
-            .player-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; align-items:stretch; }
-            .player-card { background:#111; border:1px solid #222; padding:14px; border-radius:12px; display:flex; gap:12px; align-items:center; box-shadow: 0 6px 28px rgba(0,0,0,0.55); min-height:88px; }
-            .player-card img { width:72px; height:72px; border-radius:12px; object-fit:cover; flex-shrink:0; }
-            .player-meta { flex:1; }
-            .player-name { font-weight:800; color:white; font-size:1rem; }
-            .player-sub { color:#9aa0a6; font-size:0.88rem; margin-top:6px; }
-            .player-badges { display:flex; gap:8px; align-items:center; }
-            .badge { background:#ff5e00; color:#111; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.9rem; }
-            .pts-badge { background:#0b0b0b; color:#ff5e00; border:1px solid #333; padding:8px 10px; border-radius:12px; font-weight:900; font-size:0.95rem; }
-
-            /* Mini cards for team preview */
-            .mini-team { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-            .mini-card { width:96px; background:#0f0f0f; border:1px solid #222; border-radius:10px; padding:8px; text-align:center; font-size:0.85rem; }
-            .mini-card img { width:48px; height:48px; border-radius:8px; object-fit:cover; }
-
-            /* Larger image on wide screens */
-            @media (min-width: 1200px) {
-                .player-card img { width:84px; height:84px; }
-                .player-name { font-size:1.05rem; }
-            }
-            /* Formación (alineación) */
-            .formation { display:flex; gap:12px; align-items:center; justify-content:center; margin-top:8px; }
-            .formation .slot { background:#0f0f0f; border:1px solid #222; border-radius:10px; padding:8px; width:30%; text-align:center; }
-            .formation .slot .name { font-weight:700; }
-            .formation .slot .pts { color:#ff5e00; font-weight:800; margin-top:6px; }
-            .cap-label { display:inline-block; background: linear-gradient(90deg,#ffb86b,#ff5e00); color:#111; padding:3px 8px; border-radius:999px; font-weight:800; margin-left:6px; font-size:0.75rem; }
-
-            /* Responsive adjustments */
-            @media (max-width: 880px) {
-                .player-card { width: calc(50% - 8px); }
-                .mini-card { width: 70px; }
-            }
-            @media (max-width: 520px) {
-                .player-card { width: 100%; }
-                .formation { flex-direction:column; }
-                .formation .slot { width:100%; }
-            }
-        </style> 
+    <div class="container">
+        <h1><i class="fa-solid fa-chart-line"></i> Estadísticas</h1>
+        <div class="muted">Análisis de la última jornada • Actualizado: <span id="lastUpdated">--</span></div>
 
         <div class="stats-grid">
-            <div class="stat-card" id="card-most-owned">
-                <div class="stat-title">1. Atletas más seleccionados</div>
-                <div id="mostOwnedContent" class="small">Cargando...</div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fa-solid fa-users"></i> Los más elegidos</div>
+                <div id="mostOwnedContent">Cargando...</div>
             </div>
 
-            <div class="stat-card" id="card-most-captained">
-                <div class="stat-title">2. Atleta más capitaneado</div>
-                <div id="mostCaptainedContent" class="small">Cargando...</div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fa-solid fa-star"></i> Líderes en Capitanía</div>
+                <div id="mostCaptainedContent">Cargando...</div>
             </div>
 
-            <div class="stat-card" id="card-best-value">
-                <div class="stat-title">3. Mejor puntos por millón</div>
-                <div id="bestValueContent" class="small">Cargando...</div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fa-solid fa-gem"></i> Mayor Rentabilidad (Pts/M)</div>
+                <div id="bestValueContent">Cargando...</div>
             </div>
 
-            <div class="stat-card" id="card-best-lineup">
-                <div class="stat-title">4. Mejor alineación posible</div>
-                <div id="bestLineupContent" class="small">Cargando...</div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fa-solid fa-trophy"></i> El Tridente Ideal</div>
+                <div id="bestLineupContent">Cargando...</div>
             </div>
 
-            <div style="grid-column: 1 / -1;" class="stat-card" id="card-best-efficiency">
-                <div class="stat-title">5. Mejor equipo calidad/precio llevado por un manager</div>
-                <div id="bestEfficiencyContent" class="small">Cargando...</div>
+            <div class="stat-card full-width">
+                <div class="stat-title"><i class="fa-solid fa-bolt"></i> Manager más Eficiente (Mejor relación Calidad/Precio)</div>
+                <div id="bestEfficiencyContent">Cargando...</div>
             </div>
         </div>
-
-
-    
     </div>
-</div>
 
-    <script type="module"> 
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -206,10 +212,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-
-
         async function loadStats() {
-            setLoading();
             try {
                 const [athSnap, usersSnap] = await Promise.all([
                     getDocs(collection(db, 'atletas')),
@@ -217,207 +220,139 @@
                 ]);
 
                 const atletas = {};
-                athSnap.forEach(d => { const data = d.data(); atletas[d.id] = { id: d.id, nombre: data.nombre || data.nombre_completo || d.id, precio: Number(data.precio) || 0, puntosUlt: Number(data.puntos_ultima_jornada) || 0, foto: data.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png' }; });
+                athSnap.forEach(d => { 
+                    const data = d.data(); 
+                    atletas[d.id] = { 
+                        id: d.id, 
+                        nombre: data.nombre || data.nombre_completo || d.id, 
+                        precio: Number(data.precio) || 0, 
+                        puntosUlt: Number(data.puntos_ultima_jornada) || 0, 
+                        foto: data.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png' 
+                    }; 
+                });
 
                 const users = [];
-                usersSnap.forEach(d => { const u = d.data(); users.push({ id: d.id, nombre: u.nick || u.nombre_usuario || u.nombre || d.id, equipo: u.equipo || [], capitanId: u.capitanId || null }); });
+                usersSnap.forEach(d => { 
+                    const u = d.data(); 
+                    users.push({ id: d.id, nombre: u.nick || u.nombre || d.id, equipo: u.equipo || [], capitanId: u.capitanId || null }); 
+                });
 
-                // Filtrar atletas que tuvieron participación en la última jornada
-                const participantes = Object.values(atletas).filter(a => a.puntosUlt && !isNaN(a.puntosUlt));
+                const participantes = Object.values(atletas).filter(a => a.puntosUlt > 0);
 
-                // 1. Atletas más seleccionados (solo entre participantes)
-                const ownershipCounts = {};
-                users.forEach(u => { (u.equipo || []).forEach(id => { if (atletas[id] && atletas[id].puntosUlt) ownershipCounts[id] = (ownershipCounts[id] || 0) + 1; }); });
-                const mostOwned = Object.keys(ownershipCounts).map(id => ({ id, nombre: atletas[id].nombre, count: ownershipCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count).slice(0,3);
+                // 1. MÁS SELECCIONADOS
+                const ownership = {};
+                users.forEach(u => u.equipo.forEach(id => { if(atletas[id]) ownership[id] = (ownership[id]||0) + 1; }));
+                const topOwned = Object.keys(ownership).map(id => ({...atletas[id], count: ownership[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
 
-                // 2. Atleta más capitaneado (contar capitanes entre participantes)
-                const capiCounts = {};
-                users.forEach(u => { const c = u.capitanId; if(c && atletas[c] && atletas[c].puntosUlt) capiCounts[c] = (capiCounts[c]||0) + 1; });
-                const capiList = Object.keys(capiCounts).map(id => ({ id, nombre: atletas[id].nombre, count: capiCounts[id], puntos: atletas[id].puntosUlt, precio: atletas[id].precio, foto: atletas[id].foto })).sort((a,b)=> b.count - a.count).slice(0,3);
+                // 2. MÁS CAPITANEADOS
+                const capCounts = {};
+                users.forEach(u => { if(u.capitanId) capCounts[u.capitanId] = (capCounts[u.capitanId]||0) + 1; });
+                const topCaptained = Object.keys(capCounts).map(id => ({...atletas[id], count: capCounts[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
 
-                // 3. Mejor puntos por millón (puntos/precio)
-                const valueList = participantes.map(a => ({ id: a.id, nombre: a.nombre, puntos: a.puntosUlt, precio: a.precio, foto: a.foto, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : (a.puntosUlt > 0 ? Infinity : 0) }));
-                const bestValueList = valueList.sort((a,b)=> b.ratio - a.ratio).slice(0,3); // top3 already set
+                // 3. RENTABILIDAD
+                const topValue = participantes.map(a => ({...a, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : 0})).sort((a,b)=>b.ratio - a.ratio).slice(0,3);
 
-                // 4. Mejor alineación posible (top 3 por puntos)
+                // 4. MEJOR ALINEACIÓN (CÁLCULO CON CAPITÁN X1.5)
                 const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
-                const bestThreePoints = bestThree.reduce((s,p)=>s + p.puntosUlt, 0);
+                // El mejor del top 3 es el capitán ideal
+                const idealCapPts = bestThree.length > 0 ? bestThree[0].puntosUlt * 0.5 : 0;
+                const idealTotal = bestThree.reduce((s,a)=> s + a.puntosUlt, 0) + idealCapPts;
 
-                // Para cada manager, calcular su alineación puntuación y distancia
+                // Rendimiento Managers con lógica x1.5
                 const managersPerformance = users.map(u => {
-                    const team = (u.equipo || []).map(id => atletas[id]).filter(Boolean);
-                    const teamPtsBase = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
-                    // Compute ideal captain: choose team member that maximizes (teamPtsBase + a.puntosUlt * 0.5)
+                    const team = u.equipo.map(id => atletas[id]).filter(Boolean);
+                    const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
+                    // Buscar mejor capitán posible en SU equipo
+                    let bestExtra = 0;
                     let bestCapId = null;
-                    let bestCapExtra = 0; // additional pts from captain = 0.5 * cap points
                     team.forEach(a => {
-                        const extra = (a.puntosUlt || 0) * 0.5;
-                        if (extra > bestCapExtra) { bestCapExtra = extra; bestCapId = a.id; }
+                        const extra = a.puntosUlt * 0.5;
+                        if(extra > bestExtra) { bestExtra = extra; bestCapId = a.id; }
                     });
-                    const bestTotalPts = teamPtsBase + bestCapExtra;
-                    const overlap = (u.equipo || []).filter(id => bestThree.find(bt => bt.id === id)).length;
-                    return { id: u.id, nombre: u.nombre, pts: bestTotalPts, overlap, team, capitanId: u.capitanId, bestCaptainId: bestCapId, bestCaptainExtra: bestCapExtra };
+                    return { ...u, pts: basePts + bestExtra, team, bestCapId };
                 }).sort((a,b)=> b.pts - a.pts);
 
-                const closestManagers = managersPerformance.length ? managersPerformance.filter(m => m.pts === managersPerformance[0].pts) : [];
+                renderSimpleList('mostOwnedContent', topOwned, 'Selecciones');
+                renderSimpleList('mostCaptainedContent', topCaptained, 'Capitanes');
+                renderSimpleList('bestValueContent', topValue, 'Ratio', true);
+                renderIdeal(bestThree, idealTotal, managersPerformance[0]);
+                renderEfficiency(users, atletas);
 
-                // 5. Mejor equipo calidad/precio (maximizar puntos / precio_total)
-                const managerEfficiency = users.map(u => {
-                    const team = (u.equipo || []).map(id => atletas[id]).filter(Boolean);
-                    const price = team.reduce((s,a)=> s + (a.precio || 0), 0);
-                    const teamPtsBase = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
-                    const bestCapExtra = team.reduce((mx,a) => Math.max(mx, (a.puntosUlt || 0) * 0.5), 0);
-                    const totalPtsWithBestCap = teamPtsBase + bestCapExtra;
-                    const eff = price > 0 ? (totalPtsWithBestCap / price) : (totalPtsWithBestCap > 0 ? Infinity : 0);
-                    return { id: u.id, nombre: u.nombre, price, pts: totalPtsWithBestCap, eff, team };
-                }).sort((a,b)=> b.eff - a.eff);
-                const bestEfficiency = managerEfficiency[0] || null;
+                document.getElementById('lastUpdated').innerText = new Date().toLocaleTimeString();
 
-                renderMostOwned(mostOwned);
-                renderMostCaptained(capiList);
-                renderBestValue(bestValueList);
-                renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers);
-                renderBestEfficiency(bestEfficiency);
-
-                document.getElementById('lastUpdated').innerText = new Date().toLocaleString();
-
-            } catch (err) {
-                console.error('Error cargando estadísticas:', err);
-                document.getElementById('mostOwnedContent').innerText = 'Error al cargar datos.';
-            }
+            } catch (e) { console.error(e); }
         }
 
-        function setLoading() {
-            const loadText = '<em>Cargando datos...</em>';
-            document.getElementById('mostOwnedContent').innerHTML = loadText;
-            document.getElementById('mostCaptainedContent').innerHTML = loadText;
-            document.getElementById('bestValueContent').innerHTML = loadText;
-            document.getElementById('bestLineupContent').innerHTML = loadText;
-            document.getElementById('bestEfficiencyContent').innerHTML = loadText;
-        }
-
-        function renderMostOwned(list) {
-            if (!list || list.length === 0) { document.getElementById('mostOwnedContent').innerHTML = '<div class="small">No hay datos de selección en la última jornada.</div>'; return; }
-            let html = '<div class="player-grid">';
-            list.forEach((it, i) => {
-                const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
-                const precio = (typeof it.precio !== 'undefined') ? it.precio : '-';
+        function renderSimpleList(id, list, label, isFloat = false) {
+            let html = '';
+            list.forEach(a => {
+                const val = isFloat ? a.ratio.toFixed(2) : a.count;
                 html += `
-                    <div class="player-card">
-                        <img src="${foto}" alt="${it.nombre}">
-                        <div class="player-meta">
-                            <div class="player-name">${it.nombre}</div>
-                            <div class="player-sub">Precio: ${precio}M — Selecciones: ${it.count}</div>
-                            <div class="player-badges" style="margin-top:8px;"><div class="pts-badge">${it.puntos} pts</div></div>
-                        </div>
+                <div class="player-row">
+                    <img src="${a.foto}">
+                    <div class="player-info">
+                        <div class="player-name">${a.nombre}</div>
+                        <div class="player-sub">${a.puntosUlt} pts esta jornada</div>
                     </div>
-                `;
+                    <div class="stat-highlight">
+                        <span class="highlight-value">${val}</span>
+                        <span class="highlight-label">${label}</span>
+                    </div>
+                </div>`;
             });
-            html += '</div>';
-            document.getElementById('mostOwnedContent').innerHTML = html;
+            document.getElementById(id).innerHTML = html || 'Sin datos';
         }
 
-        function renderMostCaptained(list) {
-            if (!list || list.length === 0) { document.getElementById('mostCaptainedContent').innerHTML = '<div class="small">No hay capitanes en la última jornada.</div>'; return; }
-            // Uniform top3 display as player-cards, emphasize #veces capitan
-            const top3 = list.slice(0,3);
-            let html = '<div class="player-grid">';
-            top3.forEach((it, i) => {
-                const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+        function renderIdeal(bestThree, total, bestManager) {
+            let html = `<div class="formation-display">`;
+            bestThree.forEach((a, i) => {
                 html += `
-                    <div class="player-card">
-                        <img src="${foto}" alt="${it.nombre}">
-                        <div class="player-meta">
-                            <div class="player-name">${it.nombre}</div>
-                            <div class="player-sub">${it.count} capitanes</div>
-                        </div>
-                        <div style="text-align:right;"><div class="badge">${it.count}</div><div class="small" style="margin-top:6px;color:#9aa0a6">${it.puntos} pts</div></div>
-                    </div>
-                `;
+                <div class="slot">
+                    <img src="${a.foto}">
+                    <div class="slot-name">${a.nombre}${i===0?'<span class="cap-badge">C</span>':''}</div>
+                    <div class="slot-pts">${i===0 ? a.puntosUlt * 1.5 : a.puntosUlt} pts</div>
+                </div>`;
             });
-            html += '</div>';
-            document.getElementById('mostCaptainedContent').innerHTML = html;
-        }
-
-        function renderBestValue(list) {
-            if (!list || list.length === 0) { document.getElementById('bestValueContent').innerHTML = '<div class="small">No hay datos para calcular valor.</div>'; return; }
-            let html = '<div class="player-grid">';
-            list.forEach((it, idx) => {
-                const foto = it.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
-                const ratio = (it.ratio === Infinity) ? '∞' : (it.ratio.toFixed(3));
-                html += `
-                    <div class="player-card">
-                        <img src="${foto}" alt="${it.nombre}">
-                        <div class="player-meta">
-                            <div class="player-name">${it.nombre}</div>
-                            <div class="player-sub">${it.puntos} pts — ${it.precio}M</div>
-                            <div class="player-badges" style="margin-top:8px;"><div class="badge">${ratio}</div></div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            document.getElementById('bestValueContent').innerHTML = html;
-        }
-
-        function renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers) {
-            if (!bestThree || bestThree.length === 0) { document.getElementById('bestLineupContent').innerHTML = '<div class="small">No hay datos de alineación.</div>'; return; }
-            let html = '<div class="muted">Mejor alineación (3 mejores por puntos):</div>';
-            html += '<div class="formation">';
-            bestThree.forEach((a,i)=> {
-                const foto = a.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
-                html += `<div class="slot"><img src="${foto}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;margin-bottom:6px;"><div class="name">${a.nombre}</div><div class="pts">${a.puntosUlt} pts</div></div>`;
-            });
-            html += `<div style="width:100%; text-align:center; margin-top:8px; font-weight:800;">Total: ${bestThreePoints} pts</div>`;
-            html += '</div>';
-
-            // Mostrar mejor manager(es) (por pts incluidos bonus capitán)
-            if (managersPerformance && managersPerformance.length > 0) {
-                const bestManager = managersPerformance[0];
-                const diff = bestThreePoints - bestManager.pts;
-                html += '<hr style="border:none;border-top:1px solid #222;margin:10px 0">';
-                html += `<div class="muted">Mejor manager: <strong>${bestManager.nombre}</strong> — ${bestManager.pts} pts (incluye bonus capitán)</div>`;
-                html += `<div class="small">Diferencia al óptimo: <strong>${diff}</strong> pts — Superposición con óptimo: <strong>${bestManager.overlap}</strong> jugadores</div>`;
-
-                // Mostrar mini-team del mejor manager (máx 3) con formato estilo "mi equipo"
-                if (bestManager.team && bestManager.team.length) {
-                    const teamSlots = [bestManager.team[0] || null, bestManager.team[1] || null, bestManager.team[2] || null];
-                    html += '<div style="margin-top:10px;">';
-                    html += '<div class="formation" style="justify-content:space-between;">';
-                    teamSlots.forEach(p => {
-                        if (!p) {
-                            html += '<div class="slot"><div class="name muted">Vacante</div></div>';
-                            return;
-                        }
-                        const isCapi = (bestManager.capitanId && bestManager.capitanId === p.id);
-                        const bonus = isCapi ? p.puntosUlt : 0;
-                        const totalP = (p.puntosUlt || 0) + bonus;
-                        html += `<div class="slot"><img src="${p.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png'}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;margin-bottom:6px;"><div class="name">${p.nombre}${isCapi? ' <span class="cap-label">C</span>': ''}</div><div class="pts">${p.puntosUlt} pts${isCapi? ' + ' + bonus + ' (cap)' : ''}</div></div>`;
-                    });
-                    html += '</div></div>';
-                }
-            }
-
+            html += `</div>
+            <div style="text-align:center; font-weight:800; color:#ff5e00; margin-bottom:15px;">Puntuación Óptima: ${total.toFixed(1)} pts</div>
+            <div style="border-top:1px solid #222; padding-top:15px;">
+                <div class="player-sub">Manager más cercano:</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <span style="font-weight:700;">${bestManager.nombre}</span>
+                    <span style="color:#ff5e00; font-weight:800;">${bestManager.pts.toFixed(1)} pts</span>
+                </div>
+            </div>`;
             document.getElementById('bestLineupContent').innerHTML = html;
         }
 
-        function renderBestEfficiency(it) {
-            if (!it) { document.getElementById('bestEfficiencyContent').innerHTML = '<div class="small">No hay managers con equipo válido.</div>'; return; }
-            const eff = (it.eff === Infinity) ? '∞' : it.eff.toFixed(4);
-            let html = `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;"><div><strong>${it.nombre}</strong><div class="muted">Puntos: ${it.pts} — Precio total: ${it.price}M</div></div><div class="top-badge">${eff}</div></div>`;
-            // Mostrar equipo del manager (si existe en 'team')
-            if (it.team && it.team.length) {
-                html += '<div style="margin-top:10px;">';
-                html += '<div class="small">Equipo:</div>';
-                html += '<div class="mini-team">' + it.team.map(t => `<div class="mini-card"><img src="${t.foto}" alt=""><div style="font-weight:700;">${t.nombre}</div><div style="color:#999;">${t.puntosUlt} pts</div></div>`).join('') + '</div>';
-                html += '</div>';
-            } else {
-                html += `<div class="small" style="margin-top:10px;">(Pulse actualizar para ver detalle del equipo)</div>`;
-            }
-            document.getElementById('bestEfficiencyContent').innerHTML = html;
+        function renderEfficiency(users, atletas) {
+            const eff = users.map(u => {
+                const team = u.equipo.map(id => atletas[id]).filter(Boolean);
+                const cost = team.reduce((s,a)=> s + a.precio, 0);
+                const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
+                const bestExtra = team.length ? Math.max(...team.map(a=>a.puntosUlt * 0.5)) : 0;
+                const totalPts = basePts + bestExtra;
+                return { nombre: u.nombre, ratio: cost > 0 ? totalPts / cost : 0, pts: totalPts, cost };
+            }).sort((a,b)=> b.ratio - a.ratio)[0];
+
+            if(!eff) return;
+            document.getElementById('bestEfficiencyContent').innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:1.2rem; font-weight:800;">${eff.nombre}</div>
+                        <div class="player-sub">${eff.pts.toFixed(1)} pts con un coste de ${eff.cost}M</div>
+                    </div>
+                    <div class="stat-highlight">
+                        <span class="highlight-value">${eff.ratio.toFixed(3)}</span>
+                        <span class="highlight-label">Pts / Millón</span>
+                    </div>
+                </div>
+            `;
         }
 
-        // Cargar al inicio
+        window.toggleMenu = () => document.getElementById('navLinks').classList.toggle('active');
+        window.cerrarSesion = () => { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; };
+
         loadStats();
     </script>
 </body>
