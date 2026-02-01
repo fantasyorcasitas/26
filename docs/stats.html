@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Estadísticas | Fantasy Orcasitas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background: #000; color: #fff; margin:0; padding:0; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        h1 { color: #ff5e00; text-transform:uppercase; font-size:1.8rem; }
+        .stat-card { background: rgba(20,20,20,0.95); border:1px solid #222; padding:16px; border-radius:8px; margin-bottom:16px; }
+        .stat-title { color:#ff5e00; font-weight:800; text-transform:uppercase; margin-bottom:8px; }
+        table { width:100%; border-collapse:collapse; color:#fff; }
+        th, td { padding:8px 6px; border-bottom:1px solid #222; text-align:left; }
+        th { color:#aaa; font-size:0.85rem; text-transform:uppercase; }
+        .muted { color:#999; font-size:0.9rem; }
+        .top-badge { background:#ff5e00; color:#111; padding:4px 8px; border-radius:999px; font-weight:700; }
+        .small { font-size:0.9rem; color:#ccc; }
+        .refresh { background:#222; color:#ff5e00; border:1px solid #333; padding:10px 14px; border-radius:8px; cursor:pointer; }
+        .note { color:#ccc; font-size:0.9rem; margin-top:8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fa-solid fa-chart-simple"></i> Estadísticas - Anterior Jornada</h1>
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+            <button id="btnRefresh" class="refresh"><i class="fa-solid fa-arrows-rotate"></i> Actualizar</button>
+            <div class="muted">Última actualización: <span id="lastUpdated">--</span></div>
+        </div>
+
+        <!-- 1 -->
+        <div class="stat-card" id="card-most-owned">
+            <div class="stat-title">1. Atletas más seleccionados (anterior jornada)</div>
+            <div id="mostOwnedContent" class="small">Cargando...</div>
+        </div>
+
+        <!-- 2 -->
+        <div class="stat-card" id="card-most-captained">
+            <div class="stat-title">2. Atleta más capitaneado (anterior jornada)</div>
+            <div id="mostCaptainedContent" class="small">Cargando...</div>
+        </div>
+
+        <!-- 3 -->
+        <div class="stat-card" id="card-best-value">
+            <div class="stat-title">3. Mejor puntos por millón (anterior jornada)</div>
+            <div id="bestValueContent" class="small">Cargando...</div>
+        </div>
+
+        <!-- 4 -->
+        <div class="stat-card" id="card-best-lineup">
+            <div class="stat-title">4. Mejor alineación posible (anterior jornada)</div>
+            <div id="bestLineupContent" class="small">Cargando...</div>
+        </div>
+
+        <!-- 5 -->
+        <div class="stat-card" id="card-best-efficiency">
+            <div class="stat-title">5. Mejor equipo calidad/precio llevado por un manager (anterior jornada)</div>
+            <div id="bestEfficiencyContent" class="small">Cargando...</div>
+        </div>
+
+        <div class="note">Nota: los cálculos se basan en <code>puntos_ultima_jornada</code> de los atletas y las alineaciones guardadas en los documentos de <code>usuarios</code>.</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmwfxAGq6dzy6RegYcWQHd4XgDgn1QJiM",
+            authDomain: "fantasy-atletismo-26.firebaseapp.com",
+            projectId: "fantasy-atletismo-26",
+            storageBucket: "fantasy-atletismo-26.firebasestorage.app",
+            messagingSenderId: "133833651406",
+            appId: "1:133833651406:web:4e2841f58fd2a288c30c9f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('btnRefresh').addEventListener('click', () => loadStats());
+
+        async function loadStats() {
+            setLoading();
+            try {
+                const [athSnap, usersSnap] = await Promise.all([
+                    getDocs(collection(db, 'atletas')),
+                    getDocs(collection(db, 'usuarios'))
+                ]);
+
+                const atletas = {};
+                athSnap.forEach(d => { const data = d.data(); atletas[d.id] = { id: d.id, nombre: data.nombre || data.nombre_completo || d.id, precio: Number(data.precio) || 0, puntosUlt: Number(data.puntos_ultima_jornada) || 0 }; });
+
+                const users = [];
+                usersSnap.forEach(d => { const u = d.data(); users.push({ id: d.id, nombre: u.nick || u.nombre_usuario || u.nombre || d.id, equipo: u.equipo || [], capitanId: u.capitanId || null }); });
+
+                // Filtrar atletas que tuvieron participación en la última jornada
+                const participantes = Object.values(atletas).filter(a => a.puntosUlt && !isNaN(a.puntosUlt));
+
+                // 1. Atletas más seleccionados (solo entre participantes)
+                const ownershipCounts = {};
+                users.forEach(u => { (u.equipo || []).forEach(id => { if (atletas[id] && atletas[id].puntosUlt) ownershipCounts[id] = (ownershipCounts[id] || 0) + 1; }); });
+                const mostOwned = Object.keys(ownershipCounts).map(id => ({ id, nombre: atletas[id].nombre, count: ownershipCounts[id], puntos: atletas[id].puntosUlt })).sort((a,b)=> b.count - a.count).slice(0,10);
+
+                // 2. Atleta más capitaneado (contar capitanes entre participantes)
+                const capiCounts = {};
+                users.forEach(u => { const c = u.capitanId; if(c && atletas[c] && atletas[c].puntosUlt) capiCounts[c] = (capiCounts[c]||0) + 1; });
+                const capiList = Object.keys(capiCounts).map(id => ({ id, nombre: atletas[id].nombre, count: capiCounts[id], puntos: atletas[id].puntosUlt })).sort((a,b)=> b.count - a.count);
+
+                // 3. Mejor puntos por millón (puntos/prcio)
+                const valueList = participantes.map(a => ({ id: a.id, nombre: a.nombre, puntos: a.puntosUlt, precio: a.precio, ratio: a.precio > 0 ? (a.puntosUlt / a.precio) : (a.puntosUlt > 0 ? Infinity : 0) }));
+                const bestValue = valueList.sort((a,b)=> b.ratio - a.ratio)[0] || null;
+
+                // 4. Mejor alineación posible (top 3 por puntos)
+                const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
+                const bestThreePoints = bestThree.reduce((s,p)=>s + p.puntosUlt, 0);
+
+                // Para cada manager, calcular su alineación puntuación y distancia
+                const managersPerformance = users.map(u => {
+                    const teamPts = (u.equipo || []).reduce((s,id)=> s + ((atletas[id] && atletas[id].puntosUlt) ? atletas[id].puntosUlt : 0), 0);
+                    const overlap = (u.equipo || []).filter(id => bestThree.find(bt => bt.id === id)).length;
+                    return { id: u.id, nombre: u.nombre, pts: teamPts, overlap };
+                }).sort((a,b)=> b.pts - a.pts);
+
+                const closestManagers = managersPerformance.length ? managersPerformance.filter(m => m.pts === managersPerformance[0].pts) : [];
+
+                // 5. Mejor equipo calidad/precio (maximizar puntos / precio_total)
+                const managerEfficiency = users.map(u => {
+                    const team = (u.equipo || []).map(id => atletas[id]).filter(Boolean);
+                    const price = team.reduce((s,a)=> s + (a.precio || 0), 0);
+                    const pts = team.reduce((s,a)=> s + (a.puntosUlt || 0), 0);
+                    const eff = price > 0 ? (pts / price) : (pts > 0 ? Infinity : 0);
+                    return { id: u.id, nombre: u.nombre, price, pts, eff };
+                }).sort((a,b)=> b.eff - a.eff);
+                const bestEfficiency = managerEfficiency[0] || null;
+
+                renderMostOwned(mostOwned);
+                renderMostCaptained(capiList);
+                renderBestValue(bestValue);
+                renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers);
+                renderBestEfficiency(bestEfficiency);
+
+                document.getElementById('lastUpdated').innerText = new Date().toLocaleString();
+
+            } catch (err) {
+                console.error('Error cargando estadísticas:', err);
+                document.getElementById('mostOwnedContent').innerText = 'Error al cargar datos.';
+            }
+        }
+
+        function setLoading() {
+            const loadText = '<em>Cargando datos...</em>';
+            document.getElementById('mostOwnedContent').innerHTML = loadText;
+            document.getElementById('mostCaptainedContent').innerHTML = loadText;
+            document.getElementById('bestValueContent').innerHTML = loadText;
+            document.getElementById('bestLineupContent').innerHTML = loadText;
+            document.getElementById('bestEfficiencyContent').innerHTML = loadText;
+        }
+
+        function renderMostOwned(list) {
+            if (!list || list.length === 0) { document.getElementById('mostOwnedContent').innerHTML = '<div class="small">No hay datos de selección en la última jornada.</div>'; return; }
+            let html = '<table><thead><tr><th>#</th><th>Atleta</th><th>Veces seleccionado</th><th>Puntos (última jornada)</th></tr></thead><tbody>';
+            list.forEach((it, i) => { html += `<tr><td>${i+1}</td><td>${it.nombre}</td><td>${it.count}</td><td>${it.puntos}</td></tr>`; });
+            html += '</tbody></table>';
+            document.getElementById('mostOwnedContent').innerHTML = html;
+        }
+
+        function renderMostCaptained(list) {
+            if (!list || list.length === 0) { document.getElementById('mostCaptainedContent').innerHTML = '<div class="small">No hay capitanes en la última jornada.</div>'; return; }
+            let top = list[0];
+            let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong style="font-size:1.05rem">${top.nombre}</strong><div class="muted">${top.count} managers lo capitanean</div></div><div class="top-badge">${top.count}</div></div>`;
+            html += '<hr style="border:none;border-top:1px solid #222;margin:10px 0">';
+            html += '<table><thead><tr><th>#</th><th>Atleta</th><th>Veces capitan</th><th>Puntos</th></tr></thead><tbody>';
+            list.slice(0,8).forEach((it,i)=> html += `<tr><td>${i+1}</td><td>${it.nombre}</td><td>${it.count}</td><td>${it.puntos}</td></tr>`);
+            html += '</tbody></table>';
+            document.getElementById('mostCaptainedContent').innerHTML = html;
+        }
+
+        function renderBestValue(it) {
+            if (!it) { document.getElementById('bestValueContent').innerHTML = '<div class="small">No hay datos para calcular valor.</div>'; return; }
+            const ratio = (it.ratio === Infinity) ? '∞' : (it.ratio.toFixed(3));
+            let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${it.nombre}</strong><div class="muted">${it.puntos} pts / ${it.precio}M</div></div><div class="top-badge">${ratio}</div></div>`;
+            html += '<div style="margin-top:8px;" class="small">(Puntos / Precio)</div>';
+            document.getElementById('bestValueContent').innerHTML = html;
+        }
+
+        function renderBestLineup(bestThree, bestThreePoints, managersPerformance, closestManagers) {
+            if (!bestThree || bestThree.length === 0) { document.getElementById('bestLineupContent').innerHTML = '<div class="small">No hay datos de alineación.</div>'; return; }
+            let html = '<div class="muted">Mejor alineación (3 mejores por puntos):</div>';
+            html += '<table style="margin-top:8px;"><thead><tr><th>#</th><th>Atleta</th><th>Puntos</th></tr></thead><tbody>';
+            bestThree.forEach((a,i)=> html += `<tr><td>${i+1}</td><td>${a.nombre}</td><td>${a.puntosUlt}</td></tr>`);
+            html += `<tr style="font-weight:800"><td></td><td>Total</td><td>${bestThreePoints}</td></tr>`;
+            html += '</tbody></table>';
+
+            // Mostrar managers más cercanos (por puntos)
+            if (managersPerformance && managersPerformance.length > 0) {
+                const bestPts = managersPerformance[0].pts;
+                const diff = bestThreePoints - bestPts;
+                html += '<hr style="border:none;border-top:1px solid #222;margin:10px 0">';
+                html += `<div class="muted">Mejor manager (por pts en esa jornada): <strong>${managersPerformance[0].nombre}</strong> — ${managersPerformance[0].pts} pts</div>`;
+                html += `<div class="small">Diferencia al óptimo: <strong>${diff}</strong> pts - Superposición con óptimo: <strong>${managersPerformance[0].overlap}</strong> jugadores</div>`;
+
+                // Si hay varios managers con mismo pts, mostrarlos
+                const ties = managersPerformance.filter(m => m.pts === bestPts);
+                if (ties.length > 1) {
+                    html += '<div style="margin-top:8px;" class="small">Empate entre managers:</div>';
+                    html += '<ul>' + ties.map(t => `<li>${t.nombre} — ${t.pts} pts (overlap ${t.overlap})</li>`).join('') + '</ul>';
+                }
+            }
+
+            document.getElementById('bestLineupContent').innerHTML = html;
+        }
+
+        function renderBestEfficiency(it) {
+            if (!it) { document.getElementById('bestEfficiencyContent').innerHTML = '<div class="small">No hay managers con equipo válido.</div>'; return; }
+            const eff = (it.eff === Infinity) ? '∞' : it.eff.toFixed(4);
+            let html = `<div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${it.nombre}</strong><div class="muted">Puntos: ${it.pts} — Precio total: ${it.price}M</div></div><div class="top-badge">${eff}</div></div>`;
+            html += '<div class="small" style="margin-top:8px;">(Puntos / Precio total) — cuanto mayor mejor</div>';
+            document.getElementById('bestEfficiencyContent').innerHTML = html;
+        }
+
+        // Cargar al inicio
+        loadStats();
+    </script>
+</body>
+</html>
