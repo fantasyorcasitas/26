@@ -7,63 +7,153 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #000; color: #fff; margin:0; padding:0; }
-        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
-        h1 { color: #ff5e00; text-transform:uppercase; font-size:1.8rem; }
-        .stat-card { background: rgba(20,20,20,0.95); border:1px solid #222; padding:16px; border-radius:8px; margin-bottom:16px; }
+        /* ESTILOS BASE - Consistente con el resto de páginas */
+        * { box-sizing: border-box; }
+        html { background-color: #000 !important; }
+        body {
+            display: block !important; height: auto !important; min-height: 100vh; overflow-y: auto !important;
+            background-color: transparent !important; margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif; position: relative; 
+        }
+
+        /* FONDO (imagen + overlay) */
+        .bg-image {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: -2; transform: scale(1.05);
+        }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: -1; backdrop-filter: blur(4px);
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .dashboard-container { padding-top: 40px !important; padding-bottom: 80px !important; display:flex; flex-direction:column; align-items:center; width:100%; padding-left:15px; padding-right:15px; position:relative; z-index:1; }
+
+        /* NAVBAR */
+        .navbar { position: sticky; top: 0; display:flex; justify-content:space-between; align-items:center; background-color:#000; border-bottom:2px solid #222; padding:15px 20px; z-index:1000; height:70px; width:100%; }
+        .nav-logo a { text-decoration:none; color:white; font-size:1.2rem; font-weight:800; display:flex; align-items:center; gap:10px; }
+        .nav-logo span { color:#ff5e00; }
+        .nav-links { display:flex; gap:20px; align-items:center; }
+        .nav-links a { text-decoration:none; color:#aaa; font-weight:600; font-size:0.9rem; transition:0.3s; }
+        .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
+        .btn-logout { background:none; border:none; color:#ff5e00; font-size:1.2rem; cursor:pointer; margin-left:10px; }
+        .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; }
+
+        /* Estadísticas - Tarjetas */
+        .container { max-width:1100px; margin: 40px auto; padding: 20px; }
+        h1 { color: #ff5e00; text-transform: uppercase; font-size: 1.8rem; margin-bottom: 12px; }
+        .stat-card { background: rgba(20,20,20,0.95); border:1px solid #222; padding:18px; border-radius:12px; margin-bottom:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
         .stat-title { color:#ff5e00; font-weight:800; text-transform:uppercase; margin-bottom:8px; }
         table { width:100%; border-collapse:collapse; color:#fff; }
-        th, td { padding:8px 6px; border-bottom:1px solid #222; text-align:left; }
+        th, td { padding:10px 8px; border-bottom:1px solid #222; text-align:left; }
         th { color:#aaa; font-size:0.85rem; text-transform:uppercase; }
         .muted { color:#999; font-size:0.9rem; }
-        .top-badge { background:#ff5e00; color:#111; padding:4px 8px; border-radius:999px; font-weight:700; }
-        .small { font-size:0.9rem; color:#ccc; }
+        .top-badge { background:#ff5e00; color:#111; padding:6px 10px; border-radius:999px; font-weight:800; }
+        .small { font-size:0.95rem; color:#ccc; }
         .refresh { background:#222; color:#ff5e00; border:1px solid #333; padding:10px 14px; border-radius:8px; cursor:pointer; }
         .note { color:#ccc; font-size:0.9rem; margin-top:8px; }
-    </style>
+
+        /* RESPONSIVE MÓVIL */
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 15px !important; }
+            .menu-toggle { display: block !important; }
+
+            .nav-links { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: rgba(0,0,0,0.98); flex-direction: column; justify-content: center; align-items: center; z-index: 6000; transform: translateX(100%); transition: transform 0.3s ease-in-out; }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links a { font-size: 1.5rem; margin: 20px 0; color: white !important; display: block; }
+            .btn-logout { margin-top: 30px; font-size: 1.5rem; }
+            .dashboard-container { padding-left: 15px; padding-right: 15px; }
+        }
+    </style> 
 </head>
 <body>
-    <div class="container">
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <nav class="navbar">
+        <div class="nav-logo">
+            <a href="home.html">
+                <i class="fa-solid fa-person-running"></i> FANTASY <span>ORCASITAS</span>
+            </a>
+        </div>
+
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem;">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
+             <a href="home.html">INICIO</a>
+            <a href="mi_equipo.html">MI EQUIPO</a>
+            <a href="mercado.html">MERCADO</a>
+            <a href="clasificaciones.html">RANKING</a>
+            <a href="stats.html" class="active">ESTADÍSTICAS</a>
+            <a href="calendario.html">CALENDARIO</a>
+
+            <button onclick="cerrarSesion()" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i> Salir
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
+        function cerrarSesion() { localStorage.removeItem('fantasy_user'); window.location.href = '../index.html'; }
+    </script>
+
+    <div class="dashboard-container">
+        <div class="container">
         <h1><i class="fa-solid fa-chart-simple"></i> Estadísticas - Anterior Jornada</h1>
         <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
             <button id="btnRefresh" class="refresh"><i class="fa-solid fa-arrows-rotate"></i> Actualizar</button>
             <div class="muted">Última actualización: <span id="lastUpdated">--</span></div>
+        </div> 
+
+        <style>
+            /* Grid para tarjetas */
+            .stats-grid { display:grid; grid-template-columns: 1fr; gap: 16px; width:100%; }
+            .stat-card { transition: transform 0.12s ease, box-shadow 0.12s ease; }
+            .stat-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
+            @media (min-width: 880px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+        </style>
+
+        <div class="stats-grid">
+            <div class="stat-card" id="card-most-owned">
+                <div class="stat-title">1. Atletas más seleccionados</div>
+                <div id="mostOwnedContent" class="small">Cargando...</div>
+            </div>
+
+            <div class="stat-card" id="card-most-captained">
+                <div class="stat-title">2. Atleta más capitaneado</div>
+                <div id="mostCaptainedContent" class="small">Cargando...</div>
+            </div>
+
+            <div class="stat-card" id="card-best-value">
+                <div class="stat-title">3. Mejor puntos por millón</div>
+                <div id="bestValueContent" class="small">Cargando...</div>
+            </div>
+
+            <div class="stat-card" id="card-best-lineup">
+                <div class="stat-title">4. Mejor alineación posible</div>
+                <div id="bestLineupContent" class="small">Cargando...</div>
+            </div>
+
+            <div style="grid-column: 1 / -1;" class="stat-card" id="card-best-efficiency">
+                <div class="stat-title">5. Mejor equipo calidad/precio llevado por un manager</div>
+                <div id="bestEfficiencyContent" class="small">Cargando...</div>
+            </div>
         </div>
 
-        <!-- 1 -->
-        <div class="stat-card" id="card-most-owned">
-            <div class="stat-title">1. Atletas más seleccionados (anterior jornada)</div>
-            <div id="mostOwnedContent" class="small">Cargando...</div>
-        </div>
-
-        <!-- 2 -->
-        <div class="stat-card" id="card-most-captained">
-            <div class="stat-title">2. Atleta más capitaneado (anterior jornada)</div>
-            <div id="mostCaptainedContent" class="small">Cargando...</div>
-        </div>
-
-        <!-- 3 -->
-        <div class="stat-card" id="card-best-value">
-            <div class="stat-title">3. Mejor puntos por millón (anterior jornada)</div>
-            <div id="bestValueContent" class="small">Cargando...</div>
-        </div>
-
-        <!-- 4 -->
-        <div class="stat-card" id="card-best-lineup">
-            <div class="stat-title">4. Mejor alineación posible (anterior jornada)</div>
-            <div id="bestLineupContent" class="small">Cargando...</div>
-        </div>
-
-        <!-- 5 -->
-        <div class="stat-card" id="card-best-efficiency">
-            <div class="stat-title">5. Mejor equipo calidad/precio llevado por un manager (anterior jornada)</div>
-            <div id="bestEfficiencyContent" class="small">Cargando...</div>
-        </div>
-
-        <div class="note">Nota: los cálculos se basan en <code>puntos_ultima_jornada</code> de los atletas y las alineaciones guardadas en los documentos de <code>usuarios</code>.</div>
+        <div class="note">Nota: los cálculos se basan en <code>puntos_ultima_jornada</code> de los atletas y las alineaciones guardadas en los documentos de <code>usuarios</code>. Si necesitas datos históricos por jornada, podemos añadir snapshots.</div>
     </div>
+</div>
 
-    <script type="module">
+    <script type="module"> 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
