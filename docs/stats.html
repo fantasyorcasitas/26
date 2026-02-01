@@ -23,124 +23,100 @@
         }
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.8) 100%);
+            background: linear-gradient(135deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.85) 100%);
             z-index: -1; backdrop-filter: blur(8px);
         }
 
         /* NAVBAR */
         .navbar { position: sticky; top: 0; display:flex; justify-content:space-between; align-items:center; background-color:#000; border-bottom:2px solid #222; padding:0 20px; z-index:1000; height:70px; width:100%; }
-        .nav-logo a { text-decoration:none; color:white; font-size:1.2rem; font-weight:800; display:flex; align-items:center; gap:10px; }
+        .nav-logo a { text-decoration:none; color:white; font-size:1.1rem; font-weight:800; display:flex; align-items:center; gap:8px; }
         .nav-logo span { color:#ff5e00; }
-        .nav-links { display:flex; gap:20px; align-items:center; }
-        .nav-links a { text-decoration:none; color:#aaa; font-weight:600; font-size:0.85rem; transition:0.3s; }
+        .nav-links { display:flex; gap:15px; align-items:center; }
+        .nav-links a { text-decoration:none; color:#aaa; font-weight:600; font-size:0.8rem; transition:0.3s; }
         .nav-links a:hover, .nav-links a.active { color: #ff5e00 !important; }
-        .btn-logout { background:none; border:none; color:#ff5e00; font-size:1.2rem; cursor:pointer; margin-left:10px; }
-        .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; }
+        .btn-logout { background:none; border:none; color:#ff5e00; font-size:1.1rem; cursor:pointer; }
+        .menu-toggle { display:none; background:none; border:none; color:white; font-size:1.4rem; cursor:pointer; }
 
         /* CONTENEDOR */
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        h1 { color: #ff5e00; text-transform: uppercase; font-size: 2rem; margin-bottom: 5px; font-weight: 800; }
-        .muted { color: #888; margin-bottom: 30px; font-size: 0.9rem; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 30px 15px; }
+        h1 { color: #ff5e00; text-transform: uppercase; font-size: 1.6rem; margin-bottom: 5px; font-weight: 800; }
+        .muted { color: #888; margin-bottom: 25px; font-size: 0.85rem; }
 
         /* GRID DE ESTADÍSTICAS */
         .stats-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 25px; 
+            gap: 20px; 
         }
 
         .stat-card { 
-            background: rgba(15, 15, 15, 0.8); 
+            background: rgba(15, 15, 15, 0.85); 
             border: 1px solid #222; 
             border-radius: 16px; 
-            padding: 24px; 
+            padding: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
         }
-        .stat-card:hover { transform: translateY(-5px); border-color: #444; }
         .stat-card.full-width { grid-column: 1 / -1; }
 
         .stat-title { 
             color: #ff5e00; 
-            font-size: 0.9rem; 
+            font-size: 0.85rem; 
             font-weight: 800; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        /* PLAYER CARDS - UNIFICADAS */
+        /* PLAYER ROWS */
         .player-row {
             display: flex;
             align-items: center;
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            gap: 15px;
-            border: 1px solid transparent;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .player-row img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 1px solid #333; }
-        .player-info { flex: 1; }
-        .player-name { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
-        .player-sub { font-size: 0.8rem; color: #777; }
+        .player-row img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+        .player-info { flex: 1; min-width: 0; }
+        .player-name { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-sub { font-size: 0.75rem; color: #666; }
 
-        /* EL DATO IMPORTANTE (HIGHLIGHT) */
-        .stat-highlight {
-            text-align: right;
-            min-width: 80px;
-        }
-        .highlight-value { color: #ff5e00; font-weight: 800; font-size: 1.2rem; display: block; }
-        .highlight-label { font-size: 0.7rem; color: #555; text-transform: uppercase; font-weight: 600; }
+        /* HIGHLIGHTS */
+        .stat-highlight { text-align: right; min-width: 70px; }
+        .highlight-value { color: #ff5e00; font-weight: 800; font-size: 1.1rem; line-height: 1; }
+        .highlight-label { font-size: 0.65rem; color: #555; text-transform: uppercase; display: block; margin-top: 2px; }
 
-        /* FORMACIÓN / MEJOR EQUIPO */
-        .formation-display {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .slot {
-            background: #000;
-            border: 1px solid #222;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .slot img { width: 45px; height: 45px; border-radius: 50%; margin-bottom: 8px; }
-        .slot-name { font-size: 0.8rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .slot-pts { font-size: 0.85rem; color: #ff5e00; font-weight: 800; margin-top: 4px; }
+        /* FORMACIÓN */
+        .formation-display { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
+        .slot { background: #000; border: 1px solid #222; padding: 10px 5px; border-radius: 12px; text-align: center; }
+        .slot img { width: 40px; height: 40px; border-radius: 50%; margin-bottom: 6px; }
+        .slot-name { font-size: 0.7rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; }
+        .slot-pts { font-size: 0.8rem; color: #ff5e00; font-weight: 800; margin-top: 2px; }
 
-        .cap-badge {
-            background: #ff5e00;
-            color: #000;
-            font-size: 0.65rem;
-            font-weight: 900;
-            padding: 2px 5px;
-            border-radius: 4px;
-            margin-left: 5px;
-            vertical-align: middle;
-        }
+        .cap-badge { background: #ff5e00; color: #000; font-size: 0.6rem; font-weight: 900; padding: 1px 4px; border-radius: 3px; margin-left: 3px; }
 
         /* RESPONSIVE */
-        @media (max-width: 992px) {
-            .stats-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr; } }
 
         @media (max-width: 768px) {
-            .navbar { padding: 10px 15px; }
+            .navbar { height: 60px; padding: 0 15px; }
             .menu-toggle { display: block; }
             .nav-links { 
                 position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
                 background: #000; flex-direction: column; justify-content: center; 
-                transform: translateX(100%); transition: 0.3s; 
+                transform: translateX(100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+                z-index: 2000;
             }
             .nav-links.active { transform: translateX(0); }
-            .nav-links a { font-size: 1.2rem; }
+            .nav-links a { font-size: 1.3rem; margin: 10px 0; }
+            h1 { font-size: 1.4rem; }
+            .stat-card { padding: 15px; }
         }
     </style>
 </head>
@@ -154,44 +130,45 @@
         </div>
         <button class="menu-toggle" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
         <div class="nav-links" id="navLinks">
+            <button class="menu-toggle" onclick="toggleMenu()" style="position: absolute; top: 20px; right: 20px;"><i class="fa-solid fa-xmark"></i></button>
             <a href="home.html">INICIO</a>
             <a href="mi_equipo.html">MI EQUIPO</a>
             <a href="mercado.html">MERCADO</a>
             <a href="clasificaciones.html">RANKING</a>
             <a href="stats.html" class="active">ESTADÍSTICAS</a>
             <a href="calendario.html">CALENDARIO</a>
-            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i></button>
+            <button onclick="cerrarSesion()" class="btn-logout"><i class="fa-solid fa-power-off"></i> Salir</button>
         </div>
     </nav>
 
     <div class="container">
-        <h1><i class="fa-solid fa-chart-line"></i> Estadísticas</h1>
-        <div class="muted">Análisis de la última jornada • Actualizado: <span id="lastUpdated">--</span></div>
+        <h1><i class="fa-solid fa-chart-simple"></i> Estadísticas</h1>
+        <div class="muted">Datos de la última jornada • Actualizado: <span id="lastUpdated">--</span></div>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-title"><i class="fa-solid fa-users"></i> Los más elegidos</div>
-                <div id="mostOwnedContent">Cargando...</div>
+                <div class="stat-title"><i class="fa-solid fa-users"></i> Los más seleccionados</div>
+                <div id="mostOwnedContent"></div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-title"><i class="fa-solid fa-star"></i> Líderes en Capitanía</div>
-                <div id="mostCaptainedContent">Cargando...</div>
+                <div class="stat-title"><i class="fa-solid fa-star"></i> Más capitaneados</div>
+                <div id="mostCaptainedContent"></div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-title"><i class="fa-solid fa-gem"></i> Mayor Rentabilidad (Pts/M)</div>
-                <div id="bestValueContent">Cargando...</div>
+                <div class="stat-title"><i class="fa-solid fa-gem"></i> Mejor Pts/Millón</div>
+                <div id="bestValueContent"></div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-title"><i class="fa-solid fa-trophy"></i> El Tridente Ideal</div>
-                <div id="bestLineupContent">Cargando...</div>
+                <div class="stat-title"><i class="fa-solid fa-trophy"></i> Mejor Alineación</div>
+                <div id="bestLineupContent"></div>
             </div>
 
             <div class="stat-card full-width">
-                <div class="stat-title"><i class="fa-solid fa-bolt"></i> Manager más Eficiente (Mejor relación Calidad/Precio)</div>
-                <div id="bestEfficiencyContent">Cargando...</div>
+                <div class="stat-title"><i class="fa-solid fa-bolt"></i> Manager más Eficiente (Calidad/Precio)</div>
+                <div id="bestEfficiencyContent"></div>
             </div>
         </div>
     </div>
@@ -234,7 +211,9 @@
                 const users = [];
                 usersSnap.forEach(d => { 
                     const u = d.data(); 
-                    users.push({ id: d.id, nombre: u.nick || u.nombre || d.id, equipo: u.equipo || [], capitanId: u.capitanId || null }); 
+                    // Lógica corregida para mostrar el ID si no hay nombre_usuario ni nick
+                    const displayName = u.nombre_usuario || u.nick || u.nombre || d.id;
+                    users.push({ id: d.id, nombre: displayName, equipo: u.equipo || [], capitanId: u.capitanId || null }); 
                 });
 
                 const participantes = Object.values(atletas).filter(a => a.puntosUlt > 0);
@@ -246,7 +225,7 @@
 
                 // 2. MÁS CAPITANEADOS
                 const capCounts = {};
-                users.forEach(u => { if(u.capitanId) capCounts[u.capitanId] = (capCounts[u.capitanId]||0) + 1; });
+                users.forEach(u => { if(u.capitanId && atletas[u.capitanId]) capCounts[u.capitanId] = (capCounts[u.capitanId]||0) + 1; });
                 const topCaptained = Object.keys(capCounts).map(id => ({...atletas[id], count: capCounts[id]})).sort((a,b)=>b.count - a.count).slice(0,3);
 
                 // 3. RENTABILIDAD
@@ -254,26 +233,22 @@
 
                 // 4. MEJOR ALINEACIÓN (CÁLCULO CON CAPITÁN X1.5)
                 const bestThree = participantes.sort((a,b)=> b.puntosUlt - a.puntosUlt).slice(0,3);
-                // El mejor del top 3 es el capitán ideal
                 const idealCapPts = bestThree.length > 0 ? bestThree[0].puntosUlt * 0.5 : 0;
                 const idealTotal = bestThree.reduce((s,a)=> s + a.puntosUlt, 0) + idealCapPts;
 
-                // Rendimiento Managers con lógica x1.5
                 const managersPerformance = users.map(u => {
                     const team = u.equipo.map(id => atletas[id]).filter(Boolean);
                     const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
-                    // Buscar mejor capitán posible en SU equipo
                     let bestExtra = 0;
-                    let bestCapId = null;
                     team.forEach(a => {
                         const extra = a.puntosUlt * 0.5;
-                        if(extra > bestExtra) { bestExtra = extra; bestCapId = a.id; }
+                        if(extra > bestExtra) bestExtra = extra;
                     });
-                    return { ...u, pts: basePts + bestExtra, team, bestCapId };
+                    return { ...u, pts: basePts + bestExtra };
                 }).sort((a,b)=> b.pts - a.pts);
 
-                renderSimpleList('mostOwnedContent', topOwned, 'Selecciones');
-                renderSimpleList('mostCaptainedContent', topCaptained, 'Capitanes');
+                renderSimpleList('mostOwnedContent', topOwned, 'Elegido');
+                renderSimpleList('mostCaptainedContent', topCaptained, 'Capitán');
                 renderSimpleList('bestValueContent', topValue, 'Ratio', true);
                 renderIdeal(bestThree, idealTotal, managersPerformance[0]);
                 renderEfficiency(users, atletas);
@@ -300,51 +275,53 @@
                     </div>
                 </div>`;
             });
-            document.getElementById(id).innerHTML = html || 'Sin datos';
+            document.getElementById(id).innerHTML = html || '<div class="muted">No hay datos</div>';
         }
 
         function renderIdeal(bestThree, total, bestManager) {
+            if(!bestThree.length) return;
             let html = `<div class="formation-display">`;
             bestThree.forEach((a, i) => {
                 html += `
                 <div class="slot">
                     <img src="${a.foto}">
                     <div class="slot-name">${a.nombre}${i===0?'<span class="cap-badge">C</span>':''}</div>
-                    <div class="slot-pts">${i===0 ? a.puntosUlt * 1.5 : a.puntosUlt} pts</div>
+                    <div class="slot-pts">${(i===0 ? a.puntosUlt * 1.5 : a.puntosUlt).toFixed(1)}</div>
                 </div>`;
             });
             html += `</div>
-            <div style="text-align:center; font-weight:800; color:#ff5e00; margin-bottom:15px;">Puntuación Óptima: ${total.toFixed(1)} pts</div>
-            <div style="border-top:1px solid #222; padding-top:15px;">
+            <div style="text-align:center; font-weight:800; color:#ff5e00; font-size: 0.9rem; margin-bottom:15px;">TOTAL ÓPTIMO: ${total.toFixed(1)} PTS</div>
+            <div style="border-top:1px solid #222; padding-top:12px;">
                 <div class="player-sub">Manager más cercano:</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                    <span style="font-weight:700;">${bestManager.nombre}</span>
-                    <span style="color:#ff5e00; font-weight:800;">${bestManager.pts.toFixed(1)} pts</span>
+                    <span style="font-weight:700; font-size:0.85rem; color:#fff;">${bestManager.nombre}</span>
+                    <span style="color:#ff5e00; font-weight:800; font-size:0.95rem;">${bestManager.pts.toFixed(1)} pts</span>
                 </div>
             </div>`;
             document.getElementById('bestLineupContent').innerHTML = html;
         }
 
         function renderEfficiency(users, atletas) {
-            const eff = users.map(u => {
+            const effList = users.map(u => {
                 const team = u.equipo.map(id => atletas[id]).filter(Boolean);
                 const cost = team.reduce((s,a)=> s + a.precio, 0);
                 const basePts = team.reduce((s,a)=> s + a.puntosUlt, 0);
                 const bestExtra = team.length ? Math.max(...team.map(a=>a.puntosUlt * 0.5)) : 0;
                 const totalPts = basePts + bestExtra;
                 return { nombre: u.nombre, ratio: cost > 0 ? totalPts / cost : 0, pts: totalPts, cost };
-            }).sort((a,b)=> b.ratio - a.ratio)[0];
+            }).sort((a,b)=> b.ratio - a.ratio);
 
+            const eff = effList[0];
             if(!eff) return;
             document.getElementById('bestEfficiencyContent').innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-size:1.2rem; font-weight:800;">${eff.nombre}</div>
-                        <div class="player-sub">${eff.pts.toFixed(1)} pts con un coste de ${eff.cost}M</div>
+                    <div style="min-width:0;">
+                        <div style="font-size:1.1rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${eff.nombre}</div>
+                        <div class="player-sub">${eff.pts.toFixed(1)} pts / ${eff.cost}M invertidos</div>
                     </div>
                     <div class="stat-highlight">
                         <span class="highlight-value">${eff.ratio.toFixed(3)}</span>
-                        <span class="highlight-label">Pts / Millón</span>
+                        <span class="highlight-label">Eficiencia</span>
                     </div>
                 </div>
             `;
