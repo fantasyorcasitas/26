@@ -505,6 +505,13 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                     btn.style.backgroundColor = "#ff5e00";
                 }
             }
+
+            // Habilitar botón compartir si hay al menos 1 jugador
+            const btnShare = document.getElementById('btnShareTeam');
+            if(btnShare) {
+                const hasPlayers = teamSlots.some(p => p !== null);
+                btnShare.disabled = !hasPlayers;
+            }
         }
 
         function renderSlot(index, elementId) {
