@@ -701,79 +701,87 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             ctx.closePath();
         }
 
-        // --- 1. NUEVO FONDO PREMIUM (Adiós negro plano) ---
-        // Degradado vertical base (Gris oscuro azulado profesional)
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, 1350);
-        bgGrad.addColorStop(0, '#141414'); // Casi negro arriba
-        bgGrad.addColorStop(1, '#1f2229'); // Gris oscuro azulado abajo
-        ctx.fillStyle = bgGrad;
+        // 1. FONDO "NEXO CIBERNÉTICO" (Negro sobre negro con textura)
+        ctx.fillStyle = '#050505'; // Negro casi puro
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // Luces ambientales sutiles (para dar profundidad y quitar el "vacío")
-        ctx.globalCompositeOperation = 'lighter'; // Modo de fusión para luces
-        
-        // Luz naranja suave arriba izquierda
-        const light1 = ctx.createRadialGradient(0, 0, 0, 0, 0, 800);
-        light1.addColorStop(0, 'rgba(255, 94, 0, 0.08)');
-        light1.addColorStop(1, 'transparent');
-        ctx.fillStyle = light1;
+        // Patrón geométrico hexagonal sutil
+        ctx.strokeStyle = '#151515'; // Gris muy oscuro para la red
+        ctx.lineWidth = 2;
+        const hexSize = 60;
+        const h = hexSize * Math.sqrt(3);
+        for (let y = -h; y < 1350 + h; y += h) {
+            for (let x = 0; x < 1080 + hexSize * 3; x += hexSize * 3) {
+                ctx.beginPath();
+                ctx.moveTo(x, y); ctx.lineTo(x + hexSize * 0.5, y + h * 0.5);
+                ctx.lineTo(x + hexSize * 1.5, y + h * 0.5); ctx.lineTo(x + hexSize * 2, y);
+                ctx.lineTo(x + hexSize * 1.5, y - h * 0.5); ctx.lineTo(x + hexSize * 0.5, y - h * 0.5);
+                ctx.closePath(); ctx.stroke();
+            }
+        }
+
+        // Viñeteado oscuro potente para centrar la vista
+        const vignette = ctx.createRadialGradient(540, 675, 100, 540, 675, 950);
+        vignette.addColorStop(0, 'transparent');
+        vignette.addColorStop(1, '#000000');
+        ctx.fillStyle = vignette;
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // Luz blanca/azulada suave abajo derecha
-        const light2 = ctx.createRadialGradient(1080, 1350, 0, 1080, 1350, 600);
-        light2.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
-        light2.addColorStop(1, 'transparent');
-        ctx.fillStyle = light2;
-        ctx.fillRect(0, 0, 1080, 1350);
-        
-        ctx.globalCompositeOperation = 'source-over'; // Volver a modo normal
 
-        // --- 2. HEADER GIGANTE ---
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetY = 10;
+        // 2. HEADER CINEMATOGRÁFICO
+        // Línea de horizonte de luz naranja
+        const horizonGlow = ctx.createLinearGradient(0, 180, 1080, 180);
+        horizonGlow.addColorStop(0, 'transparent');
+        horizonGlow.addColorStop(0.5, '#ff5e00');
+        horizonGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = horizonGlow;
+        ctx.fillRect(100, 178, 880, 4);
 
+        // Título con espaciado amplio
         ctx.fillStyle = '#ffffff';
-        // Fuente MASIVA para llenar espacio
-        ctx.font = '900 95px Montserrat';
+        ctx.font = '900 70px Montserrat';
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('MI EQUIPO', 540, 130);
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '12px'; // Espaciado épico
+        ctx.fillText('MI EQUIPO', 540, 140);
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
 
-        ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; // Reset shadow
-
-        // Etiqueta (Pill) del Mánager (Más grande también)
+        // Mánager
         const managerName = currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER';
+        ctx.fillStyle = '#ff5e00';
         ctx.font = 'bold 24px Montserrat';
-        const nameWidth = ctx.measureText(`@${managerName}`).width + 50;
-        const pillX = 540 - nameWidth / 2;
-        const pillY = 200;
-        
-        // Sombra para la píldora
-        ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 5;
-        drawRoundRect(ctx, pillX, pillY, nameWidth, 46, 23);
-        ctx.fillStyle = '#ff5e00'; // Naranja vibrante
-        ctx.fill();
-        ctx.shadowColor = 'transparent';
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '2px';
+        ctx.fillText(`@${managerName} / FANTASY ORCASITAS`, 540, 220);
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
 
-        ctx.fillStyle = '#ffffff'; // Texto blanco
-        ctx.fillText(`@${managerName}`, 540, pillY + 24);
 
-        // --- 3. CONFIGURACIÓN DE TARJETAS (MUCHO MÁS GRANDES) ---
-        const cardW = 340; // Antes 280
-        const cardH = 450; // Antes 380
-        
-        // Posiciones ajustadas para el nuevo tamaño
-        const topCardCy = 520;
-        const bottomCardsCy = 980;
+        // 3. CONFIGURACIÓN DE TARJETAS (Tamaño medio equilibrado)
+        const cardW = 300;
+        const cardH = 400;
+        const topCardCy = 500;
+        const bottomCardsCy = 940;
 
         const positions = [
-            { cx: 540, cy: topCardCy },
-            { cx: 320, cy: bottomCardsCy },
-            { cx: 760, cy: bottomCardsCy }
+            { cx: 540, cy: topCardCy }, // Capitán
+            { cx: 350, cy: bottomCardsCy }, // Izquierda
+            { cx: 730, cy: bottomCardsCy }  // Derecha
         ];
 
-        // --- 4. DIBUJAR JUGADORES (Con diseño interno premium) ---
+        // --- LÍNEAS DE ENERGÍA DE CONEXIÓN ---
+        ctx.strokeStyle = '#ff5e00';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#ff5e00'; ctx.shadowBlur = 20; // Luz intensa
+        ctx.beginPath();
+        // Del header al capitán
+        ctx.moveTo(540, 230); ctx.lineTo(540, topCardCy - cardH/2);
+        // Del capitán a los atletas
+        ctx.moveTo(540, topCardCy + cardH/2); ctx.lineTo(540, (topCardCy + bottomCardsCy)/2);
+        ctx.lineTo(350, (topCardCy + bottomCardsCy)/2); ctx.lineTo(350, bottomCardsCy - cardH/2);
+        ctx.moveTo(540, (topCardCy + bottomCardsCy)/2); ctx.lineTo(730, (topCardCy + bottomCardsCy)/2); ctx.lineTo(730, bottomCardsCy - cardH/2);
+        ctx.stroke();
+        ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+
+        
+        // 4. DIBUJAR JUGADORES (Estilo Cristal Oscuro)
         for (let i = 0; i < teamSlots.length; i++) {
             const player = teamSlots[i];
             const pos = positions[i];
@@ -783,127 +791,91 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 const startX = pos.cx - cardW / 2;
                 const startY = pos.cy - cardH / 2;
 
-                // A. Sombra potente para que floten
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-                ctx.shadowBlur = 35;
-                ctx.shadowOffsetY = 25;
+                // A. Resplandor trasero (Potente solo para Capi, sutil para resto)
+                const glowRadius = isRealCapi ? 300 : 200;
+                const glowColor = isRealCapi ? 'rgba(255, 94, 0, 0.25)' : 'rgba(255, 94, 0, 0.1)';
+                const cardGlow = ctx.createRadialGradient(pos.cx, pos.cy, 50, pos.cx, pos.cy, glowRadius);
+                cardGlow.addColorStop(0, glowColor);
+                cardGlow.addColorStop(1, 'transparent');
+                ctx.fillStyle = cardGlow;
+                ctx.fillRect(startX - 100, startY - 100, cardW + 200, cardH + 200);
 
-                // B. Fondo de la tarjeta con DEGRADADO INTERNO (No plano)
-                drawRoundRect(ctx, startX, startY, cardW, cardH, 25);
-                const cardGrad = ctx.createLinearGradient(startX, startY, startX, startY + cardH);
-                cardGrad.addColorStop(0, '#2a2e38'); // Gris medio arriba
-                cardGrad.addColorStop(1, '#16181d'); // Gris oscuro abajo
-                ctx.fillStyle = cardGrad;
+                // B. Fondo de la tarjeta "Cristal Oscuro" (Semitransparente)
+                ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 15; ctx.shadowOffsetY = 10;
+                drawRoundRect(ctx, startX, startY, cardW, cardH, 20);
+                // Un gris muy oscuro pero con opacidad para ver la red de fondo
+                ctx.fillStyle = 'rgba(20, 20, 24, 0.92)'; 
                 ctx.fill();
+                ctx.shadowColor = 'transparent';
 
-                ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-
-                // C. Borde Naranja Brillante
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = '#ff5e00';
+                // C. Borde de luz
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = isRealCapi ? '#ff5e00' : 'rgba(255, 94, 0, 0.5)';
+                if(isRealCapi) { ctx.shadowColor = '#ff5e00'; ctx.shadowBlur = 15; } // Luz extra para capi
                 ctx.stroke();
-                // Un segundo borde interior sutil para efecto premium
-                drawRoundRect(ctx, startX+4, startY+4, cardW-8, cardH-8, 22);
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                ctx.stroke();
+                ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
 
-                // D. Foto del jugador (Más grande)
-                const imgRadius = 75; // Antes 65
-                const imgY = startY + 120;
-                
+                // D. Foto
+                const imgRadius = 70;
+                const imgY = startY + 110;
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.src = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
                 
                 await new Promise((resolve) => {
                     img.onload = () => {
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI * 2);
-                        ctx.closePath();
-                        // Borde de la foto con sombra
-                        ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 10;
-                        ctx.lineWidth = 5;
-                        ctx.strokeStyle = '#ffffff';
-                        ctx.stroke();
-                        ctx.shadowColor = 'transparent'; // Reset shadow para la imagen
-                        
-                        ctx.clip();
-                        ctx.drawImage(img, pos.cx - imgRadius, imgY - imgRadius, imgRadius*2, imgRadius*2);
-                        ctx.restore();
-                        resolve();
+                        ctx.save(); ctx.beginPath(); ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI * 2); ctx.closePath();
+                        ctx.lineWidth = 4; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+                        ctx.clip(); ctx.drawImage(img, pos.cx - imgRadius, imgY - imgRadius, imgRadius*2, imgRadius*2);
+                        ctx.restore(); resolve();
                     };
                     img.onerror = () => {
-                        ctx.fillStyle = '#222';
-                        ctx.beginPath(); ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI*2); ctx.fill();
-                        ctx.lineWidth = 5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-                        resolve();
+                        ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI*2); ctx.fill();
+                        ctx.lineWidth = 4; ctx.strokeStyle = '#ffffff'; ctx.stroke(); resolve();
                     };
                 });
 
-                // E. Nombre (Fuente más grande)
+                // E. Textos
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '900 36px Montserrat'; // Antes 30
+                ctx.font = '900 32px Montserrat';
                 const primerNombre = player.nombre.split(' ')[0].toUpperCase(); 
-                ctx.fillText(primerNombre, pos.cx, startY + 245);
+                ctx.fillText(primerNombre, pos.cx, startY + 230);
 
-                // F. Precio (Más grande y en una "caja" sutil)
-                const priceBoxW = 140;
-                drawRoundRect(ctx, pos.cx - priceBoxW/2, startY + 275, priceBoxW, 40, 10);
-                ctx.fillStyle = 'rgba(0,0,0,0.3)'; // Fondo oscuro para el precio
-                ctx.fill();
-                
-                ctx.fillStyle = '#4cd137'; 
-                ctx.font = 'bold 28px Montserrat'; // Antes 24
-                ctx.fillText(`${player.precio} M`, pos.cx, startY + 305);
+                // F. Precio (con barra de progreso visual)
+                ctx.fillStyle = '#4cd137'; ctx.font = 'bold 26px Montserrat';
+                ctx.fillText(`${player.precio} M`, pos.cx, startY + 275);
+                // Barra de valor visual
+                const barW = 180; const barH = 6; const barY = startY + 295;
+                ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(pos.cx - barW/2, barY, barW, barH); // Fondo barra
+                const valueRatio = Math.min(player.precio / 60, 1); // Asumiendo 60M como max para la barra
+                ctx.fillStyle = '#4cd137'; ctx.fillRect(pos.cx - barW/2, barY, barW * valueRatio, barH); // Progreso
 
-                // G. Insignia 'C' (Más grande y premium)
+                // G. Insignia 'C' (Estilo botón de energía)
                 if (isRealCapi) {
-                    const badgeSize = 54; // Antes 46
-                    const badgeY = startY + 355;
-                    
-                    // Sombra dorada
-                    ctx.shadowColor = 'rgba(255, 215, 0, 0.4)'; ctx.shadowBlur = 15;
-                    
-                    drawRoundRect(ctx, pos.cx - badgeSize/2, badgeY, badgeSize, badgeSize, 14);
-                    const goldGrad = ctx.createLinearGradient(pos.cx - badgeSize/2, badgeY, pos.cx + badgeSize/2, badgeY + badgeSize);
-                    goldGrad.addColorStop(0, '#ffd700');
-                    goldGrad.addColorStop(1, '#ffaa00');
-                    ctx.fillStyle = goldGrad;
-                    ctx.fill();
-                    
+                    const badgeY = startY + 345;
+                    ctx.shadowColor = '#ff5e00'; ctx.shadowBlur = 20;
+                    ctx.beginPath(); ctx.arc(pos.cx, badgeY, 25, 0, Math.PI*2);
+                    ctx.fillStyle = '#ff5e00'; ctx.fill();
                     ctx.shadowColor = 'transparent';
-
-                    ctx.fillStyle = '#000000';
-                    ctx.font = '900 30px Montserrat';
-                    ctx.fillText('C', pos.cx, badgeY + badgeSize/2 + 2);
+                    ctx.fillStyle = '#ffffff'; ctx.font = '900 28px Montserrat'; ctx.fillText('C', pos.cx, badgeY + 10);
                 }
             }
         }
 
-        // --- 5. FOOTER (Más sólido) ---
+        // 5. FOOTER
         const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-
-        // Fondo para el footer
-        drawRoundRect(ctx, 250, 1230, 580, 70, 35);
-        ctx.fillStyle = '#1a1a1a';
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255, 94, 0, 0.3)';
-        ctx.stroke();
+        
+        // Línea de cierre
+        ctx.fillStyle = horizonGlow;
+        ctx.fillRect(300, 1250, 480, 3);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 28px Montserrat';
-        ctx.textAlign = 'center';
-        ctx.fillText(`VALOR TOTAL: ${currentTeamCost} M`, 540, 1275);
+        ctx.font = 'bold 30px Montserrat';
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '2px';
+        ctx.fillText(`VALOR TOTAL: ${currentTeamCost} M`, 540, 1300);
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
 
-        // Marca de agua (fuera de la caja)
-        ctx.fillStyle = '#888888';
-        ctx.font = '500 14px Montserrat';
-        ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1330);
-
-        // 6. COMPARTIR / DESCARGAR
+        // 6. COMPARTIR
         canvas.toBlob(async (blob) => {
             try {
                 const shareData = {
@@ -911,26 +883,12 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                     text: `🔥 ¡Echa un vistazo a mi equipo en Fantasy Orcasitas!\n\nValor: ${currentTeamCost}M`,
                     files: [new File([blob], 'mi-equipo.png', { type: 'image/png' })]
                 };
-
-                if (navigator.canShare && navigator.canShare(shareData)) {
-                    await navigator.share(shareData);
-                } else {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `equipo-${currentUserData.nombre_usuario || 'fantasy'}.png`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    alert('✅ Imagen descargada correctamente.');
+                if (navigator.canShare && navigator.canShare(shareData)) { await navigator.share(shareData); } else {
+                    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `equipo-${currentUserData.nombre_usuario || 'fantasy'}.png`; a.click(); URL.revokeObjectURL(url); alert('✅ Imagen descargada.');
                 }
-            } catch (e) {
-                console.error('Error compartiendo:', e);
-            }
+            } catch (e) { console.error('Error:', e); }
         });
-    } catch (error) {
-        console.error('Error generando imagen:', error);
-        alert('Error: ' + error.message);
-    }
+    } catch (error) { console.error('Error:', error); alert('Error: ' + error.message); }
 }
         const btnShare = document.getElementById('btnShareTeam');
         if (btnShare) {
