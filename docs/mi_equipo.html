@@ -686,7 +686,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
         canvas.height = 1350;
         const ctx = canvas.getContext('2d');
 
-        // Función para dibujar formas redondeadas suaves
+        // Helper para bordes redondeados
         function drawRoundRect(ctx, x, y, width, height, radius) {
             ctx.beginPath();
             ctx.moveTo(x + radius, y);
@@ -701,45 +701,40 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             ctx.closePath();
         }
 
-        // 1. FONDO PROFESIONAL
-        // Degradado lineal de fondo
-        const bgGradient = ctx.createLinearGradient(0, 0, 0, 1350);
-        bgGradient.addColorStop(0, '#0a0c10');
-        bgGradient.addColorStop(1, '#1a1d24');
-        ctx.fillStyle = bgGradient;
+        // 1. FONDO MINIMALISTA (Grid)
+        ctx.fillStyle = '#0a0a0c'; // Casi negro
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // Toques de luz (Glows) para dar profundidad
-        const glow1 = ctx.createRadialGradient(200, 200, 50, 200, 200, 600);
-        glow1.addColorStop(0, 'rgba(255, 94, 0, 0.12)');
-        glow1.addColorStop(1, 'transparent');
-        ctx.fillStyle = glow1;
-        ctx.fillRect(0, 0, 1080, 1350);
+        // Dibujar cuadrícula (Grid) sutil
+        ctx.strokeStyle = '#18181b'; // Gris muy oscuro para la línea
+        ctx.lineWidth = 2;
+        const gridSize = 60;
         
-        const glow2 = ctx.createRadialGradient(880, 1100, 50, 880, 1100, 600);
-        glow2.addColorStop(0, 'rgba(255, 215, 0, 0.08)');
-        glow2.addColorStop(1, 'transparent');
-        ctx.fillStyle = glow2;
-        ctx.fillRect(0, 0, 1080, 1350);
+        for (let i = 0; i <= 1080; i += gridSize) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 1350); ctx.stroke();
+        }
+        for (let i = 0; i <= 1350; i += gridSize) {
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1080, i); ctx.stroke();
+        }
 
-        // 2. TÍTULOS
+        // 2. HEADER
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 75px Montserrat';
+        ctx.font = '900 60px Montserrat';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('MI EQUIPO', 540, 120);
 
         ctx.fillStyle = '#ff5e00';
-        ctx.font = 'bold 30px Montserrat';
-        ctx.fillText(currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER', 540, 185);
+        ctx.font = 'bold 24px Montserrat';
+        ctx.fillText(currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER', 540, 170);
 
-        // 3. CONFIGURACIÓN ÚNICA DE CARTAS (Todas idénticas en tamaño)
-        const cardW = 310;
+        // 3. CONFIGURACIÓN DE LAS TARJETAS (Idénticas)
+        const cardW = 320;
         const cardH = 440;
         const positions = [
-            { cx: 540, cy: 470 }, // Capitán (Centro Arriba)
-            { cx: 310, cy: 940 }, // Atleta 2 (Izquierda Abajo)
-            { cx: 770, cy: 940 }  // Atleta 3 (Derecha Abajo)
+            { cx: 540, cy: 460 }, // Top (Capitán)
+            { cx: 330, cy: 940 }, // Bottom Left
+            { cx: 750, cy: 940 }  // Bottom Right
         ];
 
         // 4. DIBUJAR JUGADORES
@@ -749,62 +744,37 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
 
             if (player) {
                 const isRealCapi = player.id === captainId;
-                const themeColor = isRealCapi ? '#ffd700' : '#ff5e00'; // Dorado capi, Naranja resto
-                const roleText = isRealCapi ? '👑 CAPITÁN' : 'ATLETA';
-                
                 const startX = pos.cx - cardW / 2;
                 const startY = pos.cy - cardH / 2;
 
-                // A. Sombra de la carta
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-                ctx.shadowBlur = 25;
-                ctx.shadowOffsetY = 15;
-
-                // B. Fondo de la carta con degradado individual
+                // A. Fondo de la tarjeta (Color sólido, sin brillos)
                 drawRoundRect(ctx, startX, startY, cardW, cardH, 20);
-                const cardGradient = ctx.createLinearGradient(startX, startY, startX, startY + cardH);
-                cardGradient.addColorStop(0, '#1e222b');
-                cardGradient.addColorStop(1, '#111318');
-                ctx.fillStyle = cardGradient;
+                ctx.fillStyle = '#161618'; // Gris oscuro plano
                 ctx.fill();
 
-                // Limpiar sombras para el resto de elementos
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-                ctx.shadowOffsetY = 0;
-
-                // C. Borde de la carta
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = themeColor;
+                // B. Borde naranja de la tarjeta
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#ff5e00';
                 ctx.stroke();
 
-                // D. Etiqueta de Rol (Pill arriba)
-                const roleWidth = 140;
-                drawRoundRect(ctx, pos.cx - roleWidth/2, startY - 20, roleWidth, 40, 20);
-                ctx.fillStyle = themeColor;
-                ctx.fill();
+                // C. Foto del jugador (Con borde blanco)
+                const imgRadius = 80;
+                const imgY = startY + 130;
                 
-                ctx.fillStyle = isRealCapi ? '#000000' : '#ffffff';
-                ctx.font = 'bold 15px Montserrat';
-                ctx.fillText(roleText, pos.cx, startY);
-
-                // E. Foto del jugador (Tamaño fijo para todos: 160x160)
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.src = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
                 
                 await new Promise((resolve) => {
-                    const imgRadius = 80;
-                    const imgY = startY + 120;
-
                     img.onload = () => {
                         ctx.save();
                         ctx.beginPath();
                         ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI * 2);
                         ctx.closePath();
                         
+                        // Borde blanco de la foto
                         ctx.lineWidth = 4;
-                        ctx.strokeStyle = themeColor;
+                        ctx.strokeStyle = '#ffffff';
                         ctx.stroke();
                         
                         ctx.clip();
@@ -813,69 +783,71 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                         resolve();
                     };
                     img.onerror = () => {
-                        ctx.fillStyle = '#333';
+                        ctx.fillStyle = '#222';
                         ctx.beginPath();
                         ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI*2);
                         ctx.fill();
+                        ctx.lineWidth = 4;
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.stroke();
                         resolve();
                     };
                 });
 
-                // F. Textos (Nombre, Apellidos, Categoría)
+                // D. Nombre
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '900 24px Montserrat';
-                ctx.fillText(player.nombre.toUpperCase(), pos.cx, startY + 245);
+                ctx.font = 'bold 34px Montserrat';
+                // Solo el nombre de pila para mantenerlo limpio como en la foto
+                const primerNombre = player.nombre.split(' ')[0]; 
+                ctx.fillText(primerNombre, pos.cx, startY + 265);
 
-                ctx.fillStyle = '#aaaaaa';
-                ctx.font = '600 18px Montserrat';
-                ctx.fillText((player.apellidos || '').toUpperCase(), pos.cx, startY + 275);
+                // E. Precio
+                ctx.fillStyle = '#4cd137'; // Verde
+                ctx.font = 'bold 24px Montserrat';
+                ctx.fillText(`${player.precio}M`, pos.cx, startY + 315);
 
-                ctx.fillStyle = '#777777';
-                ctx.font = '15px Montserrat';
-                ctx.fillText(player.categoria || 'Atleta', pos.cx, startY + 305);
+                // F. Insignia de Capitán (Solo para el capi, estilo app)
+                if (isRealCapi) {
+                    const badgeW = 60;
+                    const badgeH = 45;
+                    drawRoundRect(ctx, pos.cx - badgeW/2, startY + 355, badgeW, badgeH, 10);
+                    ctx.fillStyle = '#ffd700'; // Amarillo
+                    ctx.fill();
 
-                // G. Precio (Pill inferior)
-                const priceWidth = 130;
-                drawRoundRect(ctx, pos.cx - priceWidth/2, startY + cardH - 55, priceWidth, 45, 12);
-                ctx.fillStyle = '#22262e';
-                ctx.fill();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = '#333b47';
-                ctx.stroke();
-
-                ctx.fillStyle = '#4cd137'; // Verde brillante
-                ctx.font = 'bold 22px Montserrat';
-                ctx.fillText(`${player.precio} M`, pos.cx, startY + cardH - 32);
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '900 24px Montserrat';
+                    ctx.fillText('C', pos.cx, startY + 386);
+                }
             }
         }
 
-        // 5. FOOTER INFO (Solo Valor del equipo, centrado)
+        // 5. FOOTER (Valor total limpio)
         const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
 
-        // Panel inferior limpio
-        drawRoundRect(ctx, 140, 1190, 800, 90, 20);
-        ctx.fillStyle = '#1a1d24';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 94, 0, 0.4)'; 
+        // Línea separadora sutil
+        ctx.strokeStyle = '#333333';
         ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(300, 1220);
+        ctx.lineTo(780, 1220);
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 26px Montserrat';
+        ctx.font = 'bold 24px Montserrat';
         ctx.textAlign = 'center';
-        ctx.fillText(`🔥 VALOR TOTAL:  ${currentTeamCost} M`, 540, 1235);
+        ctx.fillText(`VALOR TOTAL: ${currentTeamCost} M`, 540, 1270);
 
         // Marca de agua
-        ctx.fillStyle = '#666666';
-        ctx.font = '500 15px Montserrat';
-        ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1320);
+        ctx.fillStyle = '#555555';
+        ctx.font = '500 14px Montserrat';
+        ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1315);
 
-        // 6. COMPARTIR O DESCARGAR
+        // 6. COMPARTIR / DESCARGAR
         canvas.toBlob(async (blob) => {
             try {
                 const shareData = {
                     title: 'Mi Equipo Fantasy',
-                    text: `🔥 ¡Echa un vistazo a mi equipo en Fantasy Orcasitas!\n\nValor Total: ${currentTeamCost}M`,
+                    text: `🔥 ¡Echa un vistazo a mi equipo en Fantasy Orcasitas!\n\nValor: ${currentTeamCost}M`,
                     files: [new File([blob], 'mi-equipo.png', { type: 'image/png' })]
                 };
 
@@ -888,7 +860,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                     a.download = `equipo-${currentUserData.nombre_usuario || 'fantasy'}.png`;
                     a.click();
                     URL.revokeObjectURL(url);
-                    alert('✅ Imagen guardada en tu dispositivo.');
+                    alert('✅ Imagen descargada correctamente.');
                 }
             } catch (e) {
                 console.error('Error compartiendo:', e);
