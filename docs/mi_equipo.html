@@ -680,219 +680,228 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
 
         // ============ GENERAR IMAGEN DEL EQUIPO ============
         async function generarImagenEquipo() {
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1080;
-                canvas.height = 1350;
-                const ctx = canvas.getContext('2d');
+    try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1080;
+        canvas.height = 1350;
+        const ctx = canvas.getContext('2d');
 
-                // Fondo degradado profesional (colores web)
-                const gradient = ctx.createLinearGradient(0, 0, 1080, 1350);
-                gradient.addColorStop(0, '#0a0a0a');
-                gradient.addColorStop(0.5, '#1a1a1a');
-                gradient.addColorStop(1, '#0a0a0a');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 1080, 1350);
+        // Helper para dibujar rectángulos con bordes redondeados (compatible con todos los navegadores)
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
 
-                // Línea decorativa superior (naranja)
-                ctx.fillStyle = '#ff5e00';
-                ctx.fillRect(0, 0, 1080, 4);
+        // 1. FONDO PRINCIPAL
+        ctx.fillStyle = '#0f1115'; // Fondo oscuro moderno
+        ctx.fillRect(0, 0, 1080, 1350);
 
-                // Línea decorativa inferior (naranja)
-                ctx.fillStyle = '#ff5e00';
-                ctx.fillRect(0, 1346, 1080, 4);
+        // Brillo radial en el centro (Glow)
+        const glow = ctx.createRadialGradient(540, 600, 100, 540, 600, 800);
+        glow.addColorStop(0, 'rgba(255, 94, 0, 0.15)');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 1080, 1350);
 
-                // Título principal
-                ctx.fillStyle = '#ff5e00';
-                ctx.font = 'bold 76px Montserrat';
-                ctx.textAlign = 'center';
-                ctx.fillText('MI EQUIPO', 540, 110);
+        // 2. HEADER
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 68px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('MI EQUIPO', 540, 120);
 
-                // Decoración bajo el título
-                ctx.fillStyle = 'rgba(255, 94, 0, 0.3)';
-                ctx.fillRect(350, 130, 380, 2);
+        ctx.fillStyle = '#ff5e00';
+        ctx.font = 'bold 32px Montserrat';
+        ctx.fillText(currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER', 540, 180);
 
-                // Nombre usuario
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '36px Montserrat';
-                ctx.textAlign = 'center';
-                ctx.fillText(currentUserData.nombre_usuario || 'MANAGER', 540, 190);
+        // 3. CONFIGURACIÓN DE LAS CARTAS
+        const positions = [
+            // Capi (Más grande, arriba al centro)
+            { cx: 540, cy: 450, w: 360, h: 440, role: 'CAPITÁN', isCapi: true },
+            // Atleta 2 (Abajo izquierda)
+            { cx: 290, cy: 920, w: 320, h: 400, role: 'ATLETA', isCapi: false },
+            // Atleta 3 (Abajo derecha)
+            { cx: 790, cy: 920, w: 320, h: 400, role: 'ATLETA', isCapi: false }
+        ];
 
-                // Subtítulo
-                ctx.fillStyle = '#888888';
-                ctx.font = '18px Montserrat';
-                ctx.fillText('Fantasy Orcasitas', 540, 220);
+        // 4. DIBUJAR JUGADORES
+        for (let i = 0; i < teamSlots.length; i++) {
+            const player = teamSlots[i];
+            const pos = positions[i];
 
-                // POSICIONES
-                const positions = [
-                    { x: 540, y: 380, label: '🥇', role: 'CAPITÁN' },
-                    { x: 270, y: 750, label: '🥈', role: 'ATLETA' },
-                    { x: 810, y: 750, label: '🥉', role: 'ATLETA' }
-                ];
+            if (player) {
+                const isRealCapi = player.id === captainId; // Verificación real por si el orden cambia
+                const themeColor = isRealCapi ? '#ffd700' : '#ff5e00'; // Dorado para capi, Naranja resto
 
-                for (let i = 0; i < teamSlots.length; i++) {
-                    const player = teamSlots[i];
-                    const pos = positions[i];
+                const startX = pos.cx - pos.w / 2;
+                const startY = pos.cy - pos.h / 2;
 
-                    if (player) {
-                        const isCapi = player.id === captainId;
-                        
-                        // Tarjeta de fondo con borde
-                        const cardX = pos.x - 120;
-                        const cardY = pos.y - 160;
-                        const cardW = 240;
-                        const cardH = 280;
+                // A. Sombra de la carta
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                ctx.shadowBlur = 30;
+                ctx.shadowOffsetY = 15;
 
-                        // Sombra suave
-                        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                        ctx.fillRect(cardX + 5, cardY + 5, cardW, cardH);
-                        ctx.fillRect(cardX + 10, cardY + 10, cardW, cardH);
-
-                        // Fondo tarjeta (vidrio)
-                        ctx.fillStyle = 'rgba(20, 20, 20, 0.9)';
-                        ctx.fillRect(cardX, cardY, cardW, cardH);
-
-                        // Borde naranja
-                        ctx.strokeStyle = '#ff5e00';
-                        ctx.lineWidth = 3;
-                        ctx.strokeRect(cardX, cardY, cardW, cardH);
-
-                        // Línea superior naranja
-                        ctx.fillStyle = '#ff5e00';
-                        ctx.fillRect(cardX, cardY, cardW, 4);
-
-                        // Cargar imagen del jugador
-                        const img = new Image();
-                        img.crossOrigin = 'anonymous';
-                        img.src = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
-                        
-                        await new Promise((resolve) => {
-                            img.onload = () => {
-                                // Círculo con foto
-                                ctx.save();
-                                ctx.beginPath();
-                                ctx.arc(pos.x, pos.y - 80, 90, 0, Math.PI * 2);
-                                
-                                // Borde del círculo
-                                ctx.strokeStyle = isCapi ? '#ffd700' : '#ff5e00';
-                                ctx.lineWidth = 4;
-                                ctx.stroke();
-
-                                ctx.clip();
-                                ctx.drawImage(img, pos.x - 90, pos.y - 170, 180, 180);
-                                ctx.restore();
-
-                                resolve();
-                            };
-                            img.onerror = () => {
-                                ctx.fillStyle = '#333333';
-                                ctx.beginPath();
-                                ctx.arc(pos.x, pos.y - 80, 90, 0, Math.PI * 2);
-                                ctx.fill();
-                                resolve();
-                            };
-                        });
-
-                        // Medalla
-                        ctx.fillStyle = pos.label === '🥇' ? '#ffd700' : pos.label === '🥈' ? '#c0c0c0' : '#cd7f32';
-                        ctx.font = 'bold 48px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(pos.label, pos.x, pos.y - 140);
-
-                        // Rol
-                        ctx.fillStyle = '#ff5e00';
-                        ctx.font = 'bold 14px Montserrat';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(pos.role, pos.x, pos.y - 10);
-
-                        // Nombre
-                        ctx.fillStyle = '#ffffff';
-                        ctx.font = 'bold 22px Montserrat';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(player.nombre, pos.x, pos.y + 25);
-
-                        // Apellido
-                        ctx.fillStyle = '#aaaaaa';
-                        ctx.font = '18px Montserrat';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(player.apellidos || '', pos.x, pos.y + 55);
-
-                        // Precio con badge
-                        ctx.fillStyle = '#4cd137';
-                        ctx.font = 'bold 24px Montserrat';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('📊 ' + player.precio + 'M', pos.x, pos.y + 95);
-
-                        // Separador
-                        ctx.strokeStyle = 'rgba(255, 94, 0, 0.3)';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(cardX + 20, pos.y + 110);
-                        ctx.lineTo(cardX + cardW - 20, pos.y + 110);
-                        ctx.stroke();
-
-                        // Categoría o posición
-                        ctx.fillStyle = '#888888';
-                        ctx.font = '14px Montserrat';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(player.categoria || 'Atleta', pos.x, pos.y + 145);
-                    }
-                }
-
-                // Sección inferior con info
-                const infoY = 1050;
-                ctx.fillStyle = 'rgba(255, 94, 0, 0.1)';
-                ctx.fillRect(0, infoY, 1080, 100);
-                ctx.strokeStyle = 'rgba(255, 94, 0, 0.3)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(0, infoY, 1080, 100);
-
-                // Presupuesto
-                const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-                const currentBudget = totalPatrimony - currentTeamCost;
+                // B. Fondo de la carta
+                drawRoundRect(ctx, startX, startY, pos.w, pos.h, 25);
+                ctx.fillStyle = '#1a1d24';
+                ctx.fill();
                 
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 20px Montserrat';
-                ctx.textAlign = 'center';
-                ctx.fillText('💰 PRESUPUESTO RESTANTE: ' + Math.round(currentBudget) + 'M', 540, infoY + 35);
+                // Limpiar sombra para los siguientes elementos
+                ctx.shadowColor = 'transparent'; 
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
 
-                ctx.fillStyle = '#888888';
-                ctx.font = '16px Montserrat';
-                ctx.fillText('Valor total equipo: ' + currentTeamCost + 'M', 540, infoY + 70);
+                // C. Borde de la carta
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = themeColor;
+                ctx.stroke();
 
-                // Footer
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.font = '16px Montserrat';
-                ctx.textAlign = 'center';
-                ctx.fillText('🏃 Fantasy Orcasitas | ' + new Date().toLocaleDateString('es-ES'), 540, 1310);
+                // D. Etiqueta de Rol (Pill arriba)
+                const roleWidth = 140;
+                drawRoundRect(ctx, pos.cx - roleWidth/2, startY - 20, roleWidth, 40, 20);
+                ctx.fillStyle = themeColor;
+                ctx.fill();
+                
+                ctx.fillStyle = isRealCapi ? '#000000' : '#ffffff';
+                ctx.font = 'bold 16px Montserrat';
+                ctx.fillText(isRealCapi ? '👑 CAPITÁN' : 'ATLETA', pos.cx, startY);
 
-                // Convertir a blob y compartir/descargar
-                canvas.toBlob(async (blob) => {
-                    try {
-                        if (navigator.share) {
-                            await navigator.share({
-                                title: 'Mi Equipo Fantasy',
-                                text: `🏃 ${currentUserData.nombre_usuario || 'Manager'}\\n${teamSlots.filter(p => p).map(p => `${p.nombre} ${p.apellidos || ''} (${p.precio}M)`).join(', ')}\\n💰 Presupuesto: ${Math.round(currentBudget)}M`,
-                                files: [new File([blob], 'mi-equipo.png', { type: 'image/png' })]
-                            });
-                        } else {
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'mi-equipo-fantasy.png';
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            alert('✅ Imagen descargada: mi-equipo-fantasy.png');
-                        }
-                    } catch (e) {
-                        console.error('Error:', e);
-                    }
+                // E. Foto del jugador
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+                
+                await new Promise((resolve) => {
+                    img.onload = () => {
+                        const imgRadius = isRealCapi ? 85 : 75;
+                        const imgY = startY + 110;
+
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI * 2);
+                        ctx.closePath();
+                        
+                        // Borde de la foto
+                        ctx.lineWidth = 4;
+                        ctx.strokeStyle = themeColor;
+                        ctx.stroke();
+                        
+                        ctx.clip();
+                        // Dibujar imagen centrada
+                        ctx.drawImage(img, pos.cx - imgRadius, imgY - imgRadius, imgRadius*2, imgRadius*2);
+                        ctx.restore();
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        // Fallback si la imagen falla
+                        ctx.fillStyle = '#333';
+                        ctx.beginPath();
+                        ctx.arc(pos.cx, startY + 110, isRealCapi ? 85 : 75, 0, Math.PI*2);
+                        ctx.fill();
+                        resolve();
+                    };
                 });
-            } catch (error) {
-                console.error('Error generando imagen:', error);
-                alert('Error: ' + error.message);
+
+                // F. Textos (Nombre y Apellido)
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `900 ${isRealCapi ? '28px' : '24px'} Montserrat`;
+                ctx.fillText(player.nombre.toUpperCase(), pos.cx, startY + (isRealCapi ? 230 : 215));
+
+                ctx.fillStyle = '#aaaaaa';
+                ctx.font = '600 18px Montserrat';
+                ctx.fillText((player.apellidos || '').toUpperCase(), pos.cx, startY + (isRealCapi ? 260 : 245));
+
+                ctx.fillStyle = '#777777';
+                ctx.font = '16px Montserrat';
+                ctx.fillText(player.categoria || 'Atleta', pos.cx, startY + (isRealCapi ? 290 : 275));
+
+                // G. Precio (Pill inferior)
+                const priceWidth = 120;
+                drawRoundRect(ctx, pos.cx - priceWidth/2, startY + pos.h - 50, priceWidth, 40, 10);
+                ctx.fillStyle = '#22262e';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#333b47';
+                ctx.stroke();
+
+                ctx.fillStyle = '#4cd137'; // Verde brillante para el dinero
+                ctx.font = 'bold 20px Montserrat';
+                ctx.fillText(`${player.precio} M`, pos.cx, startY + pos.h - 30);
             }
         }
+
+        // 5. FOOTER INFO (Presupuesto)
+        const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
+        const currentBudget = totalPatrimony - currentTeamCost;
+
+        // Panel inferior de presupuesto
+        drawRoundRect(ctx, 100, 1180, 880, 100, 20);
+        ctx.fillStyle = '#1a1d24';
+        ctx.fill();
+        ctx.strokeStyle = '#333b47';
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px Montserrat';
+        ctx.textAlign = 'left';
+        ctx.fillText('VALOR DEL EQUIPO:', 150, 1230);
+        
+        ctx.fillStyle = '#ff5e00';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${currentTeamCost} M`, 450, 1230);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.fillText('PRESUPUESTO RESTANTE:', 550, 1230);
+
+        ctx.fillStyle = '#4cd137';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${Math.round(currentBudget)} M`, 930, 1230);
+
+        // Marca de agua
+        ctx.fillStyle = '#555555';
+        ctx.font = '600 16px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1320);
+
+        // 6. COMPARTIR O DESCARGAR
+        canvas.toBlob(async (blob) => {
+            try {
+                const shareData = {
+                    title: 'Mi Equipo Fantasy',
+                    text: `🔥 ¡Echa un vistazo a mi equipo en Fantasy Orcasitas!\n\nValor: ${currentTeamCost}M\nPresupuesto restante: ${Math.round(currentBudget)}M`,
+                    files: [new File([blob], 'mi-equipo.png', { type: 'image/png' })]
+                };
+
+                if (navigator.canShare && navigator.canShare(shareData)) {
+                    await navigator.share(shareData);
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `equipo-${currentUserData.nombre_usuario || 'fantasy'}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    alert('✅ Imagen guardada en tu dispositivo.');
+                }
+            } catch (e) {
+                console.error('Error compartiendo:', e);
+            }
+        });
+    } catch (error) {
+        console.error('Error generando imagen:', error);
+        alert('Error: ' + error.message);
+    }
+}
 
         const btnShare = document.getElementById('btnShareTeam');
         if (btnShare) {
