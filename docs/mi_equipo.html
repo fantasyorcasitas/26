@@ -701,89 +701,60 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             ctx.closePath();
         }
 
-        // 1. FONDO MINIMALISTA (Grid mejorado)
-        ctx.fillStyle = '#09090b'; // Negro profundo
+        // 1. FONDO MINIMALISTA (Grid)
+        ctx.fillStyle = '#09090b'; // Negro muy profundo
         ctx.fillRect(0, 0, 1080, 1350);
 
         // Cuadrícula sutil
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; // Blanco muy transparente
-        ctx.lineWidth = 1.5;
-        const gridSize = 70;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)'; 
+        ctx.lineWidth = 1;
+        const gridSize = 50;
         for (let i = 0; i <= 1080; i += gridSize) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 1350); ctx.stroke(); }
         for (let i = 0; i <= 1350; i += gridSize) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1080, i); ctx.stroke(); }
 
-        // Vignette sutil para oscurecer las esquinas y centrar la atención
-        const vignette = ctx.createRadialGradient(540, 675, 0, 540, 675, 800);
+        // Viñeteado oscuro en los bordes para centrar la atención y quitar "vacío"
+        const vignette = ctx.createRadialGradient(540, 675, 200, 540, 675, 900);
         vignette.addColorStop(0, 'rgba(0,0,0,0)');
-        vignette.addColorStop(1, 'rgba(0,0,0,0.7)');
+        vignette.addColorStop(1, 'rgba(0,0,0,0.8)');
         ctx.fillStyle = vignette;
         ctx.fillRect(0, 0, 1080, 1350);
 
-
-        // 2. HEADER PROFESIONAL
-        // Título con ligero espaciado (kerning) para toque premium
+        // 2. HEADER
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 80px Montserrat';
+        ctx.font = '900 70px Montserrat';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '6px';
-        ctx.fillText('MI EQUIPO', 540, 110);
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '5px';
+        ctx.fillText('MI EQUIPO', 540, 140);
         if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
 
-        // Etiqueta (Pill) del Mánager - AHORA SÓLIDA
+        // Etiqueta (Pill) del Mánager
         const managerName = currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER';
-        ctx.font = 'bold 22px Montserrat';
-        const nameWidth = ctx.measureText(`@${managerName}`).width + 50;
+        ctx.font = 'bold 20px Montserrat';
+        const nameWidth = ctx.measureText(`@${managerName}`).width + 40;
         const pillX = 540 - nameWidth / 2;
-        const pillY = 170;
-        const pillH = 44;
+        const pillY = 195;
         
-        // Sombra para la píldora
-        ctx.shadowColor = 'rgba(255, 94, 0, 0.4)';
-        ctx.shadowBlur = 15;
-        ctx.shadowOffsetY = 5;
-
-        drawRoundRect(ctx, pillX, pillY, nameWidth, pillH, 22);
-        ctx.fillStyle = '#ff5e00'; // Naranja vibrante sólido
+        drawRoundRect(ctx, pillX, pillY, nameWidth, 40, 20);
+        ctx.fillStyle = '#ff5e00'; // Naranja
         ctx.fill();
+        ctx.fillStyle = '#ffffff'; // Texto blanco
+        ctx.fillText(`@${managerName}`, 540, pillY + 20);
+
+        // 3. CONFIGURACIÓN DE TARJETAS (Más pequeñas y juntas)
+        const cardW = 280;
+        const cardH = 380;
         
-        // Reset sombra
-        ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-
-        ctx.fillStyle = '#ffffff'; // Texto blanco sobre naranja
-        ctx.fillText(`@${managerName}`, 540, pillY + pillH/2 + 2);
-
-
-        // 3. CONFIGURACIÓN DE TARJETAS Y POSICIONES
-        const cardW = 320;
-        const cardH = 440;
-        // Coordenadas centrales de las cartas
-        const topCardCy = 490;
-        const bottomCardsCy = 960;
+        // Coordenadas centrales exactas para formar una pirámide perfecta
+        const topCardCy = 480;
+        const bottomCardsCy = 900;
 
         const positions = [
             { cx: 540, cy: topCardCy }, // Top (Capitán)
-            { cx: 330, cy: bottomCardsCy }, // Bottom Left
-            { cx: 750, cy: bottomCardsCy }  // Bottom Right
+            { cx: 370, cy: bottomCardsCy }, // Bottom Left
+            { cx: 710, cy: bottomCardsCy }  // Bottom Right
         ];
 
-        // --- NUEVO: LÍNEAS DE CONEXIÓN VISUAL ---
-        // Dibujamos líneas sutiles que conectan la píldora del mánager con las cartas
-        ctx.strokeStyle = 'rgba(255, 94, 0, 0.3)'; // Naranja transparente
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 15]); // Línea discontinua tecnológica
-
-        ctx.beginPath();
-        // Línea al capitán
-        ctx.moveTo(540, pillY + pillH); ctx.lineTo(540, topCardCy - cardH/2 - 20);
-        // Líneas a los otros dos (desde un punto intermedio)
-        const midPointY = (pillY + pillH + topCardCy - cardH/2) / 2;
-        ctx.moveTo(540, midPointY); ctx.lineTo(330, midPointY); ctx.lineTo(330, bottomCardsCy - cardH/2 - 20);
-        ctx.moveTo(540, midPointY); ctx.lineTo(750, midPointY); ctx.lineTo(750, bottomCardsCy - cardH/2 - 20);
-        ctx.stroke();
-        ctx.setLineDash([]); // Resetear línea discontinua
-
-        
         // 4. DIBUJAR JUGADORES
         for (let i = 0; i < teamSlots.length; i++) {
             const player = teamSlots[i];
@@ -794,36 +765,33 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 const startX = pos.cx - cardW / 2;
                 const startY = pos.cy - cardH / 2;
 
-                // --- NUEVO: Resplandor sutil SOLO detrás del Capitán ---
-                if (isRealCapi) {
-                    const capiGlow = ctx.createRadialGradient(pos.cx, pos.cy, 100, pos.cx, pos.cy, 350);
-                    capiGlow.addColorStop(0, 'rgba(255, 94, 0, 0.15)');
-                    capiGlow.addColorStop(1, 'transparent');
-                    ctx.fillStyle = capiGlow;
-                    ctx.fillRect(startX - 50, startY - 50, cardW + 100, cardH + 100);
-                }
+                // Brillo súper sutil detrás de las tarjetas para separarlas del fondo
+                const glow = ctx.createRadialGradient(pos.cx, pos.cy, 50, pos.cx, pos.cy, 250);
+                glow.addColorStop(0, 'rgba(255, 94, 0, 0.1)');
+                glow.addColorStop(1, 'transparent');
+                ctx.fillStyle = glow;
+                ctx.fillRect(startX - 100, startY - 100, cardW + 200, cardH + 200);
 
-                // A. Sombra de la tarjeta (Más profunda)
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                ctx.shadowBlur = 30;
-                ctx.shadowOffsetY = 20;
+                // A. Sombra paralela
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetY = 10;
 
-                // B. Fondo de la tarjeta (Sólido)
-                drawRoundRect(ctx, startX, startY, cardW, cardH, 24);
-                ctx.fillStyle = '#161618'; 
+                // B. Fondo de la tarjeta
+                drawRoundRect(ctx, startX, startY, cardW, cardH, 20);
+                ctx.fillStyle = '#1a1a1c'; // Gris súper oscuro
                 ctx.fill();
 
-                // Reset sombra
                 ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
 
-                // C. Borde naranja de la tarjeta
+                // C. Borde Naranja
                 ctx.lineWidth = 4;
                 ctx.strokeStyle = '#ff5e00';
                 ctx.stroke();
 
                 // D. Foto del jugador
-                const imgRadius = 82;
-                const imgY = startY + 130;
+                const imgRadius = 65; // Más pequeña para encajar mejor
+                const imgY = startY + 100;
                 
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
@@ -835,9 +803,8 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                         ctx.beginPath();
                         ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI * 2);
                         ctx.closePath();
-                        // Borde blanco limpio
-                        ctx.lineWidth = 5;
-                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 4;
+                        ctx.strokeStyle = '#ffffff'; // Borde blanco
                         ctx.stroke();
                         ctx.clip();
                         ctx.drawImage(img, pos.cx - imgRadius, imgY - imgRadius, imgRadius*2, imgRadius*2);
@@ -847,65 +814,57 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                     img.onerror = () => {
                         ctx.fillStyle = '#222';
                         ctx.beginPath(); ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI*2); ctx.fill();
-                        ctx.lineWidth = 5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+                        ctx.lineWidth = 4; ctx.strokeStyle = '#ffffff'; ctx.stroke();
                         resolve();
                     };
                 });
 
-                // E. Textos
+                // E. Nombre (Centrado, negrita)
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 36px Montserrat';
+                ctx.font = 'bold 30px Montserrat';
                 const primerNombre = player.nombre.split(' ')[0]; 
-                ctx.fillText(primerNombre, pos.cx, startY + 270);
+                ctx.fillText(primerNombre, pos.cx, startY + 210);
 
-                // F. Precio
-                ctx.fillStyle = '#4cd137'; // Verde
-                ctx.font = 'bold 26px Montserrat';
-                ctx.fillText(`${player.precio}M`, pos.cx, startY + 325);
+                // F. Precio (Verde brillante)
+                ctx.fillStyle = '#4cd137'; 
+                ctx.font = 'bold 24px Montserrat';
+                ctx.fillText(`${player.precio}M`, pos.cx, startY + 260);
 
-                // G. Insignia de Capitán
+                // G. Insignia 'C' (Calcada a tu web)
                 if (isRealCapi) {
-                    const badgeW = 64;
-                    const badgeH = 48;
-                    // Sombra pequeña para la insignia
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 3;
-                    drawRoundRect(ctx, pos.cx - badgeW/2, startY + 365, badgeW, badgeH, 12);
-                    ctx.fillStyle = '#ffd700'; // Amarillo oro
+                    const badgeSize = 46;
+                    // Centrada justo debajo del precio
+                    drawRoundRect(ctx, pos.cx - badgeSize/2, startY + 300, badgeSize, badgeSize, 10);
+                    ctx.fillStyle = '#ffd700'; // Amarillo intenso
                     ctx.fill();
-                    ctx.shadowColor = 'transparent'; // Reset
 
-                    ctx.fillStyle = '#1a1a1a';
-                    ctx.font = '900 26px Montserrat';
-                    ctx.fillText('C', pos.cx, startY + 398);
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '900 24px Montserrat';
+                    ctx.fillText('C', pos.cx, startY + 324);
                 }
             }
         }
 
-        // 5. FOOTER
+        // 5. FOOTER (Valor total)
         const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
 
-        // Línea separadora más elegante con degradado
-        const lineGrad = ctx.createLinearGradient(300, 0, 780, 0);
-        lineGrad.addColorStop(0, 'transparent');
-        lineGrad.addColorStop(0.5, '#ff5e00');
-        lineGrad.addColorStop(1, 'transparent');
-        ctx.strokeStyle = lineGrad;
+        // Línea divisoria muy sutil
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(300, 1240);
-        ctx.lineTo(780, 1240);
+        ctx.moveTo(340, 1180);
+        ctx.lineTo(740, 1180);
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 26px Montserrat';
         ctx.textAlign = 'center';
-        // Usamos un carácter unicode de rayo naranja en lugar del emoji genérico si es posible, o el emoji normal
-        ctx.fillText(`⚡ VALOR TOTAL: ${currentTeamCost} M`, 540, 1285);
+        ctx.fillText(`VALOR TOTAL: ${currentTeamCost} M`, 540, 1230);
 
         // Marca de agua
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.fillStyle = '#666666';
         ctx.font = '500 14px Montserrat';
-        ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1325);
+        ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1280);
 
         // 6. COMPARTIR / DESCARGAR
         canvas.toBlob(async (blob) => {
