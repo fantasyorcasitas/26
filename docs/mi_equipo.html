@@ -701,12 +701,14 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             ctx.closePath();
         }
 
-        // 1. FONDO "NEXO CIBERNÉTICO" (Negro sobre negro con textura)
-        ctx.fillStyle = '#050505'; // Negro casi puro
+        // 1. FONDO "NEXO CIBERNÉTICO" (Ajustado para más visibilidad)
+        ctx.fillStyle = '#050505'; // Base negra casi pura
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // Patrón geométrico hexagonal sutil
-        ctx.strokeStyle = '#151515'; // Gris muy oscuro para la red
+        // --- AJUSTE AQUÍ ---
+        // Patrón geométrico hexagonal sutil pero visible
+        // Antes era #151515 (muy oscuro), ahora #252525 (un pelín más claro)
+        ctx.strokeStyle = '#252525'; 
         ctx.lineWidth = 2;
         const hexSize = 60;
         const h = hexSize * Math.sqrt(3);
@@ -720,7 +722,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             }
         }
 
-        // Viñeteado oscuro potente para centrar la vista
+        // Viñeteado oscuro para centrar la vista (mantiene el misterio en los bordes)
         const vignette = ctx.createRadialGradient(540, 675, 100, 540, 675, 950);
         vignette.addColorStop(0, 'transparent');
         vignette.addColorStop(1, '#000000');
@@ -754,7 +756,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
         if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
 
 
-        // 3. CONFIGURACIÓN DE TARJETAS (Tamaño medio equilibrado)
+        // 3. CONFIGURACIÓN DE TARJETAS
         const cardW = 300;
         const cardH = 400;
         const topCardCy = 500;
@@ -791,7 +793,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 const startX = pos.cx - cardW / 2;
                 const startY = pos.cy - cardH / 2;
 
-                // A. Resplandor trasero (Potente solo para Capi, sutil para resto)
+                // A. Resplandor trasero
                 const glowRadius = isRealCapi ? 300 : 200;
                 const glowColor = isRealCapi ? 'rgba(255, 94, 0, 0.25)' : 'rgba(255, 94, 0, 0.1)';
                 const cardGlow = ctx.createRadialGradient(pos.cx, pos.cy, 50, pos.cx, pos.cy, glowRadius);
@@ -800,10 +802,10 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 ctx.fillStyle = cardGlow;
                 ctx.fillRect(startX - 100, startY - 100, cardW + 200, cardH + 200);
 
-                // B. Fondo de la tarjeta "Cristal Oscuro" (Semitransparente)
+                // B. Fondo de la tarjeta "Cristal Oscuro" (Semitransparente para ver el fondo mejorado)
                 ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 15; ctx.shadowOffsetY = 10;
                 drawRoundRect(ctx, startX, startY, cardW, cardH, 20);
-                // Un gris muy oscuro pero con opacidad para ver la red de fondo
+                // Un gris muy oscuro pero con opacidad
                 ctx.fillStyle = 'rgba(20, 20, 24, 0.92)'; 
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
@@ -811,7 +813,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 // C. Borde de luz
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = isRealCapi ? '#ff5e00' : 'rgba(255, 94, 0, 0.5)';
-                if(isRealCapi) { ctx.shadowColor = '#ff5e00'; ctx.shadowBlur = 15; } // Luz extra para capi
+                if(isRealCapi) { ctx.shadowColor = '#ff5e00'; ctx.shadowBlur = 15; }
                 ctx.stroke();
                 ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
 
@@ -847,7 +849,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 // Barra de valor visual
                 const barW = 180; const barH = 6; const barY = startY + 295;
                 ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(pos.cx - barW/2, barY, barW, barH); // Fondo barra
-                const valueRatio = Math.min(player.precio / 60, 1); // Asumiendo 60M como max para la barra
+                const valueRatio = Math.min(player.precio / 60, 1);
                 ctx.fillStyle = '#4cd137'; ctx.fillRect(pos.cx - barW/2, barY, barW * valueRatio, barH); // Progreso
 
                 // G. Insignia 'C' (Estilo botón de energía)
