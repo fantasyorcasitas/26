@@ -159,6 +159,14 @@
         }
         .btn-save-fab:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
 
+        /* BOTÓN COMPARTIR EQUIPO */
+        .btn-share-fab {
+            width: 100%; background: linear-gradient(135deg, #00d4ff, #0099cc); color: white; border: none; padding: 12px; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 700; margin-top: 10px; box-shadow: 0 5px 20px rgba(0, 180, 220, 0.3); cursor: pointer; transition: 0.3s;
+        }
+        .btn-share-fab:hover { transform: scale(1.02); }
+        .btn-share-fab:disabled { background: #333; color: #777; box-shadow: none; cursor: not-allowed; }
+
         /* MODAL */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 8000;
@@ -263,6 +271,9 @@
         <div class="fab-save-container">
             <button id="btnSaveTeam" class="btn-save-fab" disabled>
                 <i class="fa-solid fa-spinner fa-spin"></i> Cargando...
+            </button>
+            <button id="btnShareTeam" class="btn-share-fab" disabled>
+                <i class="fa-solid fa-share-nodes"></i> COMPARTIR EQUIPO
             </button>
         </div>
     </div>
@@ -657,6 +668,145 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                         updateUI();
                     }, 2000);
                 }
+            });
+        }
+
+        // ============ GENERAR IMAGEN DEL EQUIPO ============
+        async function generarImagenEquipo() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 800;
+                canvas.height = 600;
+                const ctx = canvas.getContext('2d');
+
+                // Fondo degradado
+                const gradient = ctx.createLinearGradient(0, 0, 800, 600);
+                gradient.addColorStop(0, '#000033');
+                gradient.addColorStop(0.5, '#1a0033');
+                gradient.addColorStop(1, '#330000');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, 800, 600);
+
+                // Título
+                ctx.fillStyle = '#00d4ff';
+                ctx.font = 'bold 48px Montserrat, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('MI EQUIPO', 400, 70);
+
+                // Nombre usuario
+                ctx.fillStyle = '#ff5e00';
+                ctx.font = '24px Montserrat, sans-serif';
+                ctx.fillText(currentUserData.nombre_usuario || 'MANAGER', 400, 110);
+
+                const positions = [
+                    { x: 400, y: 200, label: '🥇 CAPITÁN' },
+                    { x: 200, y: 380, label: '🥈 ATLETA' },
+                    { x: 600, y: 380, label: '🥉 ATLETA' }
+                ];
+
+                for (let i = 0; i < teamSlots.length; i++) {
+                    const player = teamSlots[i];
+                    const pos = positions[i];
+
+                    if (player) {
+                        const isCapi = player.id === captainId;
+                        
+                        // Círculo de fondo
+                        ctx.fillStyle = isCapi ? '#ffd700' : '#00d4ff';
+                        ctx.beginPath();
+                        ctx.arc(pos.x, pos.y - 60, 70, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Cargar imagen
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.src = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+                        
+                        await new Promise((resolve) => {
+                            img.onload = () => {
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.arc(pos.x, pos.y - 60, 65, 0, Math.PI * 2);
+                                ctx.clip();
+                                ctx.drawImage(img, pos.x - 65, pos.y - 125, 130, 130);
+                                ctx.restore();
+                                resolve();
+                            };
+                            img.onerror = () => resolve();
+                        });
+
+                        // Nombre
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 20px Montserrat, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(player.nombre, pos.x, pos.y + 20);
+
+                        // Apellido
+                        ctx.fillStyle = '#aaaaaa';
+                        ctx.font = '16px Montserrat, sans-serif';
+                        ctx.fillText(player.apellidos || '', pos.x, pos.y + 45);
+
+                        // Precio
+                        ctx.fillStyle = '#4cd137';
+                        ctx.font = 'bold 18px Montserrat, sans-serif';
+                        ctx.fillText(player.precio + 'M', pos.x, pos.y + 70);
+
+                        // Label
+                        ctx.fillStyle = isCapi ? '#ffd700' : '#00d4ff';
+                        ctx.font = 'bold 14px Montserrat, sans-serif';
+                        ctx.fillText(pos.label, pos.x, pos.y - 115);
+                    }
+                }
+
+                // Marca de agua
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.font = '14px Montserrat, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('Fantasy Orcasitas', 750, 580);
+
+                // Convertir a blob
+                canvas.toBlob(async (blob) => {
+                    try {
+                        if (navigator.share) {
+                            await navigator.share({
+                                title: 'Mi Equipo Fantasy',
+                                text: `Te presento mi equipo:\\n${teamSlots.filter(p => p).map(p => `${p.nombre} ${p.apellidos || ''} (${p.precio}M)`).join(', ')}`,
+                                files: [new File([blob], 'mi-equipo.png', { type: 'image/png' })]
+                            });
+                        } else {
+                            // Descargar
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'mi-equipo.png';
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            alert('✅ Imagen descargada: mi-equipo.png');
+                        }
+                    } catch (e) {
+                        console.error('Error:', e);
+                        alert('Error al compartir');
+                    }
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        const btnShare = document.getElementById('btnShareTeam');
+        if (btnShare) {
+            btnShare.addEventListener('click', () => {
+                if (teamSlots.filter(p => p).length === 0) {
+                    alert('Necesitas al menos 1 jugador.');
+                    return;
+                }
+                btnShare.disabled = true;
+                btnShare.innerText = 'Generando...';
+                generarImagenEquipo().finally(() => {
+                    btnShare.disabled = false;
+                    btnShare.innerHTML = '<i class="fa-solid fa-share-nodes"></i> COMPARTIR EQUIPO';
+                });
             });
         }
 
