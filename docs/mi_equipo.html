@@ -686,7 +686,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
         canvas.height = 1350;
         const ctx = canvas.getContext('2d');
 
-        // Helper para dibujar rectángulos con bordes redondeados (compatible con todos los navegadores)
+        // Función para dibujar formas redondeadas suaves
         function drawRoundRect(ctx, x, y, width, height, radius) {
             ctx.beginPath();
             ctx.moveTo(x + radius, y);
@@ -701,36 +701,45 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             ctx.closePath();
         }
 
-        // 1. FONDO PRINCIPAL
-        ctx.fillStyle = '#0f1115'; // Fondo oscuro moderno
+        // 1. FONDO PROFESIONAL
+        // Degradado lineal de fondo
+        const bgGradient = ctx.createLinearGradient(0, 0, 0, 1350);
+        bgGradient.addColorStop(0, '#0a0c10');
+        bgGradient.addColorStop(1, '#1a1d24');
+        ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // Brillo radial en el centro (Glow)
-        const glow = ctx.createRadialGradient(540, 600, 100, 540, 600, 800);
-        glow.addColorStop(0, 'rgba(255, 94, 0, 0.15)');
-        glow.addColorStop(1, 'transparent');
-        ctx.fillStyle = glow;
+        // Toques de luz (Glows) para dar profundidad
+        const glow1 = ctx.createRadialGradient(200, 200, 50, 200, 200, 600);
+        glow1.addColorStop(0, 'rgba(255, 94, 0, 0.12)');
+        glow1.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow1;
+        ctx.fillRect(0, 0, 1080, 1350);
+        
+        const glow2 = ctx.createRadialGradient(880, 1100, 50, 880, 1100, 600);
+        glow2.addColorStop(0, 'rgba(255, 215, 0, 0.08)');
+        glow2.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow2;
         ctx.fillRect(0, 0, 1080, 1350);
 
-        // 2. HEADER
+        // 2. TÍTULOS
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 68px Montserrat';
+        ctx.font = '900 75px Montserrat';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('MI EQUIPO', 540, 120);
 
         ctx.fillStyle = '#ff5e00';
-        ctx.font = 'bold 32px Montserrat';
-        ctx.fillText(currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER', 540, 180);
+        ctx.font = 'bold 30px Montserrat';
+        ctx.fillText(currentUserData.nombre_usuario?.toUpperCase() || 'MANAGER', 540, 185);
 
-        // 3. CONFIGURACIÓN DE LAS CARTAS
+        // 3. CONFIGURACIÓN ÚNICA DE CARTAS (Todas idénticas en tamaño)
+        const cardW = 310;
+        const cardH = 440;
         const positions = [
-            // Capi (Más grande, arriba al centro)
-            { cx: 540, cy: 450, w: 360, h: 440, role: 'CAPITÁN', isCapi: true },
-            // Atleta 2 (Abajo izquierda)
-            { cx: 290, cy: 920, w: 320, h: 400, role: 'ATLETA', isCapi: false },
-            // Atleta 3 (Abajo derecha)
-            { cx: 790, cy: 920, w: 320, h: 400, role: 'ATLETA', isCapi: false }
+            { cx: 540, cy: 470 }, // Capitán (Centro Arriba)
+            { cx: 310, cy: 940 }, // Atleta 2 (Izquierda Abajo)
+            { cx: 770, cy: 940 }  // Atleta 3 (Derecha Abajo)
         ];
 
         // 4. DIBUJAR JUGADORES
@@ -739,24 +748,28 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             const pos = positions[i];
 
             if (player) {
-                const isRealCapi = player.id === captainId; // Verificación real por si el orden cambia
-                const themeColor = isRealCapi ? '#ffd700' : '#ff5e00'; // Dorado para capi, Naranja resto
-
-                const startX = pos.cx - pos.w / 2;
-                const startY = pos.cy - pos.h / 2;
+                const isRealCapi = player.id === captainId;
+                const themeColor = isRealCapi ? '#ffd700' : '#ff5e00'; // Dorado capi, Naranja resto
+                const roleText = isRealCapi ? '👑 CAPITÁN' : 'ATLETA';
+                
+                const startX = pos.cx - cardW / 2;
+                const startY = pos.cy - cardH / 2;
 
                 // A. Sombra de la carta
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-                ctx.shadowBlur = 30;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 25;
                 ctx.shadowOffsetY = 15;
 
-                // B. Fondo de la carta
-                drawRoundRect(ctx, startX, startY, pos.w, pos.h, 25);
-                ctx.fillStyle = '#1a1d24';
+                // B. Fondo de la carta con degradado individual
+                drawRoundRect(ctx, startX, startY, cardW, cardH, 20);
+                const cardGradient = ctx.createLinearGradient(startX, startY, startX, startY + cardH);
+                cardGradient.addColorStop(0, '#1e222b');
+                cardGradient.addColorStop(1, '#111318');
+                ctx.fillStyle = cardGradient;
                 ctx.fill();
-                
-                // Limpiar sombra para los siguientes elementos
-                ctx.shadowColor = 'transparent'; 
+
+                // Limpiar sombras para el resto de elementos
+                ctx.shadowColor = 'transparent';
                 ctx.shadowBlur = 0;
                 ctx.shadowOffsetY = 0;
 
@@ -772,105 +785,89 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
                 ctx.fill();
                 
                 ctx.fillStyle = isRealCapi ? '#000000' : '#ffffff';
-                ctx.font = 'bold 16px Montserrat';
-                ctx.fillText(isRealCapi ? '👑 CAPITÁN' : 'ATLETA', pos.cx, startY);
+                ctx.font = 'bold 15px Montserrat';
+                ctx.fillText(roleText, pos.cx, startY);
 
-                // E. Foto del jugador
+                // E. Foto del jugador (Tamaño fijo para todos: 160x160)
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.src = player.foto || 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
                 
                 await new Promise((resolve) => {
-                    img.onload = () => {
-                        const imgRadius = isRealCapi ? 85 : 75;
-                        const imgY = startY + 110;
+                    const imgRadius = 80;
+                    const imgY = startY + 120;
 
+                    img.onload = () => {
                         ctx.save();
                         ctx.beginPath();
                         ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI * 2);
                         ctx.closePath();
                         
-                        // Borde de la foto
                         ctx.lineWidth = 4;
                         ctx.strokeStyle = themeColor;
                         ctx.stroke();
                         
                         ctx.clip();
-                        // Dibujar imagen centrada
                         ctx.drawImage(img, pos.cx - imgRadius, imgY - imgRadius, imgRadius*2, imgRadius*2);
                         ctx.restore();
                         resolve();
                     };
                     img.onerror = () => {
-                        // Fallback si la imagen falla
                         ctx.fillStyle = '#333';
                         ctx.beginPath();
-                        ctx.arc(pos.cx, startY + 110, isRealCapi ? 85 : 75, 0, Math.PI*2);
+                        ctx.arc(pos.cx, imgY, imgRadius, 0, Math.PI*2);
                         ctx.fill();
                         resolve();
                     };
                 });
 
-                // F. Textos (Nombre y Apellido)
+                // F. Textos (Nombre, Apellidos, Categoría)
                 ctx.fillStyle = '#ffffff';
-                ctx.font = `900 ${isRealCapi ? '28px' : '24px'} Montserrat`;
-                ctx.fillText(player.nombre.toUpperCase(), pos.cx, startY + (isRealCapi ? 230 : 215));
+                ctx.font = '900 24px Montserrat';
+                ctx.fillText(player.nombre.toUpperCase(), pos.cx, startY + 245);
 
                 ctx.fillStyle = '#aaaaaa';
                 ctx.font = '600 18px Montserrat';
-                ctx.fillText((player.apellidos || '').toUpperCase(), pos.cx, startY + (isRealCapi ? 260 : 245));
+                ctx.fillText((player.apellidos || '').toUpperCase(), pos.cx, startY + 275);
 
                 ctx.fillStyle = '#777777';
-                ctx.font = '16px Montserrat';
-                ctx.fillText(player.categoria || 'Atleta', pos.cx, startY + (isRealCapi ? 290 : 275));
+                ctx.font = '15px Montserrat';
+                ctx.fillText(player.categoria || 'Atleta', pos.cx, startY + 305);
 
                 // G. Precio (Pill inferior)
-                const priceWidth = 120;
-                drawRoundRect(ctx, pos.cx - priceWidth/2, startY + pos.h - 50, priceWidth, 40, 10);
+                const priceWidth = 130;
+                drawRoundRect(ctx, pos.cx - priceWidth/2, startY + cardH - 55, priceWidth, 45, 12);
                 ctx.fillStyle = '#22262e';
                 ctx.fill();
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = '#333b47';
                 ctx.stroke();
 
-                ctx.fillStyle = '#4cd137'; // Verde brillante para el dinero
-                ctx.font = 'bold 20px Montserrat';
-                ctx.fillText(`${player.precio} M`, pos.cx, startY + pos.h - 30);
+                ctx.fillStyle = '#4cd137'; // Verde brillante
+                ctx.font = 'bold 22px Montserrat';
+                ctx.fillText(`${player.precio} M`, pos.cx, startY + cardH - 32);
             }
         }
 
-        // 5. FOOTER INFO (Presupuesto)
+        // 5. FOOTER INFO (Solo Valor del equipo, centrado)
         const currentTeamCost = teamSlots.reduce((sum, p) => sum + (p ? p.precio : 0), 0);
-        const currentBudget = totalPatrimony - currentTeamCost;
 
-        // Panel inferior de presupuesto
-        drawRoundRect(ctx, 100, 1180, 880, 100, 20);
+        // Panel inferior limpio
+        drawRoundRect(ctx, 140, 1190, 800, 90, 20);
         ctx.fillStyle = '#1a1d24';
         ctx.fill();
-        ctx.strokeStyle = '#333b47';
+        ctx.strokeStyle = 'rgba(255, 94, 0, 0.4)'; 
+        ctx.lineWidth = 2;
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 24px Montserrat';
-        ctx.textAlign = 'left';
-        ctx.fillText('VALOR DEL EQUIPO:', 150, 1230);
-        
-        ctx.fillStyle = '#ff5e00';
-        ctx.textAlign = 'right';
-        ctx.fillText(`${currentTeamCost} M`, 450, 1230);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'left';
-        ctx.fillText('PRESUPUESTO RESTANTE:', 550, 1230);
-
-        ctx.fillStyle = '#4cd137';
-        ctx.textAlign = 'right';
-        ctx.fillText(`${Math.round(currentBudget)} M`, 930, 1230);
+        ctx.font = 'bold 26px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.fillText(`🔥 VALOR TOTAL:  ${currentTeamCost} M`, 540, 1235);
 
         // Marca de agua
-        ctx.fillStyle = '#555555';
-        ctx.font = '600 16px Montserrat';
-        ctx.textAlign = 'center';
+        ctx.fillStyle = '#666666';
+        ctx.font = '500 15px Montserrat';
         ctx.fillText(`Fantasy Orcasitas | ${new Date().toLocaleDateString('es-ES')}`, 540, 1320);
 
         // 6. COMPARTIR O DESCARGAR
@@ -878,7 +875,7 @@ if (closeBtn) closeBtn.addEventListener('click', () => {
             try {
                 const shareData = {
                     title: 'Mi Equipo Fantasy',
-                    text: `🔥 ¡Echa un vistazo a mi equipo en Fantasy Orcasitas!\n\nValor: ${currentTeamCost}M\nPresupuesto restante: ${Math.round(currentBudget)}M`,
+                    text: `🔥 ¡Echa un vistazo a mi equipo en Fantasy Orcasitas!\n\nValor Total: ${currentTeamCost}M`,
                     files: [new File([blob], 'mi-equipo.png', { type: 'image/png' })]
                 };
 
