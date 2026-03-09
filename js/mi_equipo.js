@@ -25,29 +25,34 @@ let isMarketClosed = false;
 // --- 1. COMPROBAR MERCADO (LÓGICA CORREGIDA) ---
 function checkMarketStatus() {
     const now = new Date();
-    const day = now.getDay(); // 0=Domingo, 1=Lunes, 2=Martes... 6=Sábado
+    const day = now.getDay();
     const hour = now.getHours();
-
-    // BLOQUEO:
-    // Sábado (6), Domingo (0), Lunes (1) -> CERRADO TODO EL DÍA
-    // Martes (2) -> CERRADO ANTES DE LAS 10:00 (hour < 10)
+    
+    console.log(`Hoy es día: ${day}, Hora: ${hour}`);  // ← AÑADE ESTO
     
     if (day === 6 || day === 0 || day === 1 || day === 2) {
         isMarketClosed = true;
+        console.log("Mercado CERRADO por día");  // ← AÑADE ESTO
         
-        // Bloqueo Visual (Overlay)
         const overlay = document.getElementById('marketClosedMsg');
+        console.log("Overlay encontrado:", !!overlay);  // ← AÑADE ESTO
+        
         if(overlay) overlay.style.display = 'flex';
-
-        // Bloqueo Botón Guardar
+        
         const btn = document.getElementById('btnSaveTeam');
+        console.log("Botón encontrado:", !!btn);  // ← AÑADE ESTO
+        
         if(btn) {
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-lock"></i> CERRADO';
             btn.style.backgroundColor = "#333";
         }
-        return false; // Mercado Cerrado
+        return false;
     }
+    
+    isMarketClosed = false;
+    return true;
+}
 
     // SI NO ES NINGUNO DE ESOS DÍAS/HORAS -> ABIERTO
     isMarketClosed = false;
