@@ -32,7 +32,7 @@ function checkMarketStatus() {
     // Sábado (6), Domingo (0), Lunes (1) -> CERRADO TODO EL DÍA
     // Martes (2) -> CERRADO ANTES DE LAS 10:00 (hour < 10)
     
-    if (day === 6 || day === 0 || (day === 1 && hour < 20)) {
+    if (day === 6 || day === 0 || day === 1 || day === 2) {
         isMarketClosed = true;
         
         // Bloqueo Visual (Overlay)
